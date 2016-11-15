@@ -14,6 +14,7 @@ var helmet     = require('helmet');
 var compress   = require('compression');
 var hljs       = require('highlight.js');
 var Remarkable = require('remarkable');
+var message    = require('./message');
 
 var md = new Remarkable({
     highlight: function(str, lang) {
@@ -28,7 +29,6 @@ var md = new Remarkable({
         return '';
     }
 });
-
 
 var NINETY_DAYS_IN_MILLISECONDS = 7776000000;
 
@@ -74,5 +74,6 @@ app.get('/', function(req, res) {
         res.status(412).end();
     }
 });
+app.use('/message', message);
 
 module.exports = app;
