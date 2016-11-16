@@ -2,6 +2,7 @@ var _        = require('lodash');
 var lunr     = require('lunr');
 var Xray     = require('x-ray');
 var Bluebird = require('bluebird');
+var request  = require('request-promise');
 
 var NPC_DOMAIN = 'http://www.public.navy.mil';
 
@@ -37,6 +38,7 @@ function parseMessageid(val) {
         .toLowerCase();
     var year = val.substring(type.length, type.length + 2);
     var num = val.substr(-3);
+    return {type, year, num};
 }
 
 function isValidMessageId(val) {
@@ -54,9 +56,18 @@ function getMessageData(year, domain) {
         .map(parseMessageUri);
 }
 
+function getMessage(options) {
+    var year = _.get(options, 'year', '16');
+    return getMessageData(year)
+        .then(data => _.find(data, _.pick(options, 'num', 'year')))
+        .get('url')
+        .then(request);
+}
+
 module.exports = {
     createMessageId:  createMessageId,
     parseMessageid:   parseMessageid,
     isValidMessageId: isValidMessageId,
-    getMessageData:   getMessageData
+    getMessageData:   getMessageData,
+    getMessage:       getMessage
 };
