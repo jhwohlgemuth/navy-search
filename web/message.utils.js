@@ -13,8 +13,9 @@ var MSG_TYPE_DICT = {
 function parseMessageUri(data) {
     var messageId = _.head(data.split('/').slice(-1));
     var msgType   = _.takeWhile(messageId, _.flowRight(isNaN, Number)).join('');
-    var msgYear   = _.head(messageId.split('.')).substring(msgType.length, msgType.length + 2);
-    var msgNumber = _.head(messageId.split('.')).substring(msgType.length + 2);
+    var msgTypeLength = msgType.length;
+    var msgYear   = _.head(messageId.split('.')).substring(msgTypeLength, msgTypeLength + 2);
+    var msgNumber = _.head(messageId.split('.')).substring(msgTypeLength + 2);
     var extension = _.last(data.split('.'));
     return {
         type: msgType,
