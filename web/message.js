@@ -1,6 +1,7 @@
 var _       = require('lodash');
 var bunyan  = require('bunyan');
 var express = require('express');
+var utils   = require('./message.utils');
 var router  = express.Router();
 
 var log = bunyan.createLogger({
@@ -50,7 +51,10 @@ router.get('/:id', [isValid, parse], function(req, res) {
 });
 
 router.get('/navadmin/:year/:number', function(req, res) {
-    res.json({type: 'navadmin'});
+    var year = req.params.year;
+    utils.getMessageList(year).then(function(data) {
+        res.json(data);
+    });
 });
 
 
