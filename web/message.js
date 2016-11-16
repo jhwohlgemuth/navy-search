@@ -1,6 +1,7 @@
 var _       = require('lodash');
 var bunyan  = require('bunyan');
 var express = require('express');
+var request = require('request-promise');
 var utils   = require('./message.utils');
 var router  = express.Router();
 
@@ -18,9 +19,8 @@ var log = bunyan.createLogger({
 });
 
 function isValid(req, res, next) {
-    var MESSAGE_ID_REGEX = /^[a-z]{5,8}\d{5}$/gmi;
-    var id = req.params.id;
-    if (id && MESSAGE_ID_REGEX.test(id)) {
+    var val = req.params.id;
+    if (val && utils.isValidMessageId(val)) {
         next();
     } else {
         res.json({error: 'Invalid Message ID'})
@@ -46,15 +46,17 @@ function parse(req, res, next) {
 }
 
 router.get('/:id', [isValid, parse], function(req, res) {
-    log.info(res.locals.type);
     res.json({type: 'navadmin'});
 });
 
 router.get('/navadmin/:year/:number', function(req, res) {
     var year = req.params.year;
-    utils.getMessageList(year).then(function(data) {
-        res.json(data);
-    });
+    var num  = req.params.number;
+    utils.getMessageData(year)
+        .then(data => _.find(data, {num, year}))
+        .get('url')
+        .then(request)
+        .then(message => res.send(message));
 });
 
 
