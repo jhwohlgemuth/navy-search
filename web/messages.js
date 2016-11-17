@@ -19,7 +19,7 @@ var log = bunyan.createLogger({
 
 router.get('/navadmin/:year', function(req, res) {
     var year = req.params.year;
-    utils.getMessageData(year).then(
+    utils.scrapeMessageData(year).then(
         data => res.send(data)
     );
 });

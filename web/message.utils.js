@@ -46,7 +46,7 @@ function isValidMessageId(val) {
     return MESSAGE_ID_REGEX.test(val);
 }
 
-function getMessageData(year, domain) {
+function scrapeMessageData(year, domain) {
     year = (String(year).length === 4) ? Number(year.substr(-2)) : year;
     var url = `${domain || NPC_DOMAIN}/bupers-npc/reference/messages/NAVADMINS/Pages/NAVADMIN20${year}.aspx`;
     return  Bluebird.promisify((new Xray())(url, 'a', [{href: '@href'}]))(url)
@@ -58,16 +58,16 @@ function getMessageData(year, domain) {
 
 function getMessage(options) {
     var year = _.get(options, 'year', '16');
-    return getMessageData(year)
+    return scrapeMessageData(year)
         .then(data => _.find(data, _.pick(options, 'num', 'year')))
         .get('url')
         .then(request);
 }
 
 module.exports = {
-    createMessageId:  createMessageId,
-    parseMessageid:   parseMessageid,
-    isValidMessageId: isValidMessageId,
-    getMessageData:   getMessageData,
-    getMessage:       getMessage
+    createMessageId:   createMessageId,
+    parseMessageid:    parseMessageid,
+    isValidMessageId:  isValidMessageId,
+    scrapeMessageData: scrapeMessageData,
+    getMessage:        getMessage
 };
