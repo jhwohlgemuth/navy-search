@@ -1,12 +1,11 @@
 var _       = require('lodash');
 var bunyan  = require('bunyan');
 var express = require('express');
-var request = require('request-promise');
 var utils   = require('./message.utils');
 var router  = express.Router();
 
 var log = bunyan.createLogger({
-    name: 'navy-search',
+    name: 'message',
     streams: [
         {
             stream: process.stdout
@@ -45,6 +44,5 @@ router.get('/navadmin/:year/:number', function(req, res) {
         message => res.send(message)
     );
 });
-
 
 module.exports = router;

@@ -15,6 +15,9 @@ var compress   = require('compression');
 var hljs       = require('highlight.js');
 var Remarkable = require('remarkable');
 var message    = require('./message');
+var messages   = require('./messages');
+
+var VERSION = 'v' + process.env.VERSION;
 
 var md = new Remarkable({
     highlight: function(str, lang) {
@@ -74,6 +77,7 @@ app.get('/', function(req, res) {
         res.status(412).end();
     }
 });
-app.use('/message', message);
+app.use(`/${VERSION}/message`, message);
+app.use(`/${VERSION}/messages`, messages);
 
 module.exports = app;
