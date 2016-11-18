@@ -69,11 +69,9 @@ var app = express()
         includeSubdomains: true
     }))
     .use(compress())                        /** Use gzip compression **/
-    .use(express.static(__dirname))         /** Serve static files **/
-    .use(express.static('docs'));
+    .use(express.static(__dirname));        /** Serve static files **/
 app.get('/', function(req, res) {
     if (res.get('X-CSRF') === req.sessionID) {
-        console.log('Boot!');
         res.redirect('client/docs/index.html');
     } else {
         res.status(412).end();

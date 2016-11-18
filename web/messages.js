@@ -18,8 +18,8 @@ var log = bunyan.createLogger({
 });
 
 /**
- * @api {get} /messages/:year Get messages data for a given year
- * @apiGroup NAVADMIN Messages
+ * @api {get} /messages/navadmin/:year Get messages data for a given year
+ * @apiGroup NAVADMIN
  * @apiVersion 1.0.0
  * @apiDescription Gets a list of message data for a given year
  * @apiSampleRequest /messages/navadmin/16
