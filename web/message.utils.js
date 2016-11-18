@@ -7,7 +7,8 @@ var request  = require('request-promise');
 var NPC_DOMAIN = 'http://www.public.navy.mil';
 
 var MSG_TYPE_DICT = {
-    NAV: 'NAVADMIN'
+    NAV: 'NAVADMIN',
+    ALN: 'ALNAV'
 };
 
 function parseMessageUri(data) {

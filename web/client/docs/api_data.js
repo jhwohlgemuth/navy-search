@@ -1,6 +1,49 @@
 define({ "api": [
   {
     "type": "get",
+    "url": "/message",
+    "title": "Get message",
+    "group": "Message",
+    "version": "1.0.0",
+    "description": "<p>Gets a single message via attribute query</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "type",
+            "description": "<p>NAV (NAVADMIN) or ALN (ALNAV)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "year",
+            "description": "<p>Two character year (15, 16, etc...)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "num",
+            "description": "<p>Three character message number (004, 052, 213, etc...)</p>"
+          }
+        ]
+      }
+    },
+    "sampleRequest": [
+      {
+        "url": "https://usn.herokuapp.com/v1/message"
+      }
+    ],
+    "filename": "web/message.js",
+    "groupTitle": "Message",
+    "name": "GetMessage"
+  },
+  {
+    "type": "get",
     "url": "/message/:id",
     "title": "Get message from ID",
     "group": "Message",

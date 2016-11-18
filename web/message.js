@@ -30,7 +30,22 @@ function parseMessageDetails(req, res, next) {
     res.locals.msgDetails = utils.parseMessageid(req.params.id);
     next();
 }
-
+/**
+ * @api {get} /message Get message
+ * @apiGroup Message
+ * @apiVersion 1.0.0
+ * @apiDescription Gets a single message via attribute query
+ * @apiParam {string} type NAV (NAVADMIN) or ALN (ALNAV)
+ * @apiParam {string} year Two character year (15, 16, etc...)
+ * @apiParam {string} num Three character message number (004, 052, 213, etc...)
+ * @apiSampleRequest /message
+**/
+router.get('/', function(req, res) {
+    var options = _.pick(req.query, 'year', 'num');
+    utils.getMessage(options).then(
+        message => res.send(message)
+    );
+});
 /**
  * @api {get} /message/:id Get message from ID
  * @apiGroup Message
@@ -44,7 +59,6 @@ router.get('/:id', [isValid, parseMessageDetails], function(req, res) {
         message => res.send(message)
     );
 });
-
 /**
  * @api {get} /message/navadmin/:year/:number Get message from year and number
  * @apiGroup NAVADMIN
