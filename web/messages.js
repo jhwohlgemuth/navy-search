@@ -19,10 +19,10 @@ var log = bunyan.createLogger({
 
 /**
  * @api {get} /messages/:year Get messages data for a given year
- * @apiGroup Messages
+ * @apiGroup NAVADMIN Messages
  * @apiVersion 1.0.0
  * @apiDescription Gets a list of message data for a given year
- * @apiSampleRequest /messages/16
+ * @apiSampleRequest /messages/navadmin/16
 **/
 router.get('/navadmin/:year', function(req, res) {
     var year = req.params.year;

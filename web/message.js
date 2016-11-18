@@ -33,7 +33,7 @@ function parseMessageDetails(req, res, next) {
 
 /**
  * @api {get} /message/:id Get message from ID
- * @apiGroup Message
+ * @apiGroup NAVADMIN Message
  * @apiVersion 1.0.0
  * @apiDescription Gets a single message based on message ID
  * @apiSampleRequest /message/navadmin16123
@@ -47,7 +47,7 @@ router.get('/:id', [isValid, parseMessageDetails], function(req, res) {
 
 /**
  * @api {get} /message/navadmin/:year/:number Get message from year and number
- * @apiGroup Message
+ * @apiGroup NAVADMIN Message
  * @apiVersion 1.0.0
  * @apiDescription Gets a single message based on message year and number
  * @apiSampleRequest /message/navadmin/15/213
