@@ -41,12 +41,19 @@
     "x-ray": "^2.3.1"
   },
   "devDependencies": {
+    "apidoc": "^0.16.1",
     "nodemon": "^1.8.1"
   },
   "scripts": {
     "scan": "nsp check",
     "prestart": "npm run scan",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "docs": "apidoc -i ./web -o ./web/client/docs"
+  },
+  "apidoc": {
+    "title": "Navy Search RESTful API",
+    "url": "https://usn.herokuapp.com/v1",
+    "sampleUrl": "https://usn.herokuapp.com/v1"
   }
 }

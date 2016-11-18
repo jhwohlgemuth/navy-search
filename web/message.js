@@ -31,6 +31,13 @@ function parseMessageDetails(req, res, next) {
     next();
 }
 
+/**
+ * @api {get} /message/:id Get message from ID
+ * @apiGroup Message
+ * @apiVersion 1.0.0
+ * @apiDescription Gets a single message based on message ID
+ * @apiSampleRequest /message/navadmin16123
+**/
 router.get('/:id', [isValid, parseMessageDetails], function(req, res) {
     var options = _.pick(res.locals.msgDetails, 'year', 'num');
     utils.getMessage(options).then(
@@ -38,7 +45,14 @@ router.get('/:id', [isValid, parseMessageDetails], function(req, res) {
     );
 });
 
-router.get('/navadmin/:year/:number', function(req, res) {
+/**
+ * @api {get} /message/navadmin/:year/:number Get message from year and number
+ * @apiGroup Message
+ * @apiVersion 1.0.0
+ * @apiDescription Gets a single message based on message year and number
+ * @apiSampleRequest /message/navadmin/15/213
+**/
+router.get('/navadmin/:year/:num', function(req, res) {
     var options = _.pick(req.params, 'year', 'num');
     utils.getMessage(options).then(
         message => res.send(message)
