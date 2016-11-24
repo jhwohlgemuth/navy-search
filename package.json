@@ -42,6 +42,9 @@
   },
   "devDependencies": {
     "apidoc": "^0.16.1",
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "mocha": "^3.1.2",
     "nodemon": "^1.8.1"
   },
   "scripts": {
@@ -49,7 +52,8 @@
     "prestart": "npm run scan",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "docs": "apidoc -i ./web -o ./web/client/docs"
+    "docs": "apidoc -i ./web -o ./web/client/docs",
+    "test": "mocha"
   },
   "apidoc": {
     "name": "Navy Search API",
