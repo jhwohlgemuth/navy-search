@@ -62,8 +62,11 @@ function getMessage(options) {
 }
 
 module.exports = {
+    parse: {
+        messageId:  parseMessageId,
+        messageUri: parseMessageUri
+    },
     createMessageId:   createMessageId,
-    parseMessageId:    parseMessageId,
     isValidMessageId:  isValidMessageId,
     scrapeMessageData: scrapeMessageData,
     getMessage:        getMessage

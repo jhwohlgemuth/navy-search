@@ -17,8 +17,6 @@ var Remarkable = require('remarkable');
 var message    = require('./message');
 var messages   = require('./messages');
 
-var VERSION = 'v' + process.env.VERSION;
-
 var md = new Remarkable({
     highlight: function(str, lang) {
         if (lang && hljs.getLanguage(lang)) {
@@ -48,6 +46,7 @@ var app = express()
               }
         });
     })
+    .set('version', process.env.VERSION)
     .set('view engine', 'html')
     .set('views', __dirname + '/client')
     .use(session(config.get('session')))
@@ -77,7 +76,8 @@ app.get('/', function(req, res) {
         res.status(412).end();
     }
 });
-app.use(`/${VERSION}/message`, message);
-app.use(`/${VERSION}/messages`, messages);
+var VERSION = app.get('version');
+app.use(`/v${VERSION}/message`, message);
+app.use(`/v${VERSION}/messages`, messages);
 
 module.exports = app;

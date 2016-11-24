@@ -27,7 +27,7 @@ function isValid(req, res, next) {
 }
 
 function parseMessageDetails(req, res, next) {
-    res.locals.msgDetails = utils.parseMessageId(req.params.id);
+    res.locals.msgDetails = utils.parse.messageId(req.params.id);
     next();
 }
 /**
@@ -42,6 +42,7 @@ function parseMessageDetails(req, res, next) {
 **/
 router.get('/', function(req, res) {
     var options = _.pick(req.query, 'year', 'num');
+    res.type('text/plain');
     utils.getMessage(options).then(
         message => res.send(message)
     );
@@ -55,6 +56,7 @@ router.get('/', function(req, res) {
 **/
 router.get('/:id', [isValid, parseMessageDetails], function(req, res) {
     var options = _.pick(res.locals.msgDetails, 'year', 'num');
+    res.type('text/plain');
     utils.getMessage(options).then(
         message => res.send(message)
     );
@@ -68,6 +70,7 @@ router.get('/:id', [isValid, parseMessageDetails], function(req, res) {
 **/
 router.get('/navadmin/:year/:num', function(req, res) {
     var options = _.pick(req.params, 'year', 'num');
+    res.type('text/plain');
     utils.getMessage(options).then(
         message => res.send(message)
     );
