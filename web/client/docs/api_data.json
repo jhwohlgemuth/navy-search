@@ -14,7 +14,7 @@
             "type": "string",
             "optional": false,
             "field": "type",
-            "description": "<p>NAV (NAVADMIN) or ALN (ALNAV)</p>"
+            "description": "<p>NAVADMIN, ALNAV, etc...</p>"
           },
           {
             "group": "Parameter",
@@ -35,7 +35,7 @@
     },
     "sampleRequest": [
       {
-        "url": "https://usn.herokuapp.com/v1/message"
+        "url": "https://usn.herokuapp.com/v1.0/message"
       }
     ],
     "filename": "web/message.js",
@@ -51,7 +51,7 @@
     "description": "<p>Gets a single message based on message ID</p>",
     "sampleRequest": [
       {
-        "url": "https://usn.herokuapp.com/v1/message/navadmin16123"
+        "url": "https://usn.herokuapp.com/v1.0/message/navadmin16123"
       }
     ],
     "filename": "web/message.js",
@@ -67,7 +67,7 @@
     "description": "<p>Gets a single message based on message year and number</p>",
     "sampleRequest": [
       {
-        "url": "https://usn.herokuapp.com/v1/message/navadmin/15/213"
+        "url": "https://usn.herokuapp.com/v1.0/message/navadmin/15/213"
       }
     ],
     "filename": "web/message.js",
@@ -83,7 +83,7 @@
     "description": "<p>Gets a list of message data for a given year</p>",
     "sampleRequest": [
       {
-        "url": "https://usn.herokuapp.com/v1/messages/navadmin/16"
+        "url": "https://usn.herokuapp.com/v1.0/messages/navadmin/16"
       }
     ],
     "filename": "web/messages.js",
