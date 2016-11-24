@@ -27,7 +27,7 @@ function isValid(req, res, next) {
 }
 
 function parseMessageDetails(req, res, next) {
-    res.locals.msgDetails = utils.parseMessageid(req.params.id);
+    res.locals.msgDetails = utils.parseMessageId(req.params.id);
     next();
 }
 /**
