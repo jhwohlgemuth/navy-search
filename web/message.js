@@ -35,7 +35,7 @@ function parseMessageDetails(req, res, next) {
  * @apiGroup Message
  * @apiVersion 1.0.0
  * @apiDescription Gets a single message via attribute query
- * @apiParam {string} type NAVADMIN, ALNAV, etc...
+ * @apiParam {string} type NAVADMIN or ALNAV
  * @apiParam {string} year Two character year (15, 16, etc...)
  * @apiParam {string} num Three character message number (004, 052, 213, etc...)
  * @apiSampleRequest /message

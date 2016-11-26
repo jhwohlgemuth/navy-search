@@ -46,7 +46,7 @@
             "type": "string",
             "optional": false,
             "field": "type",
-            "description": "<p>NAVADMIN, ALNAV, etc...</p>"
+            "description": "<p>NAVADMIN or ALNAV</p>"
           },
           {
             "group": "Parameter",
