@@ -12,12 +12,12 @@ var MSG_TYPE = {
 };
 
 function parseMessageUri(data) {
-    var messageId  = _.head(_.head(data.split('/').slice(-1)).split('.'));
-    var ext  = _.last(data.split('.'));
-    var code    = _.takeWhile(messageId, _.flowRight(isNaN, Number)).join('');
+    var messageId = _.head(_.head(data.split('/').slice(-1)).split('.'));
+    var ext = _.last(data.split('.'));
+    var code = _.takeWhile(messageId, _.flowRight(isNaN, Number)).join('');
     var codeLength = code.length;
-    var year    = messageId.substring(codeLength, codeLength + 2);
-    var num  = messageId.substring(codeLength + 2);
+    var year = messageId.substring(codeLength, codeLength + 2);
+    var num = messageId.substring(codeLength + 2);
     var type = MSG_TYPE[code];
     var url = `${NPC_DOMAIN}${data}`;
     var id = createMessageId(type, year, num);
@@ -43,9 +43,9 @@ function isValidMessageId(val) {
     return MESSAGE_ID_REGEX.test(val);
 }
 
-function scrapeMessageData(year, domain) {
+function scrapeMessageData(type, year, options) {
     year = (String(year).length === 4) ? Number(year.substr(-2)) : year;
-    var url = `${domain || NPC_DOMAIN}/bupers-npc/reference/messages/NAVADMINS/Pages/NAVADMIN20${year}.aspx`;
+    var url = `${_.get(options, 'domain', NPC_DOMAIN)}/bupers-npc/reference/messages/${type}S/Pages/${type}20${year}.aspx`;
     return  Bluebird.promisify((new Xray())(url, 'a', [{href: '@href'}]))(url)
         .map(val => val.href)
         .filter(str => /[.]txt$/.test(str))
@@ -54,8 +54,9 @@ function scrapeMessageData(year, domain) {
 }
 
 function getMessage(options) {
+    var type = _.get(options, 'type', 'NAVADMIN');
     var year = _.get(options, 'year', '16');
-    return scrapeMessageData(year)
+    return scrapeMessageData(type, year)
         .then(data => _.find(data, _.pick(options, 'num', 'year')))
         .get('url')
         .then(request);
