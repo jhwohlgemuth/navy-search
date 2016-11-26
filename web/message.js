@@ -17,22 +17,56 @@ var log = bunyan.createLogger({
     ]
 });
 
-function isValid(req, res, next) {
-    var val = req.params.id;
-    if (val && utils.isValidMessageId(val)) {
+function isValidMessageId(req, res, next) {
+    if (utils.isValidMessageId(_.get(req, 'params.id', ''))) {
         next();
     } else {
-        res.json({error: 'Invalid Message ID'})
+        var errorResponse = {
+            errors: [{
+                title: 'Invalid Message ID',
+                code: 'INVALID_MESSAGE_ID',
+                description: 'Message ID must include type, year, and number. Message ID format is "(NAVADMIN|ALNAV)YY###"'
+            }]
+        };
+        log.error(errorResponse);
+        res.status(400);
+        res.json(errorResponse);
     }
 }
 
+function isValidYear(val) {
+    var FORMAT = 'YY';
+    var len = FORMAT.length;
+    var valLen = val.length;
+    var year = String(new Date().getFullYear()).substring(valLen);
+    return (valLen === len) && (Number(val) <= Number(year));
+}
+
+function isValidNum(val) {
+    return val.length === 3;
+}
+
 function hasValidParameters(req, res, next) {
-    var year = _.get(req, 'params.year', '');
-    var num = _.get(req, 'params.num', '');
-    if ((year.length === 2) && (num.length === 3)) {
+    var validYear = isValidYear(_.get(req, 'params.year', ''));
+    var validNum = isValidNum(_.get(req, 'params.num', ''));
+    if (validYear && validNum) {
         next();
     } else {
-        res.json({error: 'Invalid Message Parameters'})
+        var errorResponse = {errors: []};
+        errorResponse.errors = []
+            .concat(validYear ? [] : {
+                title: 'Invalid Message "year" Parameter',
+                code: 'INVALID_MESSAGE_YEAR',
+                description: 'Message year must be a present or past date in "YY" format'
+            })
+            .concat(validNum  ? [] : {
+                title: 'Invalid Message "num" Parameter',
+                code: 'INVALID_MESSAGE_NUM',
+                description: 'Message number must be in "###" format (ex: "2" --> "002")'
+            });
+        log.error(errorResponse);
+        res.status(400);
+        res.json(errorResponse);
     }
 }
 
@@ -66,7 +100,7 @@ router.get('/', function(req, res) {
  * @apiDescription Gets a single message based on message ID
  * @apiSampleRequest /message/NAVADMIN16123
 **/
-router.get('/:id', [isValid, parseMessageDetails], function(req, res) {
+router.get('/:id', [isValidMessageId, parseMessageDetails], function(req, res) {
     var options = _.pick(res.locals.msgDetails, 'type', 'year', 'num');
     res.type('text/plain');
     utils.getMessage(options).then(
