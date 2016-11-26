@@ -1,0 +1,12 @@
+{
+  "name": "Navy Search API",
+  "title": "Navy Search API",
+  "description": "\"The Search API for those that Serve\"",
+  "order": [
+    "Message",
+    "NAVADMIN",
+    "ALNAV"
+  ],
+  "url": "https://usn.herokuapp.com/v1.0",
+  "sampleUrl": "https://usn.herokuapp.com/v1.0"
+}

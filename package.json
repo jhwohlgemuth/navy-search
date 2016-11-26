@@ -55,12 +55,5 @@
     "docs": "apidoc -i ./web -o ./web/client/docs",
     "test": "mocha test/ -R mocha-unfunk-reporter",
     "test:watch": "npm test -- -w"
-  },
-  "apidoc": {
-    "name": "Navy Search API",
-    "title": "Navy Search API",
-    "description": "\"The Search API for those that Serve\"",
-    "url": "https://usn.herokuapp.com/v1.0",
-    "sampleUrl": "https://usn.herokuapp.com/v1.0"
   }
 }
