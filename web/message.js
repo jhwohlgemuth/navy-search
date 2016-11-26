@@ -26,6 +26,16 @@ function isValid(req, res, next) {
     }
 }
 
+function hasValidParameters(req, res, next) {
+    var year = _.get(req, 'params.year', '');
+    var num = _.get(req, 'params.num', '');
+    if ((year.length === 2) && (num.length === 3)) {
+        next();
+    } else {
+        res.json({error: 'Invalid Message Parameters'})
+    }
+}
+
 function parseMessageDetails(req, res, next) {
     res.locals.msgDetails = utils.parse.messageId(req.params.id);
     next();
@@ -70,7 +80,7 @@ router.get('/:id', [isValid, parseMessageDetails], function(req, res) {
  * @apiDescription Gets a single message based on message year and number
  * @apiSampleRequest /message/NAVADMIN/15/213
 **/
-router.get('/NAVADMIN/:year/:num', function(req, res) {
+router.get('/NAVADMIN/:year/:num', [hasValidParameters], function(req, res) {
     var options = _.pick(req.params, 'year', 'num');
     res.type('text/plain');
     utils.getMessage(_.extend(options, {type: 'NAVADMIN'})).then(
@@ -84,7 +94,7 @@ router.get('/NAVADMIN/:year/:num', function(req, res) {
  * @apiDescription Gets a single message based on message year and number
  * @apiSampleRequest /message/ALNAV/16/042
 **/
-router.get('/ALNAV/:year/:num', function(req, res) {
+router.get('/ALNAV/:year/:num', [hasValidParameters], function(req, res) {
     var options = _.pick(req.params, 'year', 'num');
     res.type('text/plain');
     utils.getMessage(_.extend(options, {type: 'ALNAV'})).then(
