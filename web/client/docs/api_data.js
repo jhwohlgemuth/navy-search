@@ -44,27 +44,40 @@ define({ "api": [
           {
             "group": "Parameter",
             "type": "string",
+            "allowedValues": [
+              "\"NAVADMIN\"",
+              "\"ALNAV\""
+            ],
             "optional": false,
             "field": "type",
-            "description": "<p>NAVADMIN or ALNAV</p>"
+            "description": "<p>Message type</p>"
           },
           {
             "group": "Parameter",
             "type": "string",
+            "size": "2",
             "optional": false,
             "field": "year",
-            "description": "<p>Two character year (15, 16, etc...)</p>"
+            "description": "<p>Year in YY format (15, 16, etc...)</p>"
           },
           {
             "group": "Parameter",
             "type": "string",
+            "size": "3",
             "optional": false,
             "field": "num",
-            "description": "<p>Three character message number (004, 052, 213, etc...)</p>"
+            "description": "<p>Message number (004, 052, 213, etc...)</p>"
           }
         ]
       }
     },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "curl -i https://api.navysearch.org/v1.0/message?type=NAVADMIN&year=16&num=042",
+        "type": "json"
+      }
+    ],
     "sampleRequest": [
       {
         "url": "https://usn.herokuapp.com/v1.0/message"
