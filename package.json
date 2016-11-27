@@ -48,12 +48,14 @@
   "devDependencies": {
     "apidoc": "^0.16.1",
     "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
     "coveralls": "^2.11.15",
     "istanbul": "^0.4.5",
     "mocha": "^3.1.2",
     "mocha-lcov-reporter": "^1.2.0",
     "mocha-unfunk-reporter": "^0.4.0",
-    "nodemon": "^1.8.1"
+    "nodemon": "^1.8.1",
+    "supertest": "^2.0.1"
   },
   "scripts": {
     "scan": "nsp check",
