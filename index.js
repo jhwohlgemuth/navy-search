@@ -1,5 +1,6 @@
 'use strict';
 
+require('opbeat').start();
 require('dotenv').config();
 
 var config = require('config');

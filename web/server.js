@@ -69,7 +69,8 @@ var app = express()
         includeSubdomains: true
     }))
     .use(compress())                        /** Use gzip compression **/
-    .use(express.static(__dirname));        /** Serve static files **/
+    .use(express.static(__dirname))         /** Serve static files **/
+    .use(require('opbeat').middleware.express());
 app.get('/', function(req, res) {
     if (res.get('X-CSRF') === req.sessionID) {
         res.redirect('client/docs/index.html');
