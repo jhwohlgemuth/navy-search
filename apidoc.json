@@ -1,7 +1,7 @@
 {
   "name": "Navy Search API",
   "title": "Navy Search API",
-  "description": "\"The Search API for those that Serve\"",
+  "description": "\"Search for those that Serve\"",
   "order": [
     "Message",
     "NAVADMIN",

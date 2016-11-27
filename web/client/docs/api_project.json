@@ -1,7 +1,7 @@
 {
   "name": "Navy Search API",
   "version": "1.0.0",
-  "description": "\"The Search API for those that Serve\"",
+  "description": "\"Search for those that Serve\"",
   "title": "Navy Search API",
   "order": [
     "Message",
@@ -13,7 +13,7 @@
   "apidoc": "0.2.0",
   "generator": {
     "name": "apidoc",
-    "time": "2016-11-26T02:55:59.373Z",
+    "time": "2016-11-27T23:08:58.409Z",
     "url": "http://apidocjs.com",
     "version": "0.16.1"
   }
