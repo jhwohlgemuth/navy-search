@@ -14,7 +14,7 @@ var helmet     = require('helmet');
 var compress   = require('compression');
 var hljs       = require('highlight.js');
 var Remarkable = require('remarkable');
-var store      = require('./datastore');
+var store      = require('./data/store');
 var message    = require('./message');
 var messages   = require('./messages');
 
