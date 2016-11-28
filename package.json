@@ -48,7 +48,6 @@
   "devDependencies": {
     "apidoc": "^0.16.1",
     "chai": "^3.5.0",
-    "chai-http": "^3.0.0",
     "coveralls": "^2.11.15",
     "istanbul": "^0.4.5",
     "mocha": "^3.1.2",
