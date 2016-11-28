@@ -3,7 +3,6 @@ var mocha    = require('mocha');
 var chai     = require('chai');
 var request  = require('supertest');
 var expect   = chai.expect;
-chai.use(chaiHttp);
 
 var router = require('../web/message');
 var app = express();
