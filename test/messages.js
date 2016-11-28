@@ -4,19 +4,31 @@ var chai     = require('chai');
 var request  = require('supertest');
 var expect   = chai.expect;
 
-var router = require('../web/message');
+var message = require('../web/message');
+var messages = require('../web/messages');
 var app = express();
-app.use('/', router);
 
-var API_ROOT = 'http://localhost:5984/';
+var API_ROOT = '127.0.0.1:5984/';
 var VERSION  = '1.0';
 
+app.set('version', VERSION);
+app.use('/message', message);
+app.use('/messages', messages);
+
 describe(`GET /v${VERSION}/messages/NAVADMIN/:year`, function() {
-    var endpoint = `${API_ROOT}v${VERSION}/messages/NAVADMIN/16`;
-    it('responds with JSON array', function(done) {
+    this.timeout(3000);
+    var endpoint = `/messages/navadmin/16`;
+    it('can return Collection+JSON MIME type response', function(done) {
         request(app)
-            .get('/NAVADMIN16042')
+            .get(endpoint)
             .expect(200)
+            .expect(function(data) {
+                var response = data.res.body;
+                var href = '/' + response.collection.href.split('/').slice(2).join('/');
+                expect(response).to.have.property('collection');
+                expect(href).to.equal(endpoint)
+                expect(response.collection.items).to.be.an('array');
+            })
             .end(function(err, res) {
                 if (err) {return done(err);}
                 done();
