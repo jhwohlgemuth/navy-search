@@ -54,6 +54,8 @@
     "mocha-lcov-reporter": "^1.2.0",
     "mocha-unfunk-reporter": "^0.4.0",
     "nodemon": "^1.8.1",
+    "proxyquire": "^1.7.10",
+    "sinon": "^1.17.6",
     "supertest": "^2.0.1"
   },
   "scripts": {
