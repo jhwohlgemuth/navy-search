@@ -15,7 +15,7 @@ app.set('version', VERSION);
 app.use('/message', message);
 app.use('/messages', messages);
 
-describe(`GET /v${VERSION}/messages/NAVADMIN/:year`, function() {
+xdescribe(`GET /v${VERSION}/messages/NAVADMIN/:year`, function() {
     this.timeout(3000);
     var endpoint = `/messages/navadmin/16`;
     it('can return Collection+JSON MIME type response', function(done) {
