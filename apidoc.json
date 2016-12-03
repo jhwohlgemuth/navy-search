@@ -7,6 +7,6 @@
     "NAVADMIN",
     "ALNAV"
   ],
-  "url": "https://usn.herokuapp.com/v1.0",
-  "sampleUrl": "https://usn.herokuapp.com/v1.0"
+  "url": "https://usn.herokuapp.com/api/v1.0",
+  "sampleUrl": "https://usn.herokuapp.com/api/v1.0"
 }

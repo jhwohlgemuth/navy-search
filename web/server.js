@@ -79,7 +79,7 @@ app.get('/', function(req, res) {
     }
 });
 var VERSION = app.get('version');
-app.use(`/v${VERSION}/message`, message);
-app.use(`/v${VERSION}/messages`, messages);
+app.use(`/api/v${VERSION}/message`, message);
+app.use(`/api/v${VERSION}/messages`, messages);
 
 module.exports = app;
