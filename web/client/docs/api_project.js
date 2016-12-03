@@ -8,12 +8,12 @@ define({
     "NAVADMIN",
     "ALNAV"
   ],
-  "url": "https://usn.herokuapp.com/v1.0",
-  "sampleUrl": "https://usn.herokuapp.com/v1.0",
+  "url": "https://usn.herokuapp.com/api/v1.0",
+  "sampleUrl": "https://usn.herokuapp.com/api/v1.0",
   "apidoc": "0.2.0",
   "generator": {
     "name": "apidoc",
-    "time": "2016-11-27T23:08:58.409Z",
+    "time": "2016-12-03T03:37:25.806Z",
     "url": "http://apidocjs.com",
     "version": "0.16.1"
   }
