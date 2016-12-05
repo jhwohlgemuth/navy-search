@@ -49,6 +49,7 @@
     "apidoc": "^0.16.1",
     "chai": "^3.5.0",
     "coveralls": "^2.11.15",
+    "fs-extra": "^1.0.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.1.2",
     "mocha-lcov-reporter": "^1.2.0",

@@ -1,3 +1,5 @@
+var fs         = require('fs-extra');
+var path       = require('path');
 var Bluebird   = require('bluebird');
 var express    = require('express');
 var mocha      = require('mocha');
@@ -5,6 +7,11 @@ var chai       = require('chai');
 var request    = require('supertest');
 var proxyquire = require('proxyquire');
 var expect     = chai.expect;
+
+function readFile(fileName) {
+    var filePath = path.join(__dirname, fileName);
+    return fs.readFileSync(filePath);
+}
 
 var URL_ROOT = 'http://www.public.navy.mil/bupers-npc/reference/messages/Documents/NAVADMINS/NAV2016/';
 var MSG_TYPE = [
@@ -37,11 +44,14 @@ var stubs = {
     './message.utils': {
         scrapeMessageData: function() {
             return Bluebird.resolve(TEST_DATA);
+        },
+        getMessage: function() {
+            return Bluebird.resolve(readFile('data/NAVADMIN16215.txt'));
         }
     }
 };
 
-var message = require('../web/message');
+var message = proxyquire('../web/message', stubs);
 var messages = proxyquire('../web/messages', stubs);
 var app = express();
 
@@ -82,5 +92,32 @@ MSG_TYPE.forEach(function(type) {
                     done();
                 });
         });
+    });
+});
+describe(`GET /api/v${VERSION}/message/:id`, function() {
+    this.timeout(3000);
+    var endpoint = (`/message/NAVADMIN16215`).toLowerCase();
+    it('can get message text', function() {
+        request(app)
+            .get(endpoint)
+            .expect(200)
+            .end(function(err, res) {
+                if (err) {return done(err);}
+                done();
+            });
+    });
+    xit('can handle invalid ID parameters', function() {
+        var invalidEndpoint = endpoint + 'notValidId';
+        request(app)
+            .get(invalidEndpoint)
+            .expect(200)
+            .expect(function(data) {
+                var response = data.res.body;
+                console.log(response.errors);
+            })
+            .end(function(err, res) {
+                if (err) {return done(err);}
+                done();
+            });
     });
 });
