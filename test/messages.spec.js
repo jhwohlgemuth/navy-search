@@ -69,8 +69,8 @@ MSG_TYPE.forEach(function(type) {
         it('can format scraped messages data', function(done) {
             request(app)
                 .get(endpoint)
-                .expect(function(data) {
-                    var response = data.res.body;
+                .expect(function(res) {
+                    var response = res.body;
                     var href = '/' + response.collection.href.split('/').slice(2).join('/');
                     expect(response).to.have.property('collection');
                     expect(href).to.equal(endpoint)
@@ -97,24 +97,39 @@ MSG_TYPE.forEach(function(type) {
 describe(`GET /api/v${VERSION}/message/:id`, function() {
     this.timeout(3000);
     var endpoint = (`/message/NAVADMIN16215`).toLowerCase();
-    it('can get message text', function() {
+    it('can get message text', function(done) {
         request(app)
             .get(endpoint)
             .expect(200)
+            .expect('Content-Type', 'text/plain; charset=utf-8')
             .end(function(err, res) {
                 if (err) {return done(err);}
                 done();
             });
     });
-    xit('can handle invalid ID parameters', function() {
-        var invalidEndpoint = endpoint + 'notValidId';
+});
+describe(`GET /api/v${VERSION}/message/NAVADMIN/:year/:num`, function() {
+    this.timeout(3000);
+    var endpoint = (`/message/NAVADMIN/16/215`).toLowerCase();
+    it('can get message text', function(done) {
         request(app)
-            .get(invalidEndpoint)
+            .get(endpoint)
             .expect(200)
-            .expect(function(data) {
-                var response = data.res.body;
-                console.log(response.errors);
-            })
+            .expect('Content-Type', 'text/plain; charset=utf-8')
+            .end(function(err, res) {
+                if (err) {return done(err);}
+                done();
+            });
+    });
+});
+describe(`GET /api/v${VERSION}/message/ALNAV/:year/:num`, function() {
+    this.timeout(3000);
+    var endpoint = (`/message/ALNAV/16/042`).toLowerCase();
+    it('can get message text', function(done) {
+        request(app)
+            .get(endpoint)
+            .expect(200)
+            .expect('Content-Type', 'text/plain; charset=utf-8')
             .end(function(err, res) {
                 if (err) {return done(err);}
                 done();
