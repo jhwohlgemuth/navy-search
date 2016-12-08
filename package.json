@@ -63,6 +63,7 @@
     "scan": "nsp check",
     "prestart": "npm run scan",
     "start": "node index.js",
+    "refresh": "node ./bin/refresh",
     "dev": "nodemon index.js",
     "docs": "apidoc -i ./web -o ./web/client/docs",
     "mocha": "mocha -R mocha-unfunk-reporter",
