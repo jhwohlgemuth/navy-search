@@ -1,0 +1,86 @@
+UNCLASSIFIED
+ROUTINE
+R 071900Z JUN 16
+FM SECNAV WASHINGTON DC
+TO ALNAV
+INFO SECNAV WASHINGTON DC
+CNO WASHINGTON DC
+CMC WASHINGTON DC
+BT
+UNCLAS
+
+ALNAV 042/16
+
+MSGID/GENADMIN/SECNAV WASHINGTON DC/-/JUN//
+
+SUBJ/FY-17 U.S. MARINE CORPS RESERVE CHIEF WARRANT OFFICER SELECTIONS//
+
+Rmks/1.  I am pleased to announce the following named Officers of the Marine
+Corps Reserve that have been selected for promotion to the grades of Chief
+Warrant Officer, W5, W4, and W3.  The number listed to the left of each
+Officer is their select number.  Reserve Chief Warrant Officers are promoted
+based on the needs of the Marine Corps.
+
+2.  The following Officers were selected from within the Active Reserve
+competitive category:
+
+      CHIEF WARRANT OFFICER, W4
+Sel# Name                   MCC       MOS
+1    Long            AG     S7L       0170
+      CHIEF WARRANT OFFICER, W3
+Sel# Name                   MCC       MOS
+1    Bowie           RC     S3C       6502
+4    Duke            QW     S6H       0170
+1    Hoy             RA     G17       0170
+2    Lawson          DL     B64       0170
+5    Polanco         P      F01       0170
+6    Rivers          WE     1GH       0170
+3    Sanchez         GF     1GH       0170
+
+3.  The following Officers were selected from within the Other Than Active
+Reserve competitive category:
+
+      CHIEF WARRANT OFFICER, W5
+Sel# Name                   MCC
+3    Blankenship     BD     IRR
+1    Broome          DV     IMA
+2    Nasarzewski     JJ     MOBCOM
+4    Stephens Jr     RD     SA5
+5    Tillman         PC     S43
+       CHIEF WARRANT OFFICER, W4
+Sel# Name                   MCC
+7    Diantonio       VL     IMA
+5    Domers          CL     SWB
+3    Fernandez       EH     IMA
+2    Kritenbrink     MG     IMA
+6    Simpson         BC     S3B
+8    Skrobiszewski   EF     SDS
+4    Swanson         TC     SU3
+1    Toole Jr        RJ     S7A
+9    Ververs II      EC     SGB
+        CHIEF WARRANT OFFICER, W3
+Sel# Name                   MCC
+14   Ahonen Jr       DA     S4E
+6    Ampol Jr        JG     S5J
+9    Camacho         MR     S2C
+1    Coren           DA     IMA
+8    Cuomo           AL     IMA
+15   Garcia          JR     S4K
+7    Gomez           DR     S21
+10   Hirtle          LW     S7C
+16   Jean            SW     S4H
+12   Martin          RT     S3C
+3    Orozco          LJ     IMA
+11   Owens           BJ     SG3
+2    Rankin          KE     SHL
+13   Rose            SJ     SP2
+4    Sherwood        RE     SG3
+17   Smith           CS     IMA
+5    Vigil           NA     IMA
+
+4.  Released by Ray Mabus, Secretary of the Navy.//
+
+BT
+#0001
+NNNN
+UNCLASSIFIED//
