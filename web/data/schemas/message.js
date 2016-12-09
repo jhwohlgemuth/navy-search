@@ -13,16 +13,14 @@ var messageSchema = new mongoose.Schema({
     },
     num: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
-    href: String,
+    url: String,
     text: String
 });
 
 messageSchema.methods.createMessageId = function() {
     var id = utils.createMessageId(this.type, this.year, this.num);
-    console.log(id);
 };
 
 messageSchema.pre('save', function(next) {

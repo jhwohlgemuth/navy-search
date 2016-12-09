@@ -71,7 +71,7 @@ MSG_TYPE.forEach(function(type) {
                 .get(endpoint)
                 .expect(function(res) {
                     var response = res.body;
-                    var href = '/' + response.collection.href.split('/').slice(3).join('/');
+                    var href = response.collection.href.split(`/v${VERSION}`).slice(1).join('/');
                     expect(response).to.have.property('collection');
                     expect(href).to.equal(endpoint)
                     expect(response.collection.items).to.be.an('array');

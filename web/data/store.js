@@ -15,14 +15,14 @@ var nav16042 = new Message({
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
-  Message.remove({type: 'NAVADMIN'}).then(function() {
-      nav16042.save().then(function(msg) {
-          Message
-            .find({type: 'NAVADMIN'})
-            .where('num').equals('042')
-            .exec(function(err, msg) {
-                console.log(msg);
-            });
-      });
-  });
+  // Message.remove({type: 'NAVADMIN'}).then(function() {
+  //     nav16042.save().then(function(msg) {
+  //         Message
+  //           .find({type: 'NAVADMIN'})
+  //           .where('num').equals('042')
+  //           .exec(function(err, msg) {
+  //               console.log(msg);
+  //           });
+  //     });
+  // });
 });

@@ -18,15 +18,38 @@ var MESSAGES_ENDPOINT = 'https://usn.herokuapp.com/api/v1.0/messages/';
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
-    console.log(currentYear, previousYear);
+    console.log('Started...');
     var type = 'NAVADMIN';
     var year = currentYear;
     request(`${MESSAGES_ENDPOINT}${type}/${year}`)
         .then(JSON.parse)
         .then(function(data) {
-            var requests = _.map(data.collection.items, 'href').slice(0, 1)
-                .map(function(href) {return 'https://' + href})
-                .map(request);
+            var items = _(data.collection.items)
+                .map(_.property('data'))
+                .map(function(data) {
+                    return _.transform(data, function(result, item) {
+                        return _.extend(result, {[item.name]: item.value});
+                    });
+                })
+                .map(function(item, index) {
+                    return request(item.url).then(function(txt) {
+                        item.text = txt;
+                        return item;
+                    });
+                });
+            return Bluebird.all(items);
+        })
+        .done(function(items) {
+            var stupid = _.map(items, 'num');
+            console.log(stupid.length);
+            db.close();
+            // Message.create(items).then(function(data) {
+            //     db.close();
+            // })
+            // .catch(function(err) {
+            //     console.log(err);
+            //     db.close();
+            // })
+            // .finally(function() {db.close();});
         });
-    db.close();
 });

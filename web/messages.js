@@ -31,7 +31,7 @@ function collectionJsonMimeType(req, res, next) {
  * @apiSampleRequest /messages/NAVADMIN/16
 **/
 router.get('/navadmin/:year', collectionJsonMimeType, function(req, res) {
-    var hostname = req.get('host') || 'https://';
+    var hostname = 'https://' + req.get('host');
     var version = res.app.get('version');
     var year = req.params.year;
     var href = hostname + `/api/v${version}/messages/navadmin/${year}`;
