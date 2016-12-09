@@ -13,7 +13,8 @@ var messageSchema = new mongoose.Schema({
     },
     num: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     url: String,
     text: String

@@ -47,6 +47,7 @@ router.get('/navadmin/:year', collectionJsonMimeType, function(req, res) {
             var links = [];
             return {href, data, links};
         });
+        items = _.uniqWith(items, function(a, b) {return a.href === b.href;});
         return res.json({
             collection: {version, href, items}
         });
@@ -61,7 +62,7 @@ router.get('/navadmin/:year', collectionJsonMimeType, function(req, res) {
  * @apiSampleRequest /messages/ALNAV/16
 **/
 router.get('/alnav/:year', collectionJsonMimeType, function(req, res) {
-    var hostname = req.get('host');
+    var hostname = 'https://' + req.get('host');
     var version = res.app.get('version');
     var year = req.params.year;
     var href = hostname + `/api/v${version}/messages/alnav/${year}`;
@@ -77,6 +78,7 @@ router.get('/alnav/:year', collectionJsonMimeType, function(req, res) {
             var links = [];
             return {href, data, links};
         });
+        items = _.uniqWith(items, function(a, b) {return a.href === b.href;});
         return res.json({
             collection: {version, href, items}
         });

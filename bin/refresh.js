@@ -40,16 +40,13 @@ db.once('open', function() {
             return Bluebird.all(items);
         })
         .done(function(items) {
-            var stupid = _.map(items, 'num');
-            console.log(stupid.length);
-            db.close();
-            // Message.create(items).then(function(data) {
-            //     db.close();
-            // })
-            // .catch(function(err) {
-            //     console.log(err);
-            //     db.close();
-            // })
-            // .finally(function() {db.close();});
+            Message.create(items).then(function(data) {
+                // db.close();
+            })
+            .catch(function(err) {
+                console.log(err);
+                // db.close();
+            })
+            .finally(function() {db.close();});
         });
 });
