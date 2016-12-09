@@ -31,10 +31,10 @@ function collectionJsonMimeType(req, res, next) {
  * @apiSampleRequest /messages/NAVADMIN/16
 **/
 router.get('/navadmin/:year', collectionJsonMimeType, function(req, res) {
-    var hostname = req.get('host');
+    var hostname = req.get('host') || 'https://';
     var version = res.app.get('version');
     var year = req.params.year;
-    var href = hostname + `/v${version}/messages/navadmin/${year}`;
+    var href = hostname + `/api/v${version}/messages/navadmin/${year}`;
     var baseUrl = `${hostname}/v${version}/message/`;
     utils.scrapeMessageData('NAVADMIN', year).then(function(messageData) {
         var items = messageData.map(function(item) {
@@ -64,7 +64,7 @@ router.get('/alnav/:year', collectionJsonMimeType, function(req, res) {
     var hostname = req.get('host');
     var version = res.app.get('version');
     var year = req.params.year;
-    var href = hostname + `/v${version}/messages/alnav/${year}`;
+    var href = hostname + `/api/v${version}/messages/alnav/${year}`;
     var baseUrl = `${hostname}/v${version}/message/`;
     utils.scrapeMessageData('ALNAV', year).then(function(messageData) {
         var items = messageData.map(function(item) {
