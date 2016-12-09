@@ -35,7 +35,7 @@ router.get('/navadmin/:year', collectionJsonMimeType, function(req, res) {
     var version = res.app.get('version');
     var year = req.params.year;
     var href = hostname + `/api/v${version}/messages/navadmin/${year}`;
-    var baseUrl = `${hostname}/v${version}/message/`;
+    var baseUrl = `${hostname}/api/v${version}/message/`;
     utils.scrapeMessageData('NAVADMIN', year).then(function(messageData) {
         var items = messageData.map(function(item) {
             var href = baseUrl + utils.createMessageId(item.type, item.year, item.num);
@@ -65,7 +65,7 @@ router.get('/alnav/:year', collectionJsonMimeType, function(req, res) {
     var version = res.app.get('version');
     var year = req.params.year;
     var href = hostname + `/api/v${version}/messages/alnav/${year}`;
-    var baseUrl = `${hostname}/v${version}/message/`;
+    var baseUrl = `${hostname}/api/v${version}/message/`;
     utils.scrapeMessageData('ALNAV', year).then(function(messageData) {
         var items = messageData.map(function(item) {
             var href = baseUrl + utils.createMessageId(item.type, item.year, item.num);
