@@ -62,7 +62,7 @@
   },
   "scripts": {
     "scan": "nsp check",
-    "prestart": "npm run scan",
+    "prestart": "npm run scan && npm run refresh",
     "start": "node index.js",
     "refresh": "node ./bin/refresh",
     "dev": "nodemon index.js",
