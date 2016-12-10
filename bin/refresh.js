@@ -1,5 +1,6 @@
 require('dotenv').config();
 var _        = require('lodash');
+var chalk    = require('chalk');
 var Bluebird = require('bluebird');
 var request  = require('request-promise');
 var mongoose = require('mongoose');
@@ -16,37 +17,42 @@ var previousYear = String(Number(currentYear) - 1);
 
 var MESSAGES_ENDPOINT = 'https://usn.herokuapp.com/api/v1.0/messages/';
 
+var START_MESSAGE = chalk.dim('Started data refresh...');
+var DONE_MESSAGE = chalk.green.bold('COMPLETE') + '\n\n';
+var ERROR_MESSAGE = chalk.red.bold('ERROR') + '\n\n';
+
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
-    console.log('Started...');
+    process.stdout.write(START_MESSAGE);
     var type = 'NAVADMIN';
     var year = currentYear;
-    request(`${MESSAGES_ENDPOINT}${type}/${year}`)
+    Message.remove({type})
+        // Get and parse message data
+        .then(() => request(`${MESSAGES_ENDPOINT}${type}/${year}`))
         .then(JSON.parse)
-        .then(function(data) {
-            var items = _(data.collection.items)
+        // Format returned data for processing
+        .then((data) => {
+            return Bluebird.all(_(data.collection.items)
                 .map(_.property('data'))
                 .map(function(data) {
                     return _.transform(data, function(result, item) {
                         return _.extend(result, {[item.name]: item.value});
                     });
                 })
-                .map(function(item, index) {
-                    return request(item.url).then(function(txt) {
-                        item.text = txt;
+                .map(function(item) {
+                    return request(item.url).then((text) => {
+                        item.text = text;
                         return item;
                     });
-                });
-            return Bluebird.all(items);
+                })
+            );
         })
-        .done(function(items) {
-            Message.create(items).then(function(data) {
-                // db.close();
-            })
-            .catch(function(err) {
-                console.log(err);
-                // db.close();
-            })
-            .finally(function() {db.close();});
-        });
+        // Create and save mongodb models
+        .then((items) => Message.create(items))
+        .then(() => process.stdout.write(DONE_MESSAGE))
+        .catch((err) => {
+            process.stdout.write(ERROR_MESSAGE);
+            console.log(err);
+        })
+        .finally(() => db.close());
 });
