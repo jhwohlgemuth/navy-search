@@ -1,4 +1,4 @@
-require('dotenv').config();
+process.env.VERSION || require('dotenv').config();
 var _        = require('lodash');
 var chalk    = require('chalk');
 var Bluebird = require('bluebird');
