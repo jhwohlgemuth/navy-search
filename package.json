@@ -61,9 +61,8 @@
     "supertest": "^2.0.1"
   },
   "scripts": {
-    "postinstall": "npm run refresh",
     "scan": "nsp check",
-    "prestart": "npm run scan",
+    "prestart": "npm run scan && npm run refresh",
     "start": "node index.js",
     "refresh": "node ./bin/refresh",
     "dev": "nodemon index.js",
