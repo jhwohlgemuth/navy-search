@@ -1,7 +1,7 @@
 'use strict';
 
 require('opbeat').start();
-require('dotenv').config();
+process.env.VERSION || require('dotenv').config();
 
 var config = require('config');
 var log    = require('npmlog');
