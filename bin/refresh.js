@@ -48,7 +48,8 @@ db.once('open', function() {
             return Bluebird.all(_.uniqWith(items, hasSameAttr('num')).map((item) => {
                 var options = {
                     uri: item.url,
-                    headers: {'User-Agent': 'Request-Promise'}
+                    headers: {'User-Agent': 'Request-Promise'},
+                    simple: false
                 };
                 return request(options).then((text) => {
                     item.text = text;
