@@ -1,4 +1,5 @@
 process.env.VERSION || require('dotenv').config();
+
 var _             = require('lodash');
 var chalk         = require('chalk');
 var Bluebird      = require('bluebird');
@@ -6,6 +7,12 @@ var request       = require('request-promise');
 var mongoose      = require('mongoose');
 var messageSchema = require('../web/data/schemas/message');
 var utils         = require('../web/message.utils');
+
+function hasSameAttr(val) {
+    return function(a, b) {
+        return a[val] === b[val];
+    }
+}
 
 mongoose.Promise = Bluebird;
 mongoose.connect(process.env.MONGODB_URI);
@@ -27,37 +34,22 @@ db.once('open', function() {
     process.stdout.write(START_MESSAGE);
     var type = 'NAVADMIN';
     var year = currentYear;
-    utils.scrapeMessageData('NAVADMIN', year).then(function(messageData) {
-        console.log(messageData);
-        db.close();
-    });
-    // Message.remove({type})
-    //     // Get and parse message data
-    //     .then(() => request(`${MESSAGES_ENDPOINT}${type}/${year}`))
-    //     .then(JSON.parse)
-    //     // Format returned data for processing
-    //     .then((data) => {
-    //         return Bluebird.all(_(data.collection.items)
-    //             .map(_.property('data'))
-    //             .map(function(data) {
-    //                 return _.transform(data, function(result, item) {
-    //                     return _.extend(result, {[item.name]: item.value});
-    //                 });
-    //             })
-    //             .map(function(item) {
-    //                 return request(item.url).then((text) => {
-    //                     item.text = text;
-    //                     return item;
-    //                 });
-    //             })
-    //         );
-    //     })
-    //     // Create and save mongodb models
-    //     .then((items) => Message.create(items))
-    //     .then(() => process.stdout.write(DONE_MESSAGE))
-    //     .catch((err) => {
-    //         process.stdout.write(ERROR_MESSAGE);
-    //         console.log(err);
-    //     })
-    //     .finally(() => db.close());
+    Message.remove({type})
+        .then(() => utils.scrapeMessageData('NAVADMIN', year))
+        .then((items) => {
+            return Bluebird.all(_.uniqWith(items, hasSameAttr('num')).map((item) => {
+                return request(item.url).then((text) => {
+                    item.text = text;
+                    return item;
+                });
+            }));
+        })
+        .then((items) => Message.create(items))
+        // .then((items) => console.log(items.length))
+        .then(() => process.stdout.write(DONE_MESSAGE))
+        .catch((err) => {
+            process.stdout.write(ERROR_MESSAGE);
+            console.log(err);
+        })
+        .finally(() => db.close());
 });
