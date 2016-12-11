@@ -39,11 +39,7 @@ db.once('open', function() {
         .then(() => utils.scrapeMessageData(type, year))
         .then((items) => {
             return Bluebird.all(_.uniqWith(items, hasSameAttr('num')).map((item) => {
-                var options = {
-                    uri: item.url,
-                    // headers: {'User-Agent': 'navy-search-message-request'},
-                    simple: false
-                };
+                var options = {uri: item.url, simple: false};
                 return request(options).then((text) => _.assign(item, {text}));
             }));
         })
