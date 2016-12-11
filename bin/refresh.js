@@ -41,7 +41,7 @@ db.once('open', function() {
             return Bluebird.all(_.uniqWith(items, hasSameAttr('num')).map((item) => {
                 var options = {
                     uri: item.url,
-                    headers: {'User-Agent': 'navy-search-message-request'},
+                    // headers: {'User-Agent': 'navy-search-message-request'},
                     simple: false
                 };
                 return request(options).then((text) => _.assign(item, {text}));
