@@ -34,22 +34,27 @@ db.once('open', function() {
     process.stdout.write(START_MESSAGE);
     var type = 'NAVADMIN';
     var year = currentYear;
-    Message.remove({type})
-        .then(() => utils.scrapeMessageData('NAVADMIN', year))
-        .then((items) => {
-            return Bluebird.all(_.uniqWith(items, hasSameAttr('num')).map((item) => {
-                return request(item.url).then((text) => {
-                    item.text = text;
-                    return item;
-                });
-            }));
-        })
-        .then((items) => Message.create(items))
-        // .then((items) => console.log(items.length))
-        .then(() => process.stdout.write(DONE_MESSAGE))
-        .catch((err) => {
-            process.stdout.write(ERROR_MESSAGE);
-            console.log(err);
-        })
-        .finally(() => db.close());
+    var url = 'http://www.public.navy.mil/bupers-npc/reference/messages/Documents/NAVADMINS/NAV2016/NAV16001.txt';
+    request(url).then(function(txt) {
+        console.log(txt);
+        db.close();
+    });
+    // Message.remove({type})
+    //     .then(() => utils.scrapeMessageData('NAVADMIN', year))
+    //     .then((items) => {
+    //         return Bluebird.all(_.uniqWith(items, hasSameAttr('num')).map((item) => {
+    //             return request(item.url).then((text) => {
+    //                 item.text = text;
+    //                 return item;
+    //             });
+    //         }));
+    //     })
+    //     .then((items) => Message.create(items))
+    //     .then((items) => console.log(items.length))
+    //     .then(() => process.stdout.write(DONE_MESSAGE))
+    //     .catch((err) => {
+    //         process.stdout.write(ERROR_MESSAGE);
+    //         console.log(err);
+    //     })
+    //     .finally(() => db.close());
 });
