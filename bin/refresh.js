@@ -39,8 +39,7 @@ db.once('open', function() {
         .then(() => utils.scrapeMessageData(type, year))
         .then((items) => {
             return Bluebird.all(_.uniqWith(items, hasSameAttr('num')).map((item) => {
-                var options = {uri: item.url, simple: false};
-                return request(options).then((text) => _.assign(item, {text}));
+                return request({uri: item.url, simple: false}).then((text) => _.assign(item, {text}));
             }));
         })
         .then((items) => Message.create(items))
