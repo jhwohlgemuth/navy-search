@@ -33,7 +33,12 @@ function hasSameAttr(val) {
 }
 
 function refreshMessages(type, year) {
-    return Bluebird.all([utils.scrapeMessageData(type, '16'), utils.scrapeMessageData(type, '15')])
+    var currYear = getCurrentYear();
+    var prevYear = String(Number(currYear) - 1);
+    return Bluebird.all([
+            // utils.scrapeMessageData(type, currYear),
+            utils.scrapeMessageData(type, prevYear)
+        ])
         .tap(() => process.stdout.write(chalk.dim(`Started ${type} data refresh...`)))
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
@@ -51,18 +56,5 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
     var type = 'NAVADMIN';
     var year = getCurrentYear();
-    var currYear = getCurrentYear();
-    var prevYear = String(Number(currYear) - 1);
-    refreshMessages(type, year).finally(() => db.close());
-    // utils.scrapeMessageData(type, year)
-    //     .then((items) => {
-    //         return Bluebird.all(_.uniqWith(items, hasSameAttr('num')).map((item) => {
-    //             return request({uri: item.url, simple: false}).then((text) => _.assign(item, {text}));
-    //         }));
-    //     })
-    //     .tap((items) => {return (items.length > 0) && Message.remove({type})})
-    //     .then((items) => Message.create(items))
-    //     .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
-    //     .catch(processError)
-    //     .finally(() => db.close());
+    refreshMessages(type).finally(() => db.close());
 });
