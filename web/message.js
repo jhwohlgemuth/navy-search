@@ -74,6 +74,8 @@ function parseMessageDetails(req, res, next) {
     res.locals.msgDetails = utils.parse.messageId(req.params.id);
     next();
 }
+
+var NO_MESSAGE = 'intentionally left blank';
 /**
  * @api {get} /message Get message
  * @apiGroup Message
@@ -90,7 +92,7 @@ router.get('/', function(req, res) {
     var options = _.pick(req.query, 'type', 'year', 'num');
     res.type('text/plain');
     utils.getMessage(options).then(
-        message => res.send(message)
+        message => res.send(_.get(message, 'text', NO_MESSAGE))
     );
 });
 /**
@@ -104,7 +106,7 @@ router.get('/:id', [isValidMessageId, parseMessageDetails], function(req, res) {
     var options = _.pick(res.locals.msgDetails, 'type', 'year', 'num');
     res.type('text/plain');
     utils.getMessage(options).then(
-        message => res.send(message)
+        message => res.send(_.get(message, 'text', NO_MESSAGE))
     );
 });
 /**
@@ -118,7 +120,7 @@ router.get('/NAVADMIN/:year/:num', [hasValidParameters], function(req, res) {
     var options = _.pick(req.params, 'year', 'num');
     res.type('text/plain');
     utils.getMessage(_.extend(options, {type: 'NAVADMIN'})).then(
-        message => res.send(message)
+        message => res.send(_.get(message, 'text', NO_MESSAGE))
     );
 });
 /**
@@ -132,7 +134,7 @@ router.get('/ALNAV/:year/:num', [hasValidParameters], function(req, res) {
     var options = _.pick(req.params, 'year', 'num');
     res.type('text/plain');
     utils.getMessage(_.extend(options, {type: 'ALNAV'})).then(
-        message => res.send(message)
+        message => res.send(_.get(message, 'text', NO_MESSAGE))
     );
 });
 

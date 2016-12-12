@@ -2,7 +2,9 @@ var _        = require('lodash');
 var lunr     = require('lunr');
 var Xray     = require('x-ray');
 var Bluebird = require('bluebird');
+var mongoose = require('mongoose');
 var request  = require('request-promise');
+var Message  = require('../web/data/schemas/message');
 
 var NPC_DOMAIN = 'http://www.public.navy.mil';
 
@@ -54,12 +56,12 @@ function scrapeMessageData(type, year, options) {
 }
 
 function getMessage(options) {
-    var type = _.get(options, 'type', 'NAVADMIN');
+    var type = _.get(options, 'type', 'unknown').toUpperCase();
     var year = _.get(options, 'year', '16');
-    return scrapeMessageData(type, year)
-        .then((item) => _.find(item, _.pick(options, 'num', 'year')))
-        .get('url')
-        .then(request);
+    var num  = _.get(options, 'num', '042');
+    return Message
+        .findOne({type, year, num})
+        .exec();
 }
 
 module.exports = {

@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-var utils   = require('../../message.utils');
 
 var messageSchema = new mongoose.Schema({
     id: {

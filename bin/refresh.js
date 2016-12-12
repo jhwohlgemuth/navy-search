@@ -12,7 +12,6 @@ mongoose.Promise = Bluebird;
 mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
-// var Message = mongoose.model('Message');
 
 function processError(err) {
     var ERROR_MESSAGE = chalk.red.bold('ERROR') + '\n\n';
