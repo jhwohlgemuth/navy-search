@@ -43,7 +43,12 @@ function refreshMessages(type) {
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
             return Bluebird.all(_.uniqWith(items, hasSameAttr('id')).map((item) => {
-                return request({uri: item.url, simple: false}).then((text) => {
+                var options = {
+                    uri: item.url,
+                    simple: false,
+                    headers: {'User-Agent': 'navy-search-request'}
+                };
+                return request(options).then((text) => {
                     var id = utils.createMessageId(item.type, item.year, item.num);
                     return _.assign(item, {id, text});
                 });
