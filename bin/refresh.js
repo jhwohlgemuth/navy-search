@@ -14,9 +14,11 @@ mongoose.connect(process.env.MONGODB_URI);
 var db = mongoose.connection;
 var Message = mongoose.model('Message', messageSchema);
 
-var START_MESSAGE = chalk.dim('Started data refresh...');
-var DONE_MESSAGE = chalk.green.bold('COMPLETE');
-var ERROR_MESSAGE = chalk.red.bold('ERROR') + '\n\n';
+function processError(err) {
+    var ERROR_MESSAGE = chalk.red.bold('ERROR') + '\n\n';
+    process.stdout.write(ERROR_MESSAGE);
+    console.log(err);
+}
 
 function getCurrentYear() {
     var today = new Date();
@@ -30,23 +32,37 @@ function hasSameAttr(val) {
     }
 }
 
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-    process.stdout.write(START_MESSAGE);
-    var type = 'NAVADMIN';
-    var year = getCurrentYear();
-    Message.remove({type})
-        .then(() => utils.scrapeMessageData(type, year))
+function refreshMessages(type, year) {
+    return Bluebird.all([utils.scrapeMessageData(type, '16'), utils.scrapeMessageData(type, '15')])
+        .tap(() => process.stdout.write(chalk.dim(`Started ${type} data refresh...`)))
+        .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
             return Bluebird.all(_.uniqWith(items, hasSameAttr('num')).map((item) => {
                 return request({uri: item.url, simple: false}).then((text) => _.assign(item, {text}));
             }));
         })
+        .tap((items) => {return (items.length > 0) && Message.remove({type})})
         .then((items) => Message.create(items))
-        .then((items) => process.stdout.write(`${DONE_MESSAGE} (${items.length})\n\n`))
-        .catch((err) => {
-            process.stdout.write(ERROR_MESSAGE);
-            console.log(err);
-        })
-        .finally(() => db.close());
+        .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
+        .catch(processError);
+}
+
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+    var type = 'NAVADMIN';
+    var year = getCurrentYear();
+    var currYear = getCurrentYear();
+    var prevYear = String(Number(currYear) - 1);
+    refreshMessages(type, year).finally(() => db.close());
+    // utils.scrapeMessageData(type, year)
+    //     .then((items) => {
+    //         return Bluebird.all(_.uniqWith(items, hasSameAttr('num')).map((item) => {
+    //             return request({uri: item.url, simple: false}).then((text) => _.assign(item, {text}));
+    //         }));
+    //     })
+    //     .tap((items) => {return (items.length > 0) && Message.remove({type})})
+    //     .then((items) => Message.create(items))
+    //     .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
+    //     .catch(processError)
+    //     .finally(() => db.close());
 });

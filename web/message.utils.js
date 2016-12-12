@@ -57,7 +57,7 @@ function getMessage(options) {
     var type = _.get(options, 'type', 'NAVADMIN');
     var year = _.get(options, 'year', '16');
     return scrapeMessageData(type, year)
-        .then(data => _.find(data, _.pick(options, 'num', 'year')))
+        .then((item) => _.find(item, _.pick(options, 'num', 'year')))
         .get('url')
         .then(request);
 }
