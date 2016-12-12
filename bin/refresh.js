@@ -1,18 +1,18 @@
 process.env.VERSION || require('dotenv').config();
 
-var _             = require('lodash');
-var chalk         = require('chalk');
-var Bluebird      = require('bluebird');
-var request       = require('request-promise');
-var mongoose      = require('mongoose');
-var messageSchema = require('../web/data/schemas/message');
-var utils         = require('../web/message.utils');
+var _        = require('lodash');
+var chalk    = require('chalk');
+var Bluebird = require('bluebird');
+var request  = require('request-promise');
+var mongoose = require('mongoose');
+var utils    = require('../web/message.utils');
+var Message  = require('../web/data/schemas/message');
 
 mongoose.Promise = Bluebird;
 mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
-var Message = mongoose.model('Message', messageSchema);
+// var Message = mongoose.model('Message');
 
 function processError(err) {
     var ERROR_MESSAGE = chalk.red.bold('ERROR') + '\n\n';
@@ -32,15 +32,13 @@ function hasSameAttr(val) {
     }
 }
 
-function refreshMessages(type, year) {
+function refreshMessages(type) {
     var currYear = getCurrentYear();
     var prevYear = String(Number(currYear) - 1);
+    var years = [currYear, prevYear];
     return Bluebird.resolve(Message.remove({type}))
         .then(() => {
-            return Bluebird.all([
-                utils.scrapeMessageData(type, currYear),
-                utils.scrapeMessageData(type, prevYear)
-            ]);
+            return Bluebird.all(years.map((year) => utils.scrapeMessageData(type, year)));
         })
         .tap(() => process.stdout.write(chalk.dim(`Started ${type} data refresh...`)))
         .reduce((allItems, items) => allItems.concat(items))
@@ -59,7 +57,8 @@ function refreshMessages(type, year) {
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
-    var type = 'NAVADMIN';
-    var year = getCurrentYear();
-    refreshMessages(type).finally(() => db.close());
+    Bluebird.resolve()
+        .then(() => refreshMessages('NAVADMIN'))
+        .then(() => refreshMessages('ALNAV'))
+        .finally(() => db.close());
 });

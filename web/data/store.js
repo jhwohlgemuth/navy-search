@@ -4,8 +4,7 @@ mongoose.Promise = Bluebird;
 mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
-var messageSchema = require('./schemas/message');
-var Message = mongoose.model('Message', messageSchema);
+var Message = require('./schemas/message');
 
 var nav16042 = new Message({
     type: 'NAVADMIN',
