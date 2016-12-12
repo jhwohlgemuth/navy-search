@@ -35,10 +35,13 @@ function hasSameAttr(val) {
 function refreshMessages(type, year) {
     var currYear = getCurrentYear();
     var prevYear = String(Number(currYear) - 1);
-    return Bluebird.all([
-            // utils.scrapeMessageData(type, currYear),
-            utils.scrapeMessageData(type, prevYear)
-        ])
+    return Bluebird.resolve(Message.remove({type}))
+        .then(() => {
+            return Bluebird.all([
+                utils.scrapeMessageData(type, currYear),
+                utils.scrapeMessageData(type, prevYear)
+            ]);
+        })
         .tap(() => process.stdout.write(chalk.dim(`Started ${type} data refresh...`)))
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
@@ -46,7 +49,6 @@ function refreshMessages(type, year) {
                 return request({uri: item.url, simple: false}).then((text) => _.assign(item, {text}));
             }));
         })
-        .tap((items) => {return (items.length > 0) && Message.remove({type})})
         .then((items) => Message.create(items))
         .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
         .catch(processError);

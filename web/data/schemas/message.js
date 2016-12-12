@@ -21,6 +21,7 @@ var messageSchema = new mongoose.Schema({
 
 messageSchema.methods.createMessageId = function() {
     var id = utils.createMessageId(this.type, this.year, this.num);
+    // this.id = this;
 };
 
 messageSchema.pre('save', function(next) {
