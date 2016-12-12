@@ -2,6 +2,10 @@ var mongoose = require('mongoose');
 var utils   = require('../../message.utils');
 
 var messageSchema = new mongoose.Schema({
+    id: {
+        type: String,
+        unique: true
+    },
     type: {
         type: String,
         required: true
@@ -17,16 +21,6 @@ var messageSchema = new mongoose.Schema({
     },
     url: String,
     text: String
-});
-
-messageSchema.methods.createMessageId = function() {
-    var id = utils.createMessageId(this.type, this.year, this.num);
-    // this.id = this;
-};
-
-messageSchema.pre('save', function(next) {
-    this.createMessageId();
-    next();
 });
 
 module.exports = messageSchema;

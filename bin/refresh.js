@@ -45,9 +45,12 @@ function refreshMessages(type, year) {
         .tap(() => process.stdout.write(chalk.dim(`Started ${type} data refresh...`)))
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
-            return Bluebird.all(_.uniqWith(items, hasSameAttr('num')).map((item) => {
-                return request({uri: item.url, simple: false}).then((text) => _.assign(item, {text}));
-            }));
+            return Bluebird.all(_.uniqWith(items, hasSameAttr('id')).map((item) => {
+                return request({uri: item.url, simple: false}).then((text) => {
+                    var id = utils.createMessageId(item.type, item.year, item.num);
+                    return _.assign(item, {id, text});
+                });
+            }))
         })
         .then((items) => Message.create(items))
         .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
