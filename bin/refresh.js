@@ -42,7 +42,7 @@ function refreshMessages(type) {
         .tap(() => process.stdout.write(chalk.dim(`Started ${type} data refresh...`)))
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
-            return Bluebird.all(_.uniqWith(items.slice(0, 100), hasSameAttr('id')).map((item) => {
+            return Bluebird.all(_.uniqWith(items, hasSameAttr('id')).map((item) => {
                 var options = {
                     url: item.url,
                     method: 'GET',
