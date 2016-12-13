@@ -44,7 +44,7 @@ function refreshMessages(type) {
         .then((items) => {
             return Bluebird.all(_.uniqWith(items, hasSameAttr('id')).map((item) => {
                 var options = {
-                    uri: item.url,
+                    url: item.url,
                     simple: false,
                     headers: {'User-Agent': 'navy-search-request'}
                 };

@@ -56,9 +56,9 @@ function scrapeMessageData(type, year, options) {
 }
 
 function getMessage(options) {
-    var type = _.get(options, 'type', 'unknown').toUpperCase();
-    var year = _.get(options, 'year', '16');
-    var num  = _.get(options, 'num', '042');
+    var type = _.get(options, 'type', '').toUpperCase();
+    var year = _.get(options, 'year');
+    var num  = _.get(options, 'num');
     return Message
         .findOne({type, year, num})
         .exec();
