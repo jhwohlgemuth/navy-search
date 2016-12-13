@@ -13,6 +13,9 @@ mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
 
+var CHUNK_SIZE = 100;
+var CHUNK_DELAY = 10000;
+
 function processError(err) {
     var ERROR_MESSAGE = chalk.red.bold('ERROR') + '\n\n';
     process.stdout.write(ERROR_MESSAGE);
@@ -43,7 +46,7 @@ function refreshMessages(type) {
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
             var messageItems = _.uniqWith(items, hasSameAttr('id'));
-            var chunks = _.chunk(messageItems, 100);
+            var chunks = _.chunk(messageItems, CHUNK_SIZE);
             return Bluebird.all(chunks.map(function(chunk) {
                 return Bluebird.all(chunk.map(function(item) {
                     var options = {
@@ -55,21 +58,9 @@ function refreshMessages(type) {
                     return request(options).then((text) => {
                         var id = utils.createMessageId(item.type, item.year, item.num);
                         return _.assign(item, {id, text});
-                    })
-                })).delay(10000);
-            }))
-            // return Bluebird.all(chunks[0].map((item) => {
-            //     var options = {
-            //         url: item.url,
-            //         method: 'GET',
-            //         simple: false,
-            //         headers: {'User-Agent': 'navy-search-request'}
-            //     };
-            //     return request(options).then((text) => {
-            //         var id = utils.createMessageId(item.type, item.year, item.num);
-            //         return _.assign(item, {id, text});
-            //     });
-            // }))
+                    });
+                })).delay(CHUNK_DELAY);
+            }));
         })
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => Message.create(items))
