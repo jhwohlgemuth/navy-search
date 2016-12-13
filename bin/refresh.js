@@ -13,8 +13,8 @@ mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
 
-var CHUNK_SIZE = 100;
-var CHUNK_DELAY = 30000;
+var CHUNK_SIZE = 50;
+var CHUNK_DELAY = 10000;
 
 function processError(err) {
     var ERROR_MESSAGE = chalk.red.bold('ERROR') + '\n\n';
@@ -47,7 +47,7 @@ function refreshMessages(type) {
         .then((items) => {
             var messageItems = _.uniqWith(items, hasSameAttr('id'));
             var chunks = _.chunk(messageItems, CHUNK_SIZE);
-            return Bluebird.all(chunks.map(function(chunk) {
+            return Bluebird.all(chunks.map(function(chunk, index) {
                 return Bluebird.all(chunk.map(function(item) {
                     var options = {
                         url: item.url,
@@ -59,7 +59,9 @@ function refreshMessages(type) {
                         var id = utils.createMessageId(item.type, item.year, item.num);
                         return _.assign(item, {id, text});
                     });
-                })).delay(CHUNK_DELAY);
+                }))
+                .delay(CHUNK_DELAY * index)
+                .tap(() => console.log('chunk: ' + index));
             }));
         })
         .reduce((allItems, items) => allItems.concat(items))
