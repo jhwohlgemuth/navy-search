@@ -34,7 +34,7 @@ function hasSameAttr(val) {
 function refreshMessages(type) {
     var currYear = getCurrentYear();
     var prevYear = String(Number(currYear) - 1);
-    var years = [currYear, prevYear];
+    var years = [currYear];
     return Bluebird.resolve(Message.remove({type}))
         .then(() => {
             return Bluebird.all(years.map((year) => utils.scrapeMessageData(type, year)));
@@ -42,11 +42,12 @@ function refreshMessages(type) {
         .tap(() => process.stdout.write(chalk.dim(`Started ${type} data refresh...`)))
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
-            return Bluebird.all(_.uniqWith(items, hasSameAttr('id')).map((item) => {
+            var messageItems = _.uniqWith(items, hasSameAttr('id'));
+            var chunks = _.chunk(messageItems, 150);
+            return Bluebird.all(chunks[0].map((item) => {
                 var options = {
                     url: item.url,
                     method: 'GET',
-                    timeout: 50000000,
                     simple: false,
                     headers: {'User-Agent': 'navy-search-request'}
                 };
