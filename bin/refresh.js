@@ -46,7 +46,7 @@ function refreshMessages(type) {
                 var options = {
                     url: item.url,
                     method: 'GET',
-                    timeout: 120000,
+                    timeout: 500000,
                     simple: false,
                     headers: {'User-Agent': 'navy-search-request'}
                 };
