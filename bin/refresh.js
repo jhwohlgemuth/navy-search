@@ -43,7 +43,7 @@ function refreshMessages(type) {
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
             var messageItems = _.uniqWith(items, hasSameAttr('id'));
-            var chunks = _.chunk(messageItems, 150);
+            var chunks = _.chunk(messageItems, 100);
             return Bluebird.all(chunks[0].map((item) => {
                 var options = {
                     url: item.url,
