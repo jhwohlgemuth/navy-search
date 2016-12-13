@@ -56,7 +56,7 @@ function refreshMessages(type) {
                         var id = utils.createMessageId(item.type, item.year, item.num);
                         return _.assign(item, {id, text});
                     })
-                })).delay(1000);
+                })).delay(10000);
             }))
             // return Bluebird.all(chunks[0].map((item) => {
             //     var options = {
