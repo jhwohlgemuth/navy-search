@@ -42,10 +42,11 @@ function refreshMessages(type) {
         .tap(() => process.stdout.write(chalk.dim(`Started ${type} data refresh...`)))
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
-            return Bluebird.all(_.uniqWith(items.slice(0, 150), hasSameAttr('id')).map((item) => {
+            return Bluebird.all(_.uniqWith(items, hasSameAttr('id')).map((item) => {
                 var options = {
                     url: item.url,
                     method: 'GET',
+                    timeout: 10000,
                     simple: false,
                     headers: {'User-Agent': 'navy-search-request'}
                 };
