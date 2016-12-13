@@ -44,19 +44,34 @@ function refreshMessages(type) {
         .then((items) => {
             var messageItems = _.uniqWith(items, hasSameAttr('id'));
             var chunks = _.chunk(messageItems, 100);
-            return Bluebird.all(chunks[0].map((item) => {
-                var options = {
-                    url: item.url,
-                    method: 'GET',
-                    simple: false,
-                    headers: {'User-Agent': 'navy-search-request'}
-                };
-                return request(options).then((text) => {
-                    var id = utils.createMessageId(item.type, item.year, item.num);
-                    return _.assign(item, {id, text});
-                });
+            return Bluebird.all(chunks.map(function(chunk) {
+                return Bluebird.all(chunk.map(function(item) {
+                    var options = {
+                        url: item.url,
+                        method: 'GET',
+                        simple: false,
+                        headers: {'User-Agent': 'navy-search-request'}
+                    };
+                    return request(options).then((text) => {
+                        var id = utils.createMessageId(item.type, item.year, item.num);
+                        return _.assign(item, {id, text});
+                    })
+                })).delay(1000);
             }))
+            // return Bluebird.all(chunks[0].map((item) => {
+            //     var options = {
+            //         url: item.url,
+            //         method: 'GET',
+            //         simple: false,
+            //         headers: {'User-Agent': 'navy-search-request'}
+            //     };
+            //     return request(options).then((text) => {
+            //         var id = utils.createMessageId(item.type, item.year, item.num);
+            //         return _.assign(item, {id, text});
+            //     });
+            // }))
         })
+        .reduce((allItems, items) => allItems.concat(items))
         .then((items) => Message.create(items))
         .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
         .catch(processError);
