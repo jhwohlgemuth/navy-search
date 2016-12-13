@@ -45,6 +45,7 @@ function refreshMessages(type) {
             return Bluebird.all(_.uniqWith(items, hasSameAttr('id')).map((item) => {
                 var options = {
                     url: item.url,
+                    method: 'GET',
                     simple: false,
                     headers: {'User-Agent': 'navy-search-request'}
                 };
