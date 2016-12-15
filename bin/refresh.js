@@ -13,8 +13,8 @@ mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
 
-var CHUNK_SIZE = 50;
-var CHUNK_DELAY = 1000;
+var CHUNK_SIZE = 100;
+var CHUNK_DELAY = 100;
 
 function processError(err) {
     var ERROR_MESSAGE = chalk.red.bold('ERROR') + '\n\n';
@@ -25,7 +25,7 @@ function processError(err) {
 function getCurrentYear() {
     var today = new Date();
     // Return current year in YY format
-    return String(today.getFullYear()).substring(2);
+    return Number(String(today.getFullYear()).substring(2));
 }
 
 function hasSameAttr(val) {
@@ -36,13 +36,12 @@ function hasSameAttr(val) {
 
 function refreshMessages(type) {
     var currYear = getCurrentYear();
-    var prevYear = String(Number(currYear) - 1);
-    var years = [currYear];
+    var years = _.range(currYear, currYear - 2);
     return Bluebird.resolve(Message.remove({type}))
         .then(() => {
             return Bluebird.all(years.map((year) => utils.scrapeMessageData(type, year)));
         })
-        .tap(() => console.log(chalk.dim(`Started ${type} data refresh...`)))
+        .tap(() => console.log(chalk.dim(`Started ${type} data populate`)))
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
             var messageItems = _.uniqWith(items, hasSameAttr('id'));
@@ -81,6 +80,6 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
     Bluebird.resolve()
         .then(() => refreshMessages('NAVADMIN'))
-        // .then(() => refreshMessages('ALNAV'))
+        .then(() => refreshMessages('ALNAV'))
         .finally(() => db.close());
 });
