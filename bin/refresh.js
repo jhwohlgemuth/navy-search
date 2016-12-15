@@ -42,7 +42,7 @@ function refreshMessages(type) {
         .then(() => {
             return Bluebird.all(years.map((year) => utils.scrapeMessageData(type, year)));
         })
-        .tap(() => process.stdout.write(chalk.dim(`Started ${type} data refresh...`)))
+        .tap(() => console.log(chalk.dim(`Started ${type} data refresh...`)))
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
             var messageItems = _.uniqWith(items, hasSameAttr('id'));
@@ -54,17 +54,24 @@ function refreshMessages(type) {
                             var id = utils.createMessageId(item.type, item.year, item.num);
                             return _.assign(item, {id, text});
                         })
-                        .catch((text) => {
+                        .catch(() => {
                             console.log('fail: ' + item.num);
                             var id = utils.createMessageId(item.type, item.year, item.num);
+                            var text = 'fail';
                             return _.assign(item, {id, text});
                         });
                 }))
                 .delay(CHUNK_DELAY * index)
-                .tap(() => console.log('chunk: ' + index));
+                .tap(() => console.log('chunk: ' + index + chalk.dim('/' + chunks.length)));
             }));
         })
         .reduce((allItems, items) => allItems.concat(items))
+        .map((item) => {
+            return (item.text !== 'fail') ? item : request(item.url).then((text) => {
+                var id = utils.createMessageId(item.type, item.year, item.num);
+                return _.assign(item, {id, text});
+            });
+        })
         .then((items) => Message.create(items))
         .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
         .catch(processError);
