@@ -49,19 +49,13 @@ function refreshMessages(type) {
             var chunks = _.chunk(messageItems, CHUNK_SIZE);
             return Bluebird.all(chunks.map(function(chunk, index) {
                 return Bluebird.all(chunk.map(function(item) {
-                    var options = {
-                        url: item.url,
-                        // method: 'GET',
-                        // simple: false,
-                        // headers: {'User-Agent': 'navy-search-request'}
-                    };
-                    return request(options)
+                    return request(item.url)
                         .then((text) => {
                             var id = utils.createMessageId(item.type, item.year, item.num);
                             return _.assign(item, {id, text});
                         })
                         .catch((text) => {
-                            console.log('fail');
+                            console.log('fail: ' + item.num);
                             var id = utils.createMessageId(item.type, item.year, item.num);
                             return _.assign(item, {id, text});
                         });
