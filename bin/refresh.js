@@ -61,7 +61,7 @@ function refreshMessages(type) {
                             return _.assign(item, {id, text});
                         })
                         .catch((text) => {
-                            console.log(text);
+                            console.log('fail');
                         });
                 }))
                 .delay(CHUNK_DELAY * index)
