@@ -62,6 +62,8 @@ function refreshMessages(type) {
                         })
                         .catch((text) => {
                             console.log('fail');
+                            var id = utils.createMessageId(item.type, item.year, item.num);
+                            return _.assign(item, {id, text});
                         });
                 }))
                 .delay(CHUNK_DELAY * index)
