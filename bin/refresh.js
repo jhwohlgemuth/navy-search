@@ -51,14 +51,18 @@ function refreshMessages(type) {
                 return Bluebird.all(chunk.map(function(item) {
                     var options = {
                         url: item.url,
-                        method: 'GET',
-                        simple: false,
-                        headers: {'User-Agent': 'navy-search-request'}
+                        // method: 'GET',
+                        // simple: false,
+                        // headers: {'User-Agent': 'navy-search-request'}
                     };
-                    return request(options).then((text) => {
-                        var id = utils.createMessageId(item.type, item.year, item.num);
-                        return _.assign(item, {id, text});
-                    });
+                    return request(options)
+                        .then((text) => {
+                            var id = utils.createMessageId(item.type, item.year, item.num);
+                            return _.assign(item, {id, text});
+                        })
+                        .catch((text) => {
+                            console.log(text);
+                        });
                 }))
                 .delay(CHUNK_DELAY * index)
                 .tap(() => console.log('chunk: ' + index));
