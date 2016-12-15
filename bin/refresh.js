@@ -80,6 +80,6 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
     Bluebird.resolve()
         .then(() => refreshMessages('NAVADMIN'))
-        .then(() => refreshMessages('ALNAV'))
+        // .then(() => refreshMessages('ALNAV'))
         .finally(() => db.close());
 });
