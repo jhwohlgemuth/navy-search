@@ -13,7 +13,7 @@ mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
 
-var CHUNK_SIZE = 100;
+var CHUNK_SIZE = 50;
 var CHUNK_DELAY = 1000;
 
 function processError(err) {
@@ -68,6 +68,11 @@ function refreshMessages(type) {
             return (item.text !== 'fail') ? item : request(item.url).then((text) => {
                 console.log('Retry: ' + item.num);
                 var id = utils.createMessageId(item.type, item.year, item.num);
+                return _.assign(item, {id, text});
+            })
+            .catch(() => {
+                var id = utils.createMessageId(item.type, item.year, item.num);
+                var text = 'intentionally left blank';
                 return _.assign(item, {id, text});
             });
         })
