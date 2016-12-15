@@ -55,7 +55,6 @@ function refreshMessages(type) {
                             return _.assign(item, {id, text});
                         })
                         .catch(() => {
-                            console.log('fail: ' + item.num);
                             var id = utils.createMessageId(item.type, item.year, item.num);
                             var text = 'fail';
                             return _.assign(item, {id, text});
@@ -68,6 +67,7 @@ function refreshMessages(type) {
         .reduce((allItems, items) => allItems.concat(items))
         .map((item) => {
             return (item.text !== 'fail') ? item : request(item.url).then((text) => {
+                console.log('Retry: ' + item.num);
                 var id = utils.createMessageId(item.type, item.year, item.num);
                 return _.assign(item, {id, text});
             });
