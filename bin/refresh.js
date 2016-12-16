@@ -48,6 +48,9 @@ function attemptRequest(options, isRetry) {
 }
 
 function isRequestFail(item) {
+    if (item.text === FAIL_TEXT) {
+        console.log('Fail');
+    }
     return (item.text === FAIL_TEXT);
 }
 
