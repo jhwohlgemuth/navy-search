@@ -48,9 +48,6 @@ function attemptRequest(options, isRetry) {
 }
 
 function isRequestFail(item) {
-    if (item.text === FAIL_TEXT) {
-        console.log('Fail');
-    }
     return (item.text === FAIL_TEXT);
 }
 
@@ -80,17 +77,20 @@ function populateMessages(type) {
         .then((items) => {
             var numberOfFails = items.filter(isRequestFail).length;
             console.log('Retry 1: ' + numberOfFails);
-            return Bluebird.all(items.map(maybeRequest));
+            return items;
+            // return Bluebird.all(items.map(maybeRequest));
         })
         .then((items) => {
             var numberOfFails = items.filter(isRequestFail).length;
             console.log('Retry 2: ' + numberOfFails);
-            return Bluebird.all(items.map(maybeRequest));
+            return items;
+            // return Bluebird.all(items.map(maybeRequest));
         })
         .then((items) => {
             var numberOfFails = items.filter(isRequestFail).length;
             console.log('Retry 3: ' + numberOfFails);
-            return Bluebird.all(items.map(maybeRequest));
+            return items;
+            // return Bluebird.all(items.map(maybeRequest));
         })
         .then((items) => Message.create(items))
         .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
