@@ -13,8 +13,11 @@ mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
 
-var CHUNK_SIZE = 50;
+var CHUNK_SIZE = 100;
 var CHUNK_DELAY = 1000;
+var RETRY_TIMES = 3;
+var FAIL_TEXT = 'intentionally left blank';
+var YEARS_OF_MESSAGES = 1;
 
 function processError(err) {
     var ERROR_MESSAGE = chalk.red.bold('ERROR') + '\n\n';
@@ -34,9 +37,19 @@ function hasSameAttr(val) {
     }
 }
 
+function attemptRequest(options) {
+    var args = _.at(options, 'type', 'year', 'num');
+    var item = _.pick(options, 'type', 'year', 'num', 'code', 'url');
+    var requestOptions = _.pick(options, 'url');
+    var id = _.spread(utils.createMessageId)(args);
+    return request(requestOptions)
+        .then((text) => _.assign(item, {id, text}))
+        .catch(() => _.assign(item, {id, text: FAIL_TEXT}));
+}
+
 function refreshMessages(type) {
     var currYear = getCurrentYear();
-    var years = _.range(currYear, currYear - 2);
+    var years = _.range(currYear, currYear - YEARS_OF_MESSAGES);
     return Bluebird.resolve(Message.remove({type}))
         .then(() => {
             return Bluebird.all(years.map((year) => utils.scrapeMessageData(type, year)));
@@ -47,34 +60,14 @@ function refreshMessages(type) {
             var messageItems = _.uniqWith(items, hasSameAttr('id'));
             var chunks = _.chunk(messageItems, CHUNK_SIZE);
             return Bluebird.all(chunks.map(function(chunk, index) {
-                return Bluebird.all(chunk.map(function(item) {
-                    return request(item.url)
-                        .then((text) => {
-                            var id = utils.createMessageId(item.type, item.year, item.num);
-                            return _.assign(item, {id, text});
-                        })
-                        .catch(() => {
-                            var id = utils.createMessageId(item.type, item.year, item.num);
-                            var text = 'fail';
-                            return _.assign(item, {id, text});
-                        });
-                }))
-                .delay(CHUNK_DELAY * index)
-                .tap(() => console.log('chunk: ' + index + chalk.dim('/' + chunks.length)));
+                return Bluebird.all(chunk.map(attemptRequest))
+                    .delay(CHUNK_DELAY * index)
+                    .tap(() => console.log('chunk: ' + index + chalk.dim('/' + chunks.length)));
             }));
         })
         .reduce((allItems, items) => allItems.concat(items))
         .map((item) => {
-            return (item.text !== 'fail') ? item : request(item.url).then((text) => {
-                console.log('Retry: ' + item.num);
-                var id = utils.createMessageId(item.type, item.year, item.num);
-                return _.assign(item, {id, text});
-            })
-            .catch(() => {
-                var id = utils.createMessageId(item.type, item.year, item.num);
-                var text = 'intentionally left blank';
-                return _.assign(item, {id, text});
-            });
+            return (item.text !== 'fail') ? item : attemptRequest(item);
         })
         .then((items) => Message.create(items))
         .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
