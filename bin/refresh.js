@@ -13,7 +13,7 @@ mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
 
-var CHUNK_SIZE = 50;
+var CHUNK_SIZE = 100;
 var CHUNK_DELAY = 1000;
 var FAIL_TEXT = 'intentionally left blank';
 var YEARS_OF_MESSAGES = 2;
@@ -50,6 +50,11 @@ function isRequestFail(item) {
     return (item.text === FAIL_TEXT);
 }
 
+function printNumberOfFails(items) {
+    var NUMBER_OF_FAILS = items.filter(isRequestFail).length;
+    console.log(chalk[NUMBER_OF_FAILS === 0 ? 'dim' : 'red'](`Retry: ${NUMBER_OF_FAILS}`));
+}
+
 function maybeRequest(item) {
     return isRequestFail(item) ? attemptRequest(item, true) : item;
 }
@@ -73,11 +78,11 @@ function populateMessages(type) {
             }));
         })
         .reduce((allItems, items) => allItems.concat(items))
-        .tap((items) => console.log(items.filter(isRequestFail).length))
+        .tap(printNumberOfFails)
         .map(maybeRequest)
-        .tap((items) => console.log(items.filter(isRequestFail).length))
+        .tap(printNumberOfFails)
         .map(maybeRequest)
-        .tap((items) => console.log(items.filter(isRequestFail).length))
+        .tap(printNumberOfFails)
         .then((items) => Message.create(items))
         .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
         .catch(processError);
