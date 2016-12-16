@@ -13,8 +13,8 @@ mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
 
-var CHUNK_SIZE = 80;
-var CHUNK_DELAY = 500;
+var CHUNK_SIZE = 200;
+var CHUNK_DELAY = 1000;
 var FAIL_TEXT = 'intentionally left blank';
 var YEARS_OF_MESSAGES = 2;
 
@@ -78,6 +78,10 @@ function populateMessages(type) {
             }));
         })
         .reduce((allItems, items) => allItems.concat(items))
+        .tap(printNumberOfFails)
+        .map(maybeRequest)
+        .tap(printNumberOfFails)
+        .map(maybeRequest)
         .tap(printNumberOfFails)
         .map(maybeRequest)
         .tap(printNumberOfFails)
