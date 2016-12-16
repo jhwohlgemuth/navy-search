@@ -13,9 +13,8 @@ mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
 
-var CHUNK_SIZE = 100;
-var CHUNK_DELAY = 500;
-var RETRY_TIMES = 3;
+var CHUNK_SIZE = 50;
+var CHUNK_DELAY = 3000;
 var FAIL_TEXT = 'intentionally left blank';
 var YEARS_OF_MESSAGES = 1;
 
