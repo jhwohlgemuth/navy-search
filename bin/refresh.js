@@ -51,7 +51,7 @@ function isRequestFail(item) {
 }
 
 function maybeRequest(item) {
-    return isRequestFail(item) ? item : attemptRequest(item, true);
+    return isRequestFail(item) ? attemptRequest(item, true) : item;
 }
 
 function populateMessages(type) {
@@ -73,9 +73,11 @@ function populateMessages(type) {
             }));
         })
         .reduce((allItems, items) => allItems.concat(items))
-        .tap((items) => {
-            console.log(items.filter(isRequestFail).length);
-        })
+        .tap((items) => console.log(items.filter(isRequestFail).length))
+        .map(maybeRequest)
+        .tap((items) => console.log(items.filter(isRequestFail).length))
+        .map(maybeRequest)
+        .tap((items) => console.log(items.filter(isRequestFail).length))
         .then((items) => Message.create(items))
         .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
         .catch(processError);
