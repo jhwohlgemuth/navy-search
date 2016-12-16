@@ -38,7 +38,6 @@ function hasSameAttr(val) {
 }
 
 function attemptRequest(options, isRetry) {
-    console.log(isRetry);
     var args = _.at(options, 'type', 'year', 'num');
     var item = _.pick(options, 'type', 'year', 'num', 'code', 'url');
     var requestOptions = _.pick(options, 'url');
@@ -69,7 +68,7 @@ function populateMessages(type) {
             var messageItems = _.uniqWith(items, hasSameAttr('id'));
             var chunks = _.chunk(messageItems, CHUNK_SIZE);
             return Bluebird.all(chunks.map(function(chunk, index) {
-                return Bluebird.all(chunk.map(attemptRequest))
+                return Bluebird.all(chunk.map((item) => attemptRequest(item)))
                     .delay(CHUNK_DELAY * index)
                     .tap(() => console.log('chunk: ' + index + chalk.dim('/' + chunks.length)));
             }));
