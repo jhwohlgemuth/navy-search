@@ -62,9 +62,9 @@
   },
   "scripts": {
     "scan": "nsp check",
-    "prestart": "npm run scan && npm run refresh",
+    "prestart": "npm run scan",
     "start": "node index.js",
-    "refresh": "node ./bin/refresh",
+    "populate": "node ./bin/populate",
     "dev": "nodemon index.js",
     "docs": "apidoc -i ./web -o ./web/client/docs",
     "mocha": "mocha -R mocha-unfunk-reporter",

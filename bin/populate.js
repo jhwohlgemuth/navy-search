@@ -52,7 +52,7 @@ function isRequestFail(item) {
 
 function printNumberOfFails(items) {
     var NUMBER_OF_FAILS = items.filter(isRequestFail).length;
-    (NUMBER_OF_FAILS > 0) && console.log(chalk[NUMBER_OF_FAILS === 0 ? 'dim' : 'red'](`Retry: ${NUMBER_OF_FAILS}`));
+    (NUMBER_OF_FAILS > 0) && console.log(chalk[NUMBER_OF_FAILS === 0 ? 'green' : 'red'](`Retry: ${NUMBER_OF_FAILS}`));
 }
 
 function maybeRequest(item) {
