@@ -13,8 +13,8 @@ mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
 
-var CHUNK_SIZE = 50;
-var CHUNK_DELAY = 3000;
+var CHUNK_SIZE = 100;
+var CHUNK_DELAY = 1000;
 var FAIL_TEXT = 'intentionally left blank';
 var YEARS_OF_MESSAGES = 1;
 
@@ -75,19 +75,21 @@ function populateMessages(type) {
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
             var numberOfFails = items.filter(isRequestFail).length;
-            console.log('Retry 1: ' + numberOfFails);
+            console.log(`Fails: ${numberOfFails} / ${items.length}`);
             // return items;
             return Bluebird.all(items.map(maybeRequest));
         })
+        .delay(1000)
         .then((items) => {
             var numberOfFails = items.filter(isRequestFail).length;
-            console.log('Retry 2: ' + numberOfFails);
+            console.log(`Fails: ${numberOfFails} / ${items.length}`);
             // return items;
             return Bluebird.all(items.map(maybeRequest));
         })
+        .delay(1000)
         .then((items) => {
             var numberOfFails = items.filter(isRequestFail).length;
-            console.log('Retry 3: ' + numberOfFails);
+            console.log(`Fails: ${numberOfFails} / ${items.length}`);
             // return items;
             return Bluebird.all(items.map(maybeRequest));
         })
