@@ -16,7 +16,7 @@ var db = mongoose.connection;
 var CHUNK_SIZE = 100;
 var CHUNK_DELAY = 1000;
 var FAIL_TEXT = 'intentionally left blank';
-var YEARS_OF_MESSAGES = 1;
+var YEARS_OF_MESSAGES = 2;
 
 function processError(err) {
     var ERROR_MESSAGE = chalk.red.bold('ERROR') + '\n\n';
@@ -87,6 +87,6 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
     Bluebird.resolve()
         .then(() => populateMessages('NAVADMIN'))
-        // .then(() => populateMessages('ALNAV'))
+        .then(() => populateMessages('ALNAV'))
         .finally(() => db.close());
 });
