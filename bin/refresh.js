@@ -55,7 +55,7 @@ function isRequestFail(item) {
 }
 
 function maybeRequest(item) {
-    return isRequestFail(item) ? item : attemptRequest(item, true);
+    return isRequestFail(item) ? Bluebird.resolve(item) : attemptRequest(item, true);
 }
 
 function populateMessages(type) {
@@ -73,13 +73,25 @@ function populateMessages(type) {
             return Bluebird.all(chunks.map(function(chunk, index) {
                 return Bluebird.all(chunk.map((item) => attemptRequest(item)))
                     .delay(CHUNK_DELAY * index)
-                    .tap(() => console.log('chunk: ' + index + chalk.dim('/' + chunks.length)));
+                    .tap(() => console.log('chunk: ' + (index + 1) + chalk.dim('/' + chunks.length)));
             }));
         })
         .reduce((allItems, items) => allItems.concat(items))
-        .map(maybeRequest)
-        .map(maybeRequest)
-        .map(maybeRequest)
+        .then((items) => {
+            var numberOfFails = items.filter(isRequestFail).length;
+            console.log('Retry 1: ' + numberOfFails);
+            return Bluebird.all(items.map(maybeRequest));
+        })
+        .then((items) => {
+            var numberOfFails = items.filter(isRequestFail).length;
+            console.log('Retry 2: ' + numberOfFails);
+            return Bluebird.all(items.map(maybeRequest));
+        })
+        .then((items) => {
+            var numberOfFails = items.filter(isRequestFail).length;
+            console.log('Retry 3: ' + numberOfFails);
+            return Bluebird.all(items.map(maybeRequest));
+        })
         .then((items) => Message.create(items))
         .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
         .catch(processError);
