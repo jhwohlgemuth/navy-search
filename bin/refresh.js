@@ -13,8 +13,8 @@ mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
 
-var CHUNK_SIZE = 50;
-var CHUNK_DELAY = 5000;
+var CHUNK_SIZE = 100;
+var CHUNK_DELAY = 1000;
 var RETRY_TIMES = 3;
 var FAIL_TEXT = 'intentionally left blank';
 var YEARS_OF_MESSAGES = 1;
@@ -37,7 +37,8 @@ function hasSameAttr(val) {
     }
 }
 
-function attemptRequest(options) {
+function attemptRequest(options, isRetry) {
+    console.log(isRetry);
     var args = _.at(options, 'type', 'year', 'num');
     var item = _.pick(options, 'type', 'year', 'num', 'code', 'url');
     var requestOptions = _.pick(options, 'url');
@@ -47,11 +48,15 @@ function attemptRequest(options) {
         .catch(() => _.assign(item, {id, text: FAIL_TEXT}));
 }
 
-function maybeRequest(item) {
-    return (item.text === FAIL_TEXT) ? item : attemptRequest(item);
+function isRequestFail(item) {
+    return (item.text === FAIL_TEXT);
 }
 
-function refreshMessages(type) {
+function maybeRequest(item) {
+    return isRequestFail(item) ? item : attemptRequest(item, true);
+}
+
+function populateMessages(type) {
     var currYear = getCurrentYear();
     var years = _.range(currYear, currYear - YEARS_OF_MESSAGES);
     return Bluebird.resolve(Message.remove({type}))
@@ -71,6 +76,8 @@ function refreshMessages(type) {
         })
         .reduce((allItems, items) => allItems.concat(items))
         .map(maybeRequest)
+        .map(maybeRequest)
+        .map(maybeRequest)
         .then((items) => Message.create(items))
         .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
         .catch(processError);
@@ -79,7 +86,7 @@ function refreshMessages(type) {
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
     Bluebird.resolve()
-        .then(() => refreshMessages('NAVADMIN'))
-        // .then(() => refreshMessages('ALNAV'))
+        .then(() => populateMessages('NAVADMIN'))
+        // .then(() => populateMessages('ALNAV'))
         .finally(() => db.close());
 });
