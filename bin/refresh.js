@@ -47,6 +47,10 @@ function attemptRequest(options) {
         .catch(() => _.assign(item, {id, text: FAIL_TEXT}));
 }
 
+function maybeRequest(item) {
+    return (item.text === FAIL_TEXT) ? item : attemptRequest(item);
+}
+
 function refreshMessages(type) {
     var currYear = getCurrentYear();
     var years = _.range(currYear, currYear - YEARS_OF_MESSAGES);
@@ -66,9 +70,7 @@ function refreshMessages(type) {
             }));
         })
         .reduce((allItems, items) => allItems.concat(items))
-        .map((item) => {
-            return (item.text !== 'fail') ? item : attemptRequest(item);
-        })
+        .map(maybeRequest)
         .then((items) => Message.create(items))
         .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
         .catch(processError);
