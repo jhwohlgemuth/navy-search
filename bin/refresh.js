@@ -51,7 +51,7 @@ function isRequestFail(item) {
 }
 
 function maybeRequest(item) {
-    return isRequestFail(item) ? Bluebird.resolve(item) : attemptRequest(item, true);
+    return isRequestFail(item) ? item : attemptRequest(item, true);
 }
 
 function populateMessages(type) {
