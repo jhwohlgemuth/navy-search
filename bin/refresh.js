@@ -13,8 +13,8 @@ mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
 
-var CHUNK_SIZE = 100;
-var CHUNK_DELAY = 1000;
+var CHUNK_SIZE = 50;
+var CHUNK_DELAY = 5000;
 var FAIL_TEXT = 'intentionally left blank';
 var YEARS_OF_MESSAGES = 1;
 
@@ -73,25 +73,8 @@ function populateMessages(type) {
             }));
         })
         .reduce((allItems, items) => allItems.concat(items))
-        .then((items) => {
-            var numberOfFails = items.filter(isRequestFail).length;
-            console.log(`Fails: ${numberOfFails} / ${items.length}`);
-            // return items;
-            return Bluebird.all(items.map(maybeRequest));
-        })
-        .delay(1000)
-        .then((items) => {
-            var numberOfFails = items.filter(isRequestFail).length;
-            console.log(`Fails: ${numberOfFails} / ${items.length}`);
-            // return items;
-            return Bluebird.all(items.map(maybeRequest));
-        })
-        .delay(1000)
-        .then((items) => {
-            var numberOfFails = items.filter(isRequestFail).length;
-            console.log(`Fails: ${numberOfFails} / ${items.length}`);
-            // return items;
-            return Bluebird.all(items.map(maybeRequest));
+        .tap((items) => {
+            console.log(items.filter(isRequestFail).length);
         })
         .then((items) => Message.create(items))
         .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
