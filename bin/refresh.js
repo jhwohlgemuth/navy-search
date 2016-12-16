@@ -16,7 +16,7 @@ var db = mongoose.connection;
 var CHUNK_SIZE = 200;
 var CHUNK_DELAY = 1000;
 var FAIL_TEXT = 'intentionally left blank';
-var YEARS_OF_MESSAGES = 2;
+var YEARS_OF_MESSAGES = 1;
 
 function processError(err) {
     var ERROR_MESSAGE = chalk.red.bold('ERROR') + '\n\n';
