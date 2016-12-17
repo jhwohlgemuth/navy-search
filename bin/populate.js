@@ -14,10 +14,12 @@ mongoose.connect(process.env.MONGODB_URI);
 var argv = require('yargs')
     .default('type', 'NAVADMIN')
     .default('year', '16')
+    .array('year')
     .argv;
 
 var type = argv.type;
 var year = argv.year;
+var opts = argv._;
 
 var db = mongoose.connection;
 
@@ -25,6 +27,8 @@ var CHUNK_SIZE = 200;
 var CHUNK_DELAY = 1000;
 var FAIL_TEXT = 'intentionally left blank';
 var YEARS_OF_MESSAGES = 1;
+
+var isNumberLike = _.flow(Number, _.negate(isNaN));
 
 function processError(err) {
     var ERROR_MESSAGE = chalk.red.bold('ERROR') + '\n\n';
@@ -68,8 +72,12 @@ function maybeRequest(item) {
 }
 
 function populateMessages(type) {
-    var years = []
-        .concat(year);
+    var years = _(year)
+        .filter(isNumberLike)
+        .concat(opts)
+        .map(String)
+        .uniq().value();
+        console.log(years);
     return Bluebird.resolve(Message.remove({type}))
         .then(() => Bluebird.all(years.map((year) => utils.scrapeMessageData(type, year))))
         .tap(() => console.log(chalk.dim(`Started ${type} data populate`)))
