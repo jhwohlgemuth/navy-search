@@ -20,7 +20,7 @@ const argv = require('yargs')
 const type = argv.type;
 const year = argv.year;
 const opts = argv._;
-
+console.log(argv);
 const CHUNK_SIZE = 200;
 const CHUNK_DELAY = 1000;
 const FAIL_TEXT = 'intentionally left blank';
