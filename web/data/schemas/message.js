@@ -1,5 +1,9 @@
 var mongoose = require('mongoose');
 
+var options = {
+    timestamps: true
+};
+
 var messageSchema = new mongoose.Schema({
     id: {
         type: String,
@@ -21,6 +25,6 @@ var messageSchema = new mongoose.Schema({
     },
     url: String,
     text: String
-});
+}, options);
 
 module.exports = mongoose.model('Message', messageSchema);
