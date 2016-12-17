@@ -85,6 +85,7 @@ function populateMessages(type) {
         .filter(isNumberLike)
         .map(String)
         .uniq().value();
+        console.log(argv);
     return Bluebird.all(years.map((year) => Message.remove({type, year})))
         .then(() => Bluebird.all(years.map((year) => utils.scrapeMessageData(type, year))))
         .tap(printStartMessage)
