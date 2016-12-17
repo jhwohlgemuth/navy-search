@@ -1,3 +1,4 @@
+// Load .env (if available)
 process.env.VERSION || require('dotenv').config();
 
 const _        = require('lodash');
@@ -7,9 +8,6 @@ const request  = require('request-promise');
 const mongoose = require('mongoose');
 const utils    = require('../web/message.utils');
 const Message  = require('../web/data/schemas/message');
-
-mongoose.Promise = Bluebird;
-mongoose.connect(process.env.MONGODB_URI);
 
 const argv = require('yargs')
     .default('type', 'NAVADMIN')
@@ -25,7 +23,16 @@ const CHUNK_SIZE = 200;
 const CHUNK_DELAY = 1000;
 const FAIL_TEXT = 'intentionally left blank';
 
-const isNumberLike = _.flow(Number, _.negate(isNaN));
+mongoose.Promise = Bluebird;
+mongoose.connect(process.env.MONGODB_URI);
+
+let db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+    Bluebird.resolve()
+        .then(() => populateMessages(type))
+        .finally(() => db.close());
+});
 
 function processError(err) {
     let ERROR_MESSAGE = chalk.red.bold('ERROR') + '\n\n';
@@ -77,13 +84,13 @@ function printNumberOfFails(items) {
 
 function populateMessages(type) {
     let years = _(year).concat(opts)
-        .filter(isNumberLike)
+        .filter(_.flow(Number, _.negate(isNaN)))
         .map(String)
         .uniq().value();
     return Bluebird.all(years.map((year) => Message.remove({type, year})))
         .then(() => Bluebird.all(years.map((year) => utils.scrapeMessageData(type, year))))
-        .tap(printStartMessage)
         .reduce((allItems, items) => allItems.concat(items))
+        .tap(printStartMessage)
         .then((items) => {
             var messageItems = _.uniqWith(items, hasSameAttr('id'));
             var chunks = _.chunk(messageItems, CHUNK_SIZE);
@@ -103,11 +110,3 @@ function populateMessages(type) {
         .then(printDoneMessage)
         .catch(processError);
 }
-
-let db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-    Bluebird.resolve()
-        .then(() => populateMessages(type))
-        .finally(() => db.close());
-});
