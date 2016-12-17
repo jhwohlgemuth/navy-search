@@ -20,7 +20,7 @@ const argv = require('yargs')
 const type = argv.type;
 const year = argv.year;
 const opts = argv._;
-console.log(argv);
+
 const CHUNK_SIZE = 200;
 const CHUNK_DELAY = 1000;
 const FAIL_TEXT = 'intentionally left blank';
@@ -63,11 +63,11 @@ function maybeRequest(item) {
 
 function printStartMessage(items) {
     let type = _(items).flatten().head().type;
-    return console.log(chalk.cyan(`\nStarted ${type} data populate\n`));
+    return console.log(chalk.cyan(`\nStarted ${chalk.bold(type)} data populate\n`));
 }
 
 function printDoneMessage(items) {
-    process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`);
+    process.stdout.write(`${chalk.green.bold('COMPLETE')} ~ ${chalk.bold(items.length)} messages added\n\n`);
 }
 
 function printNumberOfFails(items) {
