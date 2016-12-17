@@ -23,7 +23,7 @@ var opts = argv._;
 
 var db = mongoose.connection;
 
-var CHUNK_SIZE = 200;
+var CHUNK_SIZE = 100;
 var CHUNK_DELAY = 1000;
 var FAIL_TEXT = 'intentionally left blank';
 var YEARS_OF_MESSAGES = 1;
@@ -77,7 +77,6 @@ function populateMessages(type) {
         .concat(opts)
         .map(String)
         .uniq().value();
-        console.log(years);
     return Bluebird.resolve(Message.remove({type}))
         .then(() => Bluebird.all(years.map((year) => utils.scrapeMessageData(type, year))))
         .tap(() => console.log(chalk.dim(`Started ${type} data populate`)))
