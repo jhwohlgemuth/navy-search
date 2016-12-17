@@ -58,7 +58,8 @@
     "nodemon": "^1.8.1",
     "proxyquire": "^1.7.10",
     "sinon": "^1.17.6",
-    "supertest": "^2.0.1"
+    "supertest": "^2.0.1",
+    "yargs": "^6.5.0"
   },
   "scripts": {
     "scan": "nsp check",

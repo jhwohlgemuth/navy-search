@@ -11,6 +11,14 @@ var Message  = require('../web/data/schemas/message');
 mongoose.Promise = Bluebird;
 mongoose.connect(process.env.MONGODB_URI);
 
+var argv = require('yargs')
+    .default('type', 'NAVADMIN')
+    .default('year', '16')
+    .argv;
+
+var type = argv.type;
+var year = argv.year;
+
 var db = mongoose.connection;
 
 var CHUNK_SIZE = 200;
@@ -60,12 +68,10 @@ function maybeRequest(item) {
 }
 
 function populateMessages(type) {
-    var currYear = getCurrentYear();
-    var years = _.range(currYear, currYear - YEARS_OF_MESSAGES);
+    var years = []
+        .concat(year);
     return Bluebird.resolve(Message.remove({type}))
-        .then(() => {
-            return Bluebird.all(years.map((year) => utils.scrapeMessageData(type, year)));
-        })
+        .then(() => Bluebird.all(years.map((year) => utils.scrapeMessageData(type, year))))
         .tap(() => console.log(chalk.dim(`Started ${type} data populate`)))
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
@@ -95,7 +101,6 @@ function populateMessages(type) {
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
     Bluebird.resolve()
-        .then(() => populateMessages('NAVADMIN'))
-        .then(() => populateMessages('ALNAV'))
+        .then(() => populateMessages(type))
         .finally(() => db.close());
 });
