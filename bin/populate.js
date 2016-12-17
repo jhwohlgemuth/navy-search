@@ -62,13 +62,22 @@ function isRequestFail(item) {
     return (item.text === FAIL_TEXT);
 }
 
+function maybeRequest(item) {
+    return isRequestFail(item) ? attemptRequest(item, true) : item;
+}
+
+function printStartMessage(items) {
+    var type = _(items).flatten().head().type;
+    return console.log(chalk.dim(`Started ${type} data populate`));
+}
+
+function printDoneMessage(items) {
+    process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`);
+}
+
 function printNumberOfFails(items) {
     var NUMBER_OF_FAILS = items.filter(isRequestFail).length;
     console.log(chalk[(NUMBER_OF_FAILS > 0) ? 'red' : 'dim'](`Retry: ${NUMBER_OF_FAILS}`));
-}
-
-function maybeRequest(item) {
-    return isRequestFail(item) ? attemptRequest(item, true) : item;
 }
 
 function populateMessages(type) {
@@ -76,9 +85,9 @@ function populateMessages(type) {
         .filter(isNumberLike)
         .map(String)
         .uniq().value();
-    return Bluebird.resolve(Message.remove({type}))
+    return Bluebird.all(years.map((year) => Message.remove({type, year})))
         .then(() => Bluebird.all(years.map((year) => utils.scrapeMessageData(type, year))))
-        .tap(() => console.log(chalk.dim(`Started ${type} data populate`)))
+        .tap(printStartMessage)
         .reduce((allItems, items) => allItems.concat(items))
         .then((items) => {
             var messageItems = _.uniqWith(items, hasSameAttr('id'));
@@ -96,7 +105,7 @@ function populateMessages(type) {
         .map(maybeRequest).tap(printNumberOfFails)
         .map(maybeRequest).tap(printNumberOfFails)
         .then((items) => Message.create(items))
-        .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
+        .then(printDoneMessage)
         .catch(processError);
 }
 
