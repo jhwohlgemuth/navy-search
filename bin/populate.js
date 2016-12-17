@@ -72,9 +72,8 @@ function maybeRequest(item) {
 }
 
 function populateMessages(type) {
-    var years = _(year)
+    var years = _(year).concat(opts)
         .filter(isNumberLike)
-        .concat(opts)
         .map(String)
         .uniq().value();
     return Bluebird.resolve(Message.remove({type}))
@@ -92,14 +91,10 @@ function populateMessages(type) {
         })
         .reduce((allItems, items) => allItems.concat(items))
         .tap(printNumberOfFails)
-        .map(maybeRequest)
-        .tap(printNumberOfFails)
-        .map(maybeRequest)
-        .tap(printNumberOfFails)
-        .map(maybeRequest)
-        .tap(printNumberOfFails)
-        .map(maybeRequest)
-        .tap(printNumberOfFails)
+        .map(maybeRequest).tap(printNumberOfFails)
+        .map(maybeRequest).tap(printNumberOfFails)
+        .map(maybeRequest).tap(printNumberOfFails)
+        .map(maybeRequest).tap(printNumberOfFails)
         .then((items) => Message.create(items))
         .then((items) => process.stdout.write(`${chalk.green.bold('COMPLETE')} (${items.length})\n\n`))
         .catch(processError);
