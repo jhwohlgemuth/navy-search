@@ -23,7 +23,7 @@ var opts = argv._;
 
 var db = mongoose.connection;
 
-var CHUNK_SIZE = 100;
+var CHUNK_SIZE = 200;
 var CHUNK_DELAY = 1000;
 var FAIL_TEXT = 'intentionally left blank';
 var YEARS_OF_MESSAGES = 1;
