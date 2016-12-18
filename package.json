@@ -66,6 +66,7 @@
     "prestart": "npm run scan",
     "start": "node index.js",
     "populate": "node ./bin/populate",
+    "update": "node ./bin/update",
     "dev": "nodemon index.js",
     "docs": "apidoc -i ./web -o ./web/client/docs",
     "mocha": "mocha -R mocha-unfunk-reporter",
