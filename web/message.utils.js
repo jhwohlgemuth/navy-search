@@ -4,7 +4,7 @@ var Xray     = require('x-ray');
 var Bluebird = require('bluebird');
 var mongoose = require('mongoose');
 var request  = require('request-promise');
-var Message  = require('../web/data/schemas/message');
+var Message  = require('../web/data/schema/message');
 
 var NPC_DOMAIN = 'http://www.public.navy.mil';
 

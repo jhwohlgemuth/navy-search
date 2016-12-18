@@ -7,7 +7,7 @@ const Bluebird = require('bluebird');
 const request  = require('request-promise');
 const mongoose = require('mongoose');
 const utils    = require('../web/message.utils');
-const Message  = require('../web/data/schemas/message');
+const Message  = require('../web/data/schema/message');
 
 const argv = require('yargs')
     .default('type', 'NAVADMIN')
