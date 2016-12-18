@@ -7,6 +7,6 @@
     "NAVADMIN",
     "ALNAV"
   ],
-  "url": "https://usn.herokuapp.com/api/v1.0",
-  "sampleUrl": "https://usn.herokuapp.com/api/v1.0"
+  "url": "https://navysearch.org/api/v1.0",
+  "sampleUrl": "https://navysearch.org/api/v1.0"
 }

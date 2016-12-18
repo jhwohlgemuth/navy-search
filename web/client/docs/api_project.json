@@ -8,12 +8,12 @@
     "NAVADMIN",
     "ALNAV"
   ],
-  "url": "https://usn.herokuapp.com/api/v1.0",
-  "sampleUrl": "https://usn.herokuapp.com/api/v1.0",
+  "url": "https://navysearch.org/api/v1.0",
+  "sampleUrl": "https://navysearch.org/api/v1.0",
   "apidoc": "0.2.0",
   "generator": {
     "name": "apidoc",
-    "time": "2016-12-03T03:37:25.806Z",
+    "time": "2016-12-18T03:03:59.409Z",
     "url": "http://apidocjs.com",
     "version": "0.16.1"
   }

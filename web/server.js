@@ -72,9 +72,9 @@ var app = express()
     .use(express.static(__dirname))         /** Serve static files **/
     .use(require('opbeat').middleware.express());
 
-app.get('/', function(req, res) {
+app.get('/api/docs', function(req, res) {
     if (res.get('X-CSRF') === req.sessionID) {
-        res.redirect('client/docs/index.html');
+        res.redirect('/client/docs/index.html');
     } else {
         res.status(412).end();
     }

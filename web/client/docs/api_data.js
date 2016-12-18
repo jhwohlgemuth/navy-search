@@ -8,7 +8,7 @@ define({ "api": [
     "description": "<p>Gets a single message based on message year and number</p>",
     "sampleRequest": [
       {
-        "url": "https://usn.herokuapp.com/api/v1.0/message/ALNAV/16/042"
+        "url": "https://navysearch.org/api/v1.0/message/ALNAV/16/042"
       }
     ],
     "filename": "web/message.js",
@@ -24,7 +24,7 @@ define({ "api": [
     "description": "<p>Gets a list of message data for a given year</p>",
     "sampleRequest": [
       {
-        "url": "https://usn.herokuapp.com/api/v1.0/messages/ALNAV/16"
+        "url": "https://navysearch.org/api/v1.0/messages/ALNAV/16"
       }
     ],
     "filename": "web/messages.js",
@@ -80,7 +80,7 @@ define({ "api": [
     ],
     "sampleRequest": [
       {
-        "url": "https://usn.herokuapp.com/api/v1.0/message"
+        "url": "https://navysearch.org/api/v1.0/message"
       }
     ],
     "filename": "web/message.js",
@@ -96,7 +96,7 @@ define({ "api": [
     "description": "<p>Gets a single message based on message ID</p>",
     "sampleRequest": [
       {
-        "url": "https://usn.herokuapp.com/api/v1.0/message/NAVADMIN16123"
+        "url": "https://navysearch.org/api/v1.0/message/NAVADMIN16123"
       }
     ],
     "filename": "web/message.js",
@@ -112,7 +112,7 @@ define({ "api": [
     "description": "<p>Gets a single message based on message year and number</p>",
     "sampleRequest": [
       {
-        "url": "https://usn.herokuapp.com/api/v1.0/message/NAVADMIN/15/213"
+        "url": "https://navysearch.org/api/v1.0/message/NAVADMIN/15/213"
       }
     ],
     "filename": "web/message.js",
@@ -128,7 +128,7 @@ define({ "api": [
     "description": "<p>Gets a list of message data for a given year</p>",
     "sampleRequest": [
       {
-        "url": "https://usn.herokuapp.com/api/v1.0/messages/NAVADMIN/16"
+        "url": "https://navysearch.org/api/v1.0/messages/NAVADMIN/16"
       }
     ],
     "filename": "web/messages.js",
