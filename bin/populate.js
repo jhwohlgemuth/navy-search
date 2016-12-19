@@ -9,6 +9,11 @@ const mongoose = require('mongoose');
 const utils    = require('../web/message.utils');
 const Message  = require('../web/data/schema/message');
 
+const scrapeItems = utils.scrapeMessageData;
+const maybeRequest = utils.maybeRequest;
+const attemptRequest = utils.attemptRequest;
+const isRequestFail = utils.isRequestFail;
+
 const argv = require('yargs')
     .default('type', 'NAVADMIN')
     .default('year', '16')
@@ -40,28 +45,6 @@ function processError(err) {
     console.log(err);
 }
 
-function hasSameAttr(val) {
-    return (a, b) => (a[val] === b[val]);
-}
-
-function attemptRequest(options, isRetry) {
-    let args = _.at(options, 'type', 'year', 'num');
-    let item = _.pick(options, 'type', 'year', 'num', 'code', 'url');
-    let requestOptions = _.pick(options, 'url');
-    let id = _.spread(utils.createMessageId)(args);
-    return request(requestOptions)
-        .then((text) => _.assign(item, {id, text}))
-        .catch(() => _.assign(item, {id, text: FAIL_TEXT}));
-}
-
-function isRequestFail(item) {
-    return (item.text === FAIL_TEXT);
-}
-
-function maybeRequest(item) {
-    return isRequestFail(item) ? attemptRequest(item, true) : item;
-}
-
 function printStartMessage(items) {
     let type = _(items).flatten().head().type;
     return console.log(chalk.cyan(`\nStarted ${chalk.bold(type)} data populate\n`));
@@ -82,11 +65,11 @@ function populateMessages(type) {
         .map(String)
         .uniq().value();
     return Bluebird.all(years.map((year) => Message.remove({type, year})))
-        .then(() => Bluebird.all(years.map((year) => utils.scrapeMessageData(type, year))))
+        .then(() => Bluebird.all(years.map((year) => scrapeItems(type, year))))
         .reduce((allItems, items) => allItems.concat(items))
         .tap(printStartMessage)
         .then((items) => {
-            var messageItems = _.uniqWith(items, hasSameAttr('id'));
+            var messageItems = _.uniqWith(items, utils.hasSameAttr('id'));
             var chunks = _.chunk(messageItems, CHUNK_SIZE);
             return Bluebird.all(chunks.map(function(chunk, index) {
                 return Bluebird.all(chunk.map((item) => attemptRequest(item)))

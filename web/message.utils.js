@@ -13,6 +13,30 @@ var MSG_TYPE = {
     ALN: 'ALNAV'
 };
 
+const FAIL_TEXT = 'intentionally left blank';
+
+function hasSameAttr(val) {
+    return (a, b) => (a[val] === b[val]);
+}
+
+function attemptRequest(options, isRetry) {
+    let args = _.at(options, 'type', 'year', 'num');
+    let item = _.pick(options, 'type', 'year', 'num', 'code', 'url');
+    let requestOptions = _.pick(options, 'url');
+    let id = _.spread(createMessageId)(args);
+    return request(requestOptions)
+        .then((text) => _.assign(item, {id, text}))
+        .catch(() => _.assign(item, {id, text: FAIL_TEXT}));
+}
+
+function isRequestFail(item) {
+    return (item.text === FAIL_TEXT);
+}
+
+function maybeRequest(item) {
+    return isRequestFail(item) ? attemptRequest(item, true) : item;
+}
+
 function parseMessageUri(data) {
     var messageId = _.head(_.head(data.split('/').slice(-1)).split('.'));
     var ext = _.last(data.split('.'));
@@ -72,5 +96,9 @@ module.exports = {
     createMessageId:   createMessageId,
     isValidMessageId:  isValidMessageId,
     scrapeMessageData: scrapeMessageData,
-    getMessage:        getMessage
+    getMessage:        getMessage,
+    hasSameAttr:       hasSameAttr,
+    attemptRequest:    attemptRequest,
+    maybeRequest:      maybeRequest,
+    isRequestFail:     isRequestFail
 };
