@@ -40,12 +40,6 @@ function processError(err) {
     console.log(err);
 }
 
-function getCurrentYear() {
-    var today = new Date();
-    // Return current year in YY format
-    return Number(String(today.getFullYear()).substring(2));
-}
-
 function hasSameAttr(val) {
     return (a, b) => (a[val] === b[val]);
 }
