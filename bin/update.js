@@ -28,6 +28,8 @@ db.once('open', function() {
     var scrapedItems = scrapeItems(type, year);
     var savedItems = Message.find({type, year}).exec();
     Bluebird.all([scrapedItems, savedItems])
+        // .tap(() => Message.remove({type, year, num: '045'}))
+        // .tap(() => Message.remove({type, year, num: '049'}))
         // .tap(() => Message.remove({type, year, num: '041'}))
         // .tap(() => Message.remove({type, year, num: '042'}))
         .then((data) => _.differenceWith(_.head(data), _.last(data), hasSameAttr('id')))
@@ -63,8 +65,8 @@ function printStartMessage(items) {
 function printDoneMessage(items) {
     if (Array.isArray(items)) {
         var updatedItemsNumStr = items.slice(0)
-            .sort((a, b) => (a < b))
             .map(_.property('num'))
+            .sort((a, b) => (Number(a) > Number(b)))
             .join(', ');
         var details = ` ~ ${chalk.bold(items.length)} messages added (${updatedItemsNumStr})`;
         process.stdout.write(`${chalk.green.bold('COMPLETE')}${details}\n\n`);
