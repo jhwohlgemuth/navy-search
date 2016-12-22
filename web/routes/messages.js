@@ -2,7 +2,7 @@ var _       = require('lodash');
 var os      = require('os');
 var bunyan  = require('bunyan');
 var express = require('express');
-var utils   = require('./message.utils');
+var utils   = require('../message.utils');
 var router  = express.Router();
 
 var log = bunyan.createLogger({
@@ -22,6 +22,23 @@ function collectionJsonMimeType(req, res, next) {
     res.type('application/vnd.collection+json');
     next();
 }
+
+/**
+ * @api {get} /messages/search Search messages
+ * @apiGroup Message
+ * @apiVersion 1.0.0
+ * @apiDescription Search messages
+ * @apiParam {string} q String to search for
+ * @apiExample {json} Search for messages containing "PRT":
+ * curl -i https://api.navysearch.org/v1.0/messages/search?q=PRT
+ * @apiSampleRequest /messages/search
+**/
+router.get('/search', function(req, res) {
+    var searchStrings = _.get(req, 'query.q', '')
+        .split(',')
+        .map(_.trim);
+    res.json({searchStrings});
+});
 
 /**
  * @api {get} /messages/NAVADMIN/:year Get messages data for a given year

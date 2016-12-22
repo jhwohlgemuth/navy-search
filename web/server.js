@@ -15,8 +15,8 @@ var compress   = require('compression');
 var hljs       = require('highlight.js');
 var Remarkable = require('remarkable');
 var store      = require('./data/store');
-var message    = require('./message');
-var messages   = require('./messages');
+var message    = require('./routes/message');
+var messages   = require('./routes/messages');
 
 var md = new Remarkable({
     highlight: function(str, lang) {

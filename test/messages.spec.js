@@ -41,7 +41,7 @@ var TEST_DATA = [
 ];
 
 var stubs = {
-    './message.utils': {
+    '../message.utils': {
         scrapeMessageData: function() {
             return Bluebird.resolve(TEST_DATA);
         },
@@ -51,8 +51,8 @@ var stubs = {
     }
 };
 
-var message = proxyquire('../web/message', stubs);
-var messages = proxyquire('../web/messages', stubs);
+var message = proxyquire('../web/routes/message', stubs);
+var messages = proxyquire('../web/routes/messages', stubs);
 var app = express();
 
 var API_ROOT = '127.0.0.1:5984/';

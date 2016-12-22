@@ -1,7 +1,7 @@
 var _       = require('lodash');
 var bunyan  = require('bunyan');
 var express = require('express');
-var utils   = require('./message.utils');
+var utils   = require('../message.utils');
 var router  = express.Router();
 
 var log = bunyan.createLogger({

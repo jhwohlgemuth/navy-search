@@ -11,7 +11,7 @@ define({ "api": [
         "url": "https://navysearch.org/api/v1.0/message/ALNAV/16/042"
       }
     ],
-    "filename": "web/message.js",
+    "filename": "web/routes/message.js",
     "groupTitle": "ALNAV",
     "name": "GetMessageAlnavYearNumber"
   },
@@ -27,7 +27,7 @@ define({ "api": [
         "url": "https://navysearch.org/api/v1.0/messages/ALNAV/16"
       }
     ],
-    "filename": "web/messages.js",
+    "filename": "web/routes/messages.js",
     "groupTitle": "ALNAV",
     "name": "GetMessagesAlnavYear"
   },
@@ -83,7 +83,7 @@ define({ "api": [
         "url": "https://navysearch.org/api/v1.0/message"
       }
     ],
-    "filename": "web/message.js",
+    "filename": "web/routes/message.js",
     "groupTitle": "Message",
     "name": "GetMessage"
   },
@@ -99,9 +99,45 @@ define({ "api": [
         "url": "https://navysearch.org/api/v1.0/message/NAVADMIN16123"
       }
     ],
-    "filename": "web/message.js",
+    "filename": "web/routes/message.js",
     "groupTitle": "Message",
     "name": "GetMessageId"
+  },
+  {
+    "type": "get",
+    "url": "/messages/search",
+    "title": "Search messages",
+    "group": "Message",
+    "version": "1.0.0",
+    "description": "<p>Search messages</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "q",
+            "description": "<p>String to search for</p>"
+          }
+        ]
+      }
+    },
+    "examples": [
+      {
+        "title": "Search for messages containing \"PRT\":",
+        "content": "curl -i https://api.navysearch.org/v1.0/messages/search?q=PRT",
+        "type": "json"
+      }
+    ],
+    "sampleRequest": [
+      {
+        "url": "https://navysearch.org/api/v1.0/messages/search"
+      }
+    ],
+    "filename": "web/routes/messages.js",
+    "groupTitle": "Message",
+    "name": "GetMessagesSearch"
   },
   {
     "type": "get",
@@ -115,7 +151,7 @@ define({ "api": [
         "url": "https://navysearch.org/api/v1.0/message/NAVADMIN/15/213"
       }
     ],
-    "filename": "web/message.js",
+    "filename": "web/routes/message.js",
     "groupTitle": "NAVADMIN",
     "name": "GetMessageNavadminYearNumber"
   },
@@ -131,7 +167,7 @@ define({ "api": [
         "url": "https://navysearch.org/api/v1.0/messages/NAVADMIN/16"
       }
     ],
-    "filename": "web/messages.js",
+    "filename": "web/routes/messages.js",
     "groupTitle": "NAVADMIN",
     "name": "GetMessagesNavadminYear"
   },

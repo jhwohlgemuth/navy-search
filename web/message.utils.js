@@ -88,6 +88,10 @@ function getMessage(options) {
         .exec();
 }
 
+function searchMessages(options) {
+    
+}
+
 module.exports = {
     parse: {
         messageId:  parseMessageId,
