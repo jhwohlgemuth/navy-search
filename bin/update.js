@@ -28,10 +28,6 @@ db.once('open', function() {
     var scrapedItems = scrapeItems(type, year);
     var savedItems = Message.find({type, year}).exec();
     Bluebird.all([scrapedItems, savedItems])
-        // .tap(() => Message.remove({type, year, num: '045'}))
-        // .tap(() => Message.remove({type, year, num: '049'}))
-        // .tap(() => Message.remove({type, year, num: '041'}))
-        // .tap(() => Message.remove({type, year, num: '042'}))
         .then((data) => _.differenceWith(_.head(data), _.last(data), hasSameAttr('id')))
         .tap(printStartMessage)
         .map(attemptRequest)
