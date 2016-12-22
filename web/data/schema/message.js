@@ -26,5 +26,6 @@ var messageSchema = new mongoose.Schema({
     url: String,
     text: String
 }, options);
+messageSchema.index({text: 'text'});
 
 module.exports = mongoose.model('Message', messageSchema);

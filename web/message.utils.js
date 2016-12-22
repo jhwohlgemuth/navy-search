@@ -88,8 +88,8 @@ function getMessage(options) {
         .exec();
 }
 
-function searchMessages(options) {
-    
+function searchMessages(searchStrings, options) {
+    return searchStrings;
 }
 
 module.exports = {
@@ -101,6 +101,7 @@ module.exports = {
     isValidMessageId:  isValidMessageId,
     scrapeMessageData: scrapeMessageData,
     getMessage:        getMessage,
+    searchMessages:    searchMessages,
     hasSameAttr:       hasSameAttr,
     attemptRequest:    attemptRequest,
     maybeRequest:      maybeRequest,
