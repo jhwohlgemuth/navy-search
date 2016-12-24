@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 'use strict';
 
 var _       = require('lodash');
@@ -19,7 +20,9 @@ var log = bunyan.createLogger({
     ]
 });
 
-var BAD_REQUEST = 400;
+const NUM_FORMAT = '###';
+const NUM_FORMAT_LENGTH = NUM_FORMAT.length;
+const BAD_REQUEST = 400;
 
 function isValidMessageId(req, res, next) {
     if (utils.isValidMessageId(_.get(req, 'params.id', ''))) {
@@ -47,7 +50,7 @@ function isValidYear(val) {
 }
 
 function isValidNum(val) {
-    return val.length === 3;
+    return val.length === NUM_FORMAT_LENGTH;
 }
 
 function hasValidParameters(req, res, next) {

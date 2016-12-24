@@ -12,7 +12,8 @@ const MSG_TYPE = {
     NAV: 'NAVADMIN',
     ALN: 'ALNAV'
 };
-
+const YEAR_FORMAT = 'YY';
+const YEAR_FORMAT_LENGTH = YEAR_FORMAT.length;
 const FAIL_TEXT = 'intentionally left blank';
 
 module.exports = {
@@ -52,12 +53,16 @@ function maybeRequest(item) {
 }
 
 function parseMessageUri(data) {
-    var messageId = _.head(_.head(data.split('/').slice(-1)).split('.'));//TODO: refactor this line
+    var messageId = _(data)
+        .split('/')
+        .takeRight()
+        .split('.')
+        .head();
     var ext = _.last(data.split('.'));
-    var code = _.takeWhile(messageId, _.flowRight(isNaN, Number)).join('');
+    var code = _.takeWhile(messageId, _.flow(Number, isNaN)).join('');
     var codeLength = code.length;
-    var year = messageId.substring(codeLength, codeLength + 2);
-    var num = messageId.substring(codeLength + 2);
+    var year = messageId.substring(codeLength, codeLength + YEAR_FORMAT_LENGTH);
+    var num = messageId.substring(codeLength + YEAR_FORMAT_LENGTH);
     var type = MSG_TYPE[code];
     var url = `${NPC_DOMAIN}${data}`;
     var id = createMessageId(type, year, num);
@@ -73,8 +78,8 @@ function parseMessageId(val) {
     var type = _.takeWhile(arr, _.flow(Number, isNaN))
         .join('')
         .toLowerCase();
-    var year = val.substring(type.length, type.length + 2);
-    var num = val.substr(-3);
+    var year = val.substring(type.length, type.length + YEAR_FORMAT_LENGTH);
+    var num = val.substr(-1 * '###'.length);
     return {type, year, num};
 }
 
@@ -84,7 +89,7 @@ function isValidMessageId(val) {
 }
 
 function scrapeMessageData(type, year, options) {
-    year = (String(year).length === 'YYYY'.length) ? Number(year.substr(-1 * 'YY'.length)) : year;
+    year = (String(year).length === 'YYYY'.length) ? Number(year.substr(-1 * YEAR_FORMAT_LENGTH)) : year;
     var url = `${_.get(options, 'domain', NPC_DOMAIN)}/bupers-npc/reference/messages/${type}S/Pages/${type}20${year}.aspx`;
     return Bluebird.promisify((new Xray())(url, 'a', [{href: '@href'}]))(url)
         .map(val => val.href)
