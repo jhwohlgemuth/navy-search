@@ -1,19 +1,33 @@
-var _        = require('lodash');
-var lunr     = require('lunr');
-var Xray     = require('x-ray');
-var Bluebird = require('bluebird');
-var mongoose = require('mongoose');
-var request  = require('request-promise');
-var Message  = require('../web/data/schema/message');
+const _        = require('lodash');
+const lunr     = require('lunr');
+const Xray     = require('x-ray');
+const Bluebird = require('bluebird');
+const mongoose = require('mongoose');
+const request  = require('request-promise');
+const Message  = require('../web/data/schema/message');
 
-var NPC_DOMAIN = 'http://www.public.navy.mil';
+const NPC_DOMAIN = 'http://www.public.navy.mil';
 
-var MSG_TYPE = {
+const MSG_TYPE = {
     NAV: 'NAVADMIN',
     ALN: 'ALNAV'
 };
 
 const FAIL_TEXT = 'intentionally left blank';
+
+module.exports = {
+    parseMessageId,
+    parseMessageUri,
+    createMessageId,
+    isValidMessageId,
+    scrapeMessageData,
+    getMessage,
+    searchMessages,
+    hasSameAttr,
+    attemptRequest,
+    maybeRequest,
+    isRequestFail
+};
 
 function hasSameAttr(val) {
     return (a, b) => (a[val] === b[val]);
@@ -56,7 +70,7 @@ function createMessageId(type, year, num) {
 
 function parseMessageId(val) {
     var arr = val.split('');
-    var type = _.takeWhile(arr, _.flowRight(isNaN, Number))
+    var type = _.takeWhile(arr, _.flow(Number, isNaN))
         .join('')
         .toLowerCase();
     var year = val.substring(type.length, type.length + 2);
@@ -101,19 +115,3 @@ function searchMessages(searchStrings, options) {
     });
     return Bluebird.all(results);
 }
-
-module.exports = {
-    parse: {
-        messageId:  parseMessageId,
-        messageUri: parseMessageUri
-    },
-    createMessageId:   createMessageId,
-    isValidMessageId:  isValidMessageId,
-    scrapeMessageData: scrapeMessageData,
-    getMessage:        getMessage,
-    searchMessages:    searchMessages,
-    hasSameAttr:       hasSameAttr,
-    attemptRequest:    attemptRequest,
-    maybeRequest:      maybeRequest,
-    isRequestFail:     isRequestFail
-};

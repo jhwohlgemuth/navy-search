@@ -35,7 +35,7 @@ describe('Message Utilities', function() {
         });
     });
     it('can parse message IDs', function() {
-        var parse = utils.parse.messageId;
+        var parse = utils.parseMessageId;
         var obj = parse(TEST_ID);
         expect(obj).to.deep.equal({
             type: 'navadmin',
@@ -44,7 +44,7 @@ describe('Message Utilities', function() {
         });
     });
     it('can parse message URIs', function() {
-        var parse = utils.parse.messageUri;
+        var parse = utils.parseMessageUri;
         var obj = parse(TEST_URI);
         expect(_.pick(obj, 'type', 'year', 'num')).to.deep.equal(TEST_OBJ);
     });

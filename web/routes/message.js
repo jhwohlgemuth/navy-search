@@ -71,7 +71,7 @@ function hasValidParameters(req, res, next) {
 }
 
 function parseMessageDetails(req, res, next) {
-    res.locals.msgDetails = utils.parse.messageId(req.params.id);
+    res.locals.msgDetails = utils.parseMessageId(req.params.id);
     next();
 }
 
