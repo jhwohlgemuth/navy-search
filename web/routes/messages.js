@@ -1,5 +1,6 @@
+'use strict';
+
 var _       = require('lodash');
-var os      = require('os');
 var bunyan  = require('bunyan');
 var express = require('express');
 var utils   = require('../message.utils');
@@ -38,7 +39,8 @@ router.get('/search', function(req, res) {
         .split(',')
         .map(_.trim);
     utils.searchMessages(searchStrings)
-        .then((results) => res.json(results));
+        .then((results) => res.json(results))
+        .catch((err) => log(err));
 });
 
 /**
@@ -69,7 +71,8 @@ router.get('/navadmin/:year', collectionJsonMimeType, function(req, res) {
         return res.json({
             collection: {version, href, items}
         });
-    });
+    })
+    .catch((err) => log(err));
 });
 
 /**
@@ -100,7 +103,8 @@ router.get('/alnav/:year', collectionJsonMimeType, function(req, res) {
         return res.json({
             collection: {version, href, items}
         });
-    });
+    })
+    .catch((err) => log(err));
 });
 
 module.exports = router;

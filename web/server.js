@@ -5,53 +5,71 @@
  * @see [krakenjs/lusca]{@link https://github.com/krakenjs/lusca}
  * @see [helmetjs/helmet]{@link https://github.com/helmetjs/helmet}
 **/
+'use strict';
+
+require('./data/store');
+
 var fs         = require('fs-extra');
 var config     = require('config');
 var express    = require('express');
+var bunyan     = require('bunyan');
 var session    = require('express-session');
 var lusca      = require('lusca');
 var helmet     = require('helmet');
 var compress   = require('compression');
 var hljs       = require('highlight.js');
 var Remarkable = require('remarkable');
-var store      = require('./data/store');
 var message    = require('./routes/message');
 var messages   = require('./routes/messages');
+
+var log = bunyan.createLogger({
+    name: 'message',
+    streams: [
+        {
+            stream: process.stdout
+        },
+        {
+            type: 'file',
+            path: 'http-server.log'
+        }
+    ]
+});
 
 var md = new Remarkable({
     highlight: function(str, lang) {
         if (lang && hljs.getLanguage(lang)) {
             try {
                 return hljs.highlight(lang, str).value;
-            } catch (err) {}
+            } catch (err) {log(err);}
         }
         try {
             return hljs.highlightAuto(str).value;
-        } catch (err) {}
+        } catch (err) {log(err);}
         return '';
     }
 });
 
 var NINETY_DAYS_IN_MILLISECONDS = 7776000000;
+var PRECONDITION_FAILED = 412;
 
 var app = express()
     .engine('html', require('ejs').renderFile)
     .engine('md', function(path, options, fn) {
         fs.readFile(path, 'utf8', function(err, str) {
-            if (err) return fn(err);
+            if (err) {return fn(err);}
             try {
                 var html = md.render(str);
                 fn(null, html);
             } catch (err) {
                 fn(err);
-              }
+            }
         });
     })
     .set('version', process.env.VERSION)
     .set('view engine', 'html')
     .set('views', __dirname + '/client')
     .use(session(config.get('session')))
-    .use(function (req, res, next) {
+    .use(function(req, res, next) {
         res.set('X-CSRF', req.sessionID);
         return next();
     })
@@ -76,7 +94,7 @@ app.get('/api/docs', function(req, res) {
     if (res.get('X-CSRF') === req.sessionID) {
         res.redirect('/client/docs/index.html');
     } else {
-        res.status(412).end();
+        res.status(PRECONDITION_FAILED).end();
     }
 });
 var VERSION = app.get('version');

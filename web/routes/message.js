@@ -1,3 +1,5 @@
+'use strict';
+
 var _       = require('lodash');
 var bunyan  = require('bunyan');
 var express = require('express');
@@ -17,6 +19,8 @@ var log = bunyan.createLogger({
     ]
 });
 
+var BAD_REQUEST = 400;
+
 function isValidMessageId(req, res, next) {
     if (utils.isValidMessageId(_.get(req, 'params.id', ''))) {
         next();
@@ -29,7 +33,7 @@ function isValidMessageId(req, res, next) {
             }]
         };
         log.error(errorResponse);
-        res.status(400);
+        res.status(BAD_REQUEST);
         res.json(errorResponse);
     }
 }
@@ -59,13 +63,13 @@ function hasValidParameters(req, res, next) {
                 code: 'INVALID_MESSAGE_YEAR',
                 description: 'Message year must be a present or past date in "YY" format'
             })
-            .concat(validNum  ? [] : {
+            .concat(validNum ? [] : {
                 title: 'Invalid Message "num" Parameter',
                 code: 'INVALID_MESSAGE_NUM',
                 description: 'Message number must be in "###" format (ex: "2" --> "002")'
             });
         log.error(errorResponse);
-        res.status(400);
+        res.status(BAD_REQUEST);
         res.json(errorResponse);
     }
 }

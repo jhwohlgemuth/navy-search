@@ -1,8 +1,8 @@
+'use strict';
+
 const _        = require('lodash');
-const lunr     = require('lunr');
 const Xray     = require('x-ray');
 const Bluebird = require('bluebird');
-const mongoose = require('mongoose');
 const request  = require('request-promise');
 const Message  = require('../web/data/schema/message');
 
@@ -33,7 +33,7 @@ function hasSameAttr(val) {
     return (a, b) => (a[val] === b[val]);
 }
 
-function attemptRequest(options, isRetry) {
+function attemptRequest(options) {
     let args = _.at(options, 'type', 'year', 'num');
     let item = _.pick(options, 'type', 'year', 'num', 'code', 'url');
     let requestOptions = _.pick(options, 'url');
@@ -52,7 +52,7 @@ function maybeRequest(item) {
 }
 
 function parseMessageUri(data) {
-    var messageId = _.head(_.head(data.split('/').slice(-1)).split('.'));
+    var messageId = _.head(_.head(data.split('/').slice(-1)).split('.'));//TODO: refactor this line
     var ext = _.last(data.split('.'));
     var code = _.takeWhile(messageId, _.flowRight(isNaN, Number)).join('');
     var codeLength = code.length;
@@ -84,9 +84,9 @@ function isValidMessageId(val) {
 }
 
 function scrapeMessageData(type, year, options) {
-    year = (String(year).length === 4) ? Number(year.substr(-2)) : year;
+    year = (String(year).length === 'YYYY'.length) ? Number(year.substr(-1 * 'YY'.length)) : year;
     var url = `${_.get(options, 'domain', NPC_DOMAIN)}/bupers-npc/reference/messages/${type}S/Pages/${type}20${year}.aspx`;
-    return  Bluebird.promisify((new Xray())(url, 'a', [{href: '@href'}]))(url)
+    return Bluebird.promisify((new Xray())(url, 'a', [{href: '@href'}]))(url)
         .map(val => val.href)
         .filter(str => /[.]txt$/.test(str))
         .map(str => str.split('mil')[1])
@@ -102,8 +102,8 @@ function getMessage(options) {
         .exec();
 }
 
-function searchMessages(searchStrings, options) {
-    var score = {$meta: 'textScore'}
+function searchMessages(searchStrings) {
+    var score = {$meta: 'textScore'};
     var results = searchStrings.map((str) => {
         return Message
             .find(
