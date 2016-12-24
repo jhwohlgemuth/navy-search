@@ -76,6 +76,7 @@
     "docs": "apidoc -i ./web -o ./web/client/docs",
     "mocha": "mocha -R mocha-unfunk-reporter",
     "mocha:watch": "npm run mocha -- -w",
+    "pretest": "npm run lint",
     "test": "istanbul cover _mocha",
     "travis": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   }
