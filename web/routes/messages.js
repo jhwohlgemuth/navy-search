@@ -37,8 +37,8 @@ router.get('/search', function(req, res) {
     var searchStrings = _.get(req, 'query.q', '')
         .split(',')
         .map(_.trim);
-    var results = utils.searchMessages(searchStrings);
-    res.json({results});
+    utils.searchMessages(searchStrings)
+        .then((results) => res.json(results));
 });
 
 /**

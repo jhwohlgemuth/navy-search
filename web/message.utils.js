@@ -89,7 +89,17 @@ function getMessage(options) {
 }
 
 function searchMessages(searchStrings, options) {
-    return searchStrings;
+    var score = {$meta: 'textScore'}
+    var results = searchStrings.map((str) => {
+        return Message
+            .find(
+                {$text: {$search: str}},
+                {score: score}
+            )
+            .sort({score: score})
+            .exec();
+    });
+    return Bluebird.all(results);
 }
 
 module.exports = {
