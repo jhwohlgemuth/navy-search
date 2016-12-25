@@ -16,7 +16,10 @@ const YEAR_FORMAT = 'YY';
 const YEAR_FORMAT_LENGTH = YEAR_FORMAT.length;
 const FAIL_TEXT = 'intentionally left blank';
 
+const searchMessages = _.partial(search, Message);
+
 module.exports = {
+    hasSameAttr,
     parseMessageId,
     parseMessageUri,
     createMessageId,
@@ -24,7 +27,6 @@ module.exports = {
     scrapeMessageData,
     getMessage,
     searchMessages,
-    hasSameAttr,
     attemptRequest,
     maybeRequest,
     isRequestFail
@@ -107,10 +109,10 @@ function getMessage(options) {
         .exec();
 }
 
-function searchMessages(searchStrings) {
+function search(model, searchStrings) {
     var score = {$meta: 'textScore'};
     var results = searchStrings.map((str) => {
-        return Message
+        return model
             .find(
                 {$text: {$search: str}},
                 {score: score}
