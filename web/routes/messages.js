@@ -54,11 +54,9 @@ router.get('/search', function(req, res) {
 **/
 router.get('/summary', function(req, res) {
     const types = ['NAVADMIN', 'ALNAV'];
-    const type = types[0];
-    console.log(type)
     Bluebird.all(types.map((type) => utils.getMessages({type})))
         .reduce((allItems, items) => allItems.concat(items))
-        .then((results) => res.json(results.length))
+        .then((results) => res.json(results.length));
 });
 
 /**
