@@ -1,25 +1,20 @@
-var fs         = require('fs-extra');
-var path       = require('path');
-var Bluebird   = require('bluebird');
-var express    = require('express');
-var mocha      = require('mocha');
-var chai       = require('chai');
-var request    = require('supertest');
-var proxyquire = require('proxyquire');
-var expect     = chai.expect;
+const fs         = require('fs-extra');
+const path       = require('path');
+const Bluebird   = require('bluebird');
+const express    = require('express');
+const mocha      = require('mocha');
+const chai       = require('chai');
+const request    = require('supertest');
+const proxyquire = require('proxyquire');
+const expect     = chai.expect;
 
-function readFile(fileName) {
-    var filePath = path.join(__dirname, fileName);
-    return fs.readFileSync(filePath);
-}
-
-var URL_ROOT = 'http://www.public.navy.mil/bupers-npc/reference/messages/Documents/NAVADMINS/NAV2016/';
-var MSG_TYPE = [
+const URL_ROOT = 'http://www.public.navy.mil/bupers-npc/reference/messages/Documents/NAVADMINS/NAV2016/';
+const MSG_TYPE = [
     'NAVADMIN',
     'ALNAV'
 ];
-var TEST_NUM = '042';
-var TEST_DATA = [
+const TEST_NUM = '042';
+const TEST_DATA = [
     {
         id: `NAVADMIN16${TEST_NUM}`,
         type: 'NAVADMIN',
@@ -57,6 +52,11 @@ var app = express();
 
 var API_ROOT = '127.0.0.1:5984/';
 var VERSION  = '1.0';
+
+function readFile(fileName) {
+    var filePath = path.join(__dirname, fileName);
+    return fs.readFileSync(filePath);
+}
 
 app.set('version', VERSION);
 app.use('/message', message);

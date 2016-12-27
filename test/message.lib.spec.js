@@ -1,12 +1,12 @@
-var _      = require('lodash');
-var mocha  = require('mocha');
-var chai   = require('chai');
-var utils  = require('../web/lib/message');
-var expect = chai.expect;
+const _      = require('lodash');
+const mocha  = require('mocha');
+const chai   = require('chai');
+const msglib = require('../web/lib/message');
+const expect = chai.expect;
 
-var TEST_ID = 'NAVADMIN16042';
-var TEST_URI = '/bupers-npc/reference/messages/Documents/NAVADMINS/NAV2016/NAV16042.txt';
-var TEST_OBJ = {
+const TEST_ID = 'NAVADMIN16042';
+const TEST_URI = '/bupers-npc/reference/messages/Documents/NAVADMINS/NAV2016/NAV16042.txt';
+const TEST_OBJ = {
     type: 'NAVADMIN',
     year: '16',
     num: '042'
@@ -14,7 +14,7 @@ var TEST_OBJ = {
 
 describe('Message Utilities', function() {
     it('can validate message IDs', function() {
-        var isValid = utils.isValidMessageId;
+        var isValid = msglib.isValidMessageId;
         var VALID_IDS = [
             'NAVADMIN16042',
             'NAVADMIN15132',
@@ -35,7 +35,7 @@ describe('Message Utilities', function() {
         });
     });
     it('can parse message IDs', function() {
-        var parse = utils.parseMessageId;
+        var parse = msglib.parseMessageId;
         var obj = parse(TEST_ID);
         expect(obj).to.deep.equal({
             type: 'navadmin',
@@ -44,7 +44,7 @@ describe('Message Utilities', function() {
         });
     });
     it('can parse message URIs', function() {
-        var parse = utils.parseMessageUri;
+        var parse = msglib.parseMessageUri;
         var obj = parse(TEST_URI);
         expect(_.pick(obj, 'type', 'year', 'num')).to.deep.equal(TEST_OBJ);
     });
