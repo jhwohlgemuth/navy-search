@@ -28,5 +28,4 @@ app.listen(config.get('http').port);
 // var wss = require('./web/socket.js');
 
 log.info('HTTP server started........', 'Listening on port %j', config.get('http').port);
-log.info('HTTPS server started.......', 'Listening on port %j', config.get('https').port);
-log.info('WebSocket server started...', 'Listening on port %j', config.get('websocket').port);
+// log.info('WebSocket server started...', 'Listening on port %j', config.get('websocket').port);
