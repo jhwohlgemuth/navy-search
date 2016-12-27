@@ -12,9 +12,12 @@ const TEST_OBJ = {
     num: '042'
 };
 
+const isValidId = msglib.isValidMessageId;
+const parseId = msglib.parseMessageId;
+const parseUri = msglib.parseMessageUri;
+
 describe('Message Utilities', function() {
     it('can validate message IDs', function() {
-        var isValid = msglib.isValidMessageId;
         var VALID_IDS = [
             'NAVADMIN16042',
             'NAVADMIN15132',
@@ -22,21 +25,20 @@ describe('Message Utilities', function() {
             'ALNAV16033'
         ];
         var INVALID_IDS = [
-            'NAVADMIN201642',  // four-character year
-            'NAVADMIN1642',    // two-character num
-            'NAVADMIN150T9',   // invalid num
-            'NAV15123'         // invalid type
+            'NAVADMIN201642', // four-character year
+            'NAVADMIN1642',   // two-character num
+            'NAVADMIN150T9',  // invalid num
+            'NAV15123'        // invalid type
         ];
-        VALID_IDS.forEach(function(id) {
-            expect(isValid(id)).to.be.true;
+        VALID_IDS.forEach(function(val) {
+            expect(isValidId(val)).to.be.true;
         });
-        INVALID_IDS.forEach(function(id) {
-            expect(isValid(id)).to.be.false;
+        INVALID_IDS.forEach(function(val) {
+            expect(isValidId(val)).to.be.false;
         });
     });
     it('can parse message IDs', function() {
-        var parse = msglib.parseMessageId;
-        var obj = parse(TEST_ID);
+        var obj = parseId(TEST_ID);
         expect(obj).to.deep.equal({
             type: 'navadmin',
             year: '16',
@@ -44,8 +46,7 @@ describe('Message Utilities', function() {
         });
     });
     it('can parse message URIs', function() {
-        var parse = msglib.parseMessageUri;
-        var obj = parse(TEST_URI);
+        var obj = parseUri(TEST_URI);
         expect(_.pick(obj, 'type', 'year', 'num')).to.deep.equal(TEST_OBJ);
     });
 });

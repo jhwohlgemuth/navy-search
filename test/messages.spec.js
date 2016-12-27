@@ -1,14 +1,15 @@
-const fs         = require('fs-extra');
-const path       = require('path');
 const Bluebird   = require('bluebird');
 const express    = require('express');
 const mocha      = require('mocha');
 const chai       = require('chai');
 const request    = require('supertest');
 const proxyquire = require('proxyquire');
+const readFile   = require('../web/lib/common').readFile;
 const expect     = chai.expect;
 
 const URL_ROOT = 'http://www.public.navy.mil/bupers-npc/reference/messages/Documents/NAVADMINS/NAV2016/';
+const API_ROOT = '127.0.0.1:5984/';
+const VERSION  = '1.0';
 const MSG_TYPE = [
     'NAVADMIN',
     'ALNAV'
@@ -34,30 +35,20 @@ const TEST_DATA = [
         url: `${URL_ROOT}ALN16${TEST_NUM}.txt`
     }
 ];
-
-var stubs = {
+const stubs = {
     '../lib/message': {
         scrapeMessageData: function() {
             return Bluebird.resolve(TEST_DATA);
         },
         getMessage: function() {
-            return Bluebird.resolve(readFile('data/NAVADMIN16215.txt'));
+            return Bluebird.resolve(readFile('../../test/data/NAVADMIN16215.txt'));
         }
     }
 };
 
-var message = proxyquire('../web/routes/message', stubs);
-var messages = proxyquire('../web/routes/messages', stubs);
-var app = express();
-
-var API_ROOT = '127.0.0.1:5984/';
-var VERSION  = '1.0';
-
-function readFile(fileName) {
-    var filePath = path.join(__dirname, fileName);
-    return fs.readFileSync(filePath);
-}
-
+const message = proxyquire('../web/routes/message', stubs);
+const messages = proxyquire('../web/routes/messages', stubs);
+const app = express();
 app.set('version', VERSION);
 app.use('/message', message);
 app.use('/messages', messages);
