@@ -1,18 +1,18 @@
 // Load .env (if available)
 process.env.VERSION || require('dotenv').config();
 
-const _        = require('lodash');
-const chalk    = require('chalk');
-const Bluebird = require('bluebird');
-const request  = require('request-promise');
-const mongoose = require('mongoose');
-const utils    = require('../web/message.utils');
-const Message  = require('../web/data/schema/message');
-
-const scrapeItems = utils.scrapeMessageData;
-const maybeRequest = utils.maybeRequest;
-const attemptRequest = utils.attemptRequest;
-const isRequestFail = utils.isRequestFail;
+const _              = require('lodash');
+const chalk          = require('chalk');
+const Bluebird       = require('bluebird');
+const request        = require('request-promise');
+const mongoose       = require('mongoose');
+const Message        = require('../web/data/schema/message');
+const msglib         = require('../web/lib/message');
+const hasSameAttr    = require('../web/lib/common').hasSameAttr;
+const scrapeItems    = msglib.scrapeMessageData;
+const maybeRequest   = msglib.maybeRequest;
+const attemptRequest = msglib.attemptRequest;
+const isRequestFail  = msglib.isRequestFail;
 
 const argv = require('yargs')
     .default('type', 'NAVADMIN')
@@ -69,7 +69,7 @@ function populateMessages(type) {
         .reduce((allItems, items) => allItems.concat(items))
         .tap(printStartMessage)
         .then((items) => {
-            var messageItems = _.uniqWith(items, utils.hasSameAttr('id'));
+            var messageItems = _.uniqWith(items, hasSameAttr('id'));
             var chunks = _.chunk(messageItems, CHUNK_SIZE);
             return Bluebird.all(chunks.map(function(chunk, index) {
                 return Bluebird.all(chunk.map((item) => attemptRequest(item)))

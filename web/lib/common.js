@@ -7,3 +7,5 @@ exports.readFile = function(fileName) {
     var filePath = path.join(__dirname, fileName);
     return fs.readFileSync(filePath);
 };
+
+exports.hasSameAttr = (val) => (a, b) => (a[val] === b[val]);

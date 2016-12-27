@@ -1,16 +1,15 @@
 // Load .env (if available)
 process.env.VERSION || require('dotenv').config();
 
-const _        = require('lodash');
-const chalk    = require('chalk');
-const Bluebird = require('bluebird');
-const mongoose = require('mongoose');
-const utils    = require('../web/message.utils');
-const Message  = require('../web/data/schema/message');
-
-const scrapeItems = utils.scrapeMessageData;
-const attemptRequest = utils.attemptRequest;
-const hasSameAttr = utils.hasSameAttr;
+const _              = require('lodash');
+const chalk          = require('chalk');
+const Bluebird       = require('bluebird');
+const mongoose       = require('mongoose');
+const Message        = require('../web/data/schema/message');
+const msglib         = require('../web/lib/message');
+const hasSameAttr    = require('../web/lib/common').hasSameAttr;
+const scrapeItems    = msglib.scrapeMessageData;
+const attemptRequest = msglib.attemptRequest;
 
 const argv = require('yargs')
     .default('type', 'NAVADMIN')
