@@ -1,13 +1,13 @@
 /* eslint-disable new-cap */
 'use strict';
 
-var _       = require('lodash');
-var bunyan  = require('bunyan');
-var express = require('express');
-var utils   = require('../message.utils');
-var router  = express.Router();
+const _       = require('lodash');
+const bunyan  = require('bunyan');
+const express = require('express');
+const msglib  = require('../lib/message');
+const router  = express.Router();
 
-var log = bunyan.createLogger({
+const log = bunyan.createLogger({
     name: 'message',
     streams: [
         {
@@ -24,8 +24,12 @@ const NUM_FORMAT = '###';
 const NUM_FORMAT_LENGTH = NUM_FORMAT.length;
 const BAD_REQUEST = 400;
 
-function isValidMessageId(req, res, next) {
-    if (utils.isValidMessageId(_.get(req, 'params.id', ''))) {
+const isValidMessageId = msglib.isValidMessageId;
+const parseMessageId = msglib.parseMessageId;
+const getMessage = msglib.getMessage;
+
+function isValid(req, res, next) {
+    if (isValidMessageId(_.get(req, 'params.id', ''))) {
         next();
     } else {
         var errorResponse = {
@@ -78,7 +82,7 @@ function hasValidParameters(req, res, next) {
 }
 
 function parseMessageDetails(req, res, next) {
-    res.locals.msgDetails = utils.parseMessageId(req.params.id);
+    res.locals.msgDetails = parseMessageId(req.params.id);
     next();
 }
 
@@ -98,7 +102,7 @@ var NO_MESSAGE = 'intentionally left blank';
 router.get('/', function(req, res) {
     var options = _.pick(req.query, 'type', 'year', 'num');
     res.type('text/plain');
-    utils.getMessage(options).then(
+    getMessage(options).then(
         message => res.send(_.get(message, 'text', NO_MESSAGE))
     );
 });
@@ -109,10 +113,10 @@ router.get('/', function(req, res) {
  * @apiDescription Gets a single message based on message ID
  * @apiSampleRequest /message/NAVADMIN16123
 **/
-router.get('/:id', [isValidMessageId, parseMessageDetails], function(req, res) {
+router.get('/:id', [isValid, parseMessageDetails], function(req, res) {
     var options = _.pick(res.locals.msgDetails, 'type', 'year', 'num');
     res.type('text/plain');
-    utils.getMessage(options).then(
+    getMessage(options).then(
         message => res.send(_.get(message, 'text', NO_MESSAGE))
     );
 });
@@ -126,7 +130,7 @@ router.get('/:id', [isValidMessageId, parseMessageDetails], function(req, res) {
 router.get('/NAVADMIN/:year/:num', [hasValidParameters], function(req, res) {
     var options = _.pick(req.params, 'year', 'num');
     res.type('text/plain');
-    utils.getMessage(_.extend(options, {type: 'NAVADMIN'})).then(
+    getMessage(_.extend(options, {type: 'NAVADMIN'})).then(
         message => res.send(_.get(message, 'text', NO_MESSAGE))
     );
 });
@@ -140,7 +144,7 @@ router.get('/NAVADMIN/:year/:num', [hasValidParameters], function(req, res) {
 router.get('/ALNAV/:year/:num', [hasValidParameters], function(req, res) {
     var options = _.pick(req.params, 'year', 'num');
     res.type('text/plain');
-    utils.getMessage(_.extend(options, {type: 'ALNAV'})).then(
+    getMessage(_.extend(options, {type: 'ALNAV'})).then(
         message => res.send(_.get(message, 'text', NO_MESSAGE))
     );
 });

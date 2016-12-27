@@ -41,7 +41,7 @@ var TEST_DATA = [
 ];
 
 var stubs = {
-    '../message.utils': {
+    '../lib/message': {
         scrapeMessageData: function() {
             return Bluebird.resolve(TEST_DATA);
         },

@@ -1,7 +1,7 @@
 var _      = require('lodash');
 var mocha  = require('mocha');
 var chai   = require('chai');
-var utils  = require('../web/message.utils');
+var utils  = require('../web/lib/message');
 var expect = chai.expect;
 
 var TEST_ID = 'NAVADMIN16042';

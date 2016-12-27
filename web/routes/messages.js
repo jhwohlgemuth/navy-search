@@ -1,14 +1,14 @@
 /* eslint-disable new-cap */
 'use strict';
 
-var _        = require('lodash');
-var bunyan   = require('bunyan');
-var express  = require('express');
-var Bluebird = require('bluebird');
-var utils    = require('../message.utils');
-var router   = express.Router();
+const _        = require('lodash');
+const bunyan   = require('bunyan');
+const express  = require('express');
+const Bluebird = require('bluebird');
+const msglib   = require('../lib/message');
+const router   = express.Router();
 
-var log = bunyan.createLogger({
+const log = bunyan.createLogger({
     name: 'messages',
     streams: [
         {
@@ -20,6 +20,11 @@ var log = bunyan.createLogger({
         }
     ]
 });
+
+const scrapeMessageData = msglib.scrapeMessageData;
+const createMessageId = msglib.createMessageId;
+const getMessages = msglib.getMessages;
+const searchMessages = msglib.searchMessages;
 
 function collectionJsonMimeType(req, res, next) {
     res.type('application/vnd.collection+json');
@@ -40,7 +45,7 @@ router.get('/search', function(req, res) {
     var searchStrings = _.get(req, 'query.q', '')
         .split(',')
         .map(_.trim);
-    utils.searchMessages(searchStrings)
+    searchMessages(searchStrings)
         .then((results) => res.json(results))
         .catch((err) => log(err));
 });
@@ -54,7 +59,7 @@ router.get('/search', function(req, res) {
 **/
 router.get('/summary', function(req, res) {
     const types = ['NAVADMIN', 'ALNAV'];
-    Bluebird.all(types.map((type) => utils.getMessages({type})))
+    Bluebird.all(types.map((type) => getMessages({type})))
         .reduce((allItems, items) => allItems.concat(items))
         .then((results) => res.json(results.length));
 });
@@ -72,9 +77,9 @@ router.get('/navadmin/:year', collectionJsonMimeType, function(req, res) {
     var year = req.params.year;
     var href = hostname + `/api/v${version}/messages/navadmin/${year}`;
     var baseUrl = `${hostname}/api/v${version}/message/`;
-    utils.scrapeMessageData('NAVADMIN', year).then(function(messageData) {
+    scrapeMessageData('NAVADMIN', year).then(function(messageData) {
         var items = messageData.map(function(item) {
-            var href = baseUrl + utils.createMessageId(item.type, item.year, item.num);
+            var href = baseUrl + createMessageId(item.type, item.year, item.num);
             var data = _.map(item, function(val, key) {
                 var name = key;
                 var value = val;
@@ -104,9 +109,9 @@ router.get('/alnav/:year', collectionJsonMimeType, function(req, res) {
     var year = req.params.year;
     var href = hostname + `/api/v${version}/messages/alnav/${year}`;
     var baseUrl = `${hostname}/api/v${version}/message/`;
-    utils.scrapeMessageData('ALNAV', year).then(function(messageData) {
+    scrapeMessageData('ALNAV', year).then(function(messageData) {
         var items = messageData.map(function(item) {
-            var href = baseUrl + utils.createMessageId(item.type, item.year, item.num);
+            var href = baseUrl + createMessageId(item.type, item.year, item.num);
             var data = _.map(item, function(val, key) {
                 var name = key;
                 var value = val;

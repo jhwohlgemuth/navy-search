@@ -4,7 +4,7 @@ const _        = require('lodash');
 const Xray     = require('x-ray');
 const Bluebird = require('bluebird');
 const request  = require('request-promise');
-const Message  = require('../web/data/schema/message');
+const Message  = require('../../web/data/schema/message');
 
 const NPC_DOMAIN = 'http://www.public.navy.mil';
 
