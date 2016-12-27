@@ -26,6 +26,7 @@ module.exports = {
     isValidMessageId,
     scrapeMessageData,
     getMessage,
+    getMessages,
     searchMessages,
     attemptRequest,
     maybeRequest,
@@ -106,6 +107,13 @@ function getMessage(options) {
     var num  = _.get(options, 'num');
     return Message
         .findOne({type, year, num})
+        .exec();
+}
+
+function getMessages(options) {
+    var type = _.get(options, 'type', '').toUpperCase();
+    return Message
+        .find({type})
         .exec();
 }
 

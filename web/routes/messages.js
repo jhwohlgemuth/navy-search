@@ -1,11 +1,12 @@
 /* eslint-disable new-cap */
 'use strict';
 
-var _       = require('lodash');
-var bunyan  = require('bunyan');
-var express = require('express');
-var utils   = require('../message.utils');
-var router  = express.Router();
+var _        = require('lodash');
+var bunyan   = require('bunyan');
+var express  = require('express');
+var Bluebird = require('bluebird');
+var utils    = require('../message.utils');
+var router   = express.Router();
 
 var log = bunyan.createLogger({
     name: 'messages',
@@ -42,6 +43,20 @@ router.get('/search', function(req, res) {
     utils.searchMessages(searchStrings)
         .then((results) => res.json(results))
         .catch((err) => log(err));
+});
+
+/**
+ * @api {get} /messages/summary Get summary data for all message types
+ * @apiGroup Message
+ * @apiVersion 1.0.0
+ * @apiDescription Gets summary data for all message types
+ * @apiSampleRequest /messages/summary
+**/
+router.get('/summary', function(req, res) {
+    const types = ['NAVADMIN', 'ALNAV'];
+    Bluebird.all(types.map((type) => utils.getMessages({type})))
+        .reduce((allItems, items) => allItems.concat(items))
+        .then((results) => res.json(results.length));
 });
 
 /**
