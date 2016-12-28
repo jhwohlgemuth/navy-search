@@ -51,17 +51,24 @@ router.get('/search', function(req, res) {
 });
 
 /**
- * @api {get} /messages/summary Get summary data for all message types
+ * @api {get} /messages/count Get count data for all message types
  * @apiGroup Message
  * @apiVersion 1.0.0
- * @apiDescription Gets summary data for all message types
- * @apiSampleRequest /messages/summary
+ * @apiDescription Gets count data for all message types
+ * @apiSampleRequest /messages/count
 **/
-router.get('/summary', function(req, res) {
+router.get('/count', function(req, res) {
     const types = ['NAVADMIN', 'ALNAV'];
     Bluebird.all(types.map((type) => getMessages({type})))
         .reduce((allItems, items) => allItems.concat(items))
-        .then((results) => res.json(results.length));
+        .then((data) => _(data).groupBy('type'))
+        .then((data) => {
+            return _(data).mapValues((messages) => _(messages).groupBy('year'));
+        })
+        .then((data) => {
+            return _(data).mapValues((messages) => _(messages).mapValues(_.property('length')));
+        })
+        .then((details) => res.json(details));
 });
 
 /**

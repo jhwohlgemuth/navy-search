@@ -108,10 +108,10 @@ describe(`GET /api/v${VERSION}/messages/search`, function() {
             });
     });
 });
-describe(`GET /api/v${VERSION}/messages/summary`, function() {
+describe(`GET /api/v${VERSION}/messages/count`, function() {
     this.timeout(3000);
-    var endpoint = `/messages/summary`;
-    it('can get message details for all message types', function(done) {
+    var endpoint = `/messages/count`;
+    it('can get count for all message types', function(done) {
         get(app, endpoint)
             .expect('Content-Type', JSON_CONTENT_TYPE)
             .end(function(err, res) {

@@ -105,6 +105,22 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/messages/count",
+    "title": "Get count data for all message types",
+    "group": "Message",
+    "version": "1.0.0",
+    "description": "<p>Gets count data for all message types</p>",
+    "sampleRequest": [
+      {
+        "url": "https://navysearch.org/api/v1.0/messages/count"
+      }
+    ],
+    "filename": "web/routes/messages.js",
+    "groupTitle": "Message",
+    "name": "GetMessagesCount"
+  },
+  {
+    "type": "get",
     "url": "/messages/search",
     "title": "Search messages",
     "group": "Message",
@@ -195,8 +211,8 @@ define({ "api": [
     "url": "",
     "version": "0.0.0",
     "filename": "web/client/docs/main.js",
-    "group": "_home_vagrant_appdev_navy_search_api_web_client_docs_main_js",
-    "groupTitle": "_home_vagrant_appdev_navy_search_api_web_client_docs_main_js",
+    "group": "_home_vagrant_appdev_navy_search_web_client_docs_main_js",
+    "groupTitle": "_home_vagrant_appdev_navy_search_web_client_docs_main_js",
     "name": ""
   }
 ] });
