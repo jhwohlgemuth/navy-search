@@ -92,7 +92,7 @@ var app = express()
 
 app.get('/api/docs', function(req, res) {
     if (res.get('X-CSRF') === req.sessionID) {
-        res.redirect('/client/docs/index.html');
+        res.redirect('/apidocs/index.html');
     } else {
         res.status(PRECONDITION_FAILED).end();
     }

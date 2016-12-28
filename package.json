@@ -73,7 +73,7 @@
     "dev": "nodemon index.js",
     "lint": "eslint --fix -c ./config/.eslintrc.js --ignore-path ./config/.eslintignore ./web",
     "lint:watch": "watch 'npm run lint' ./web",
-    "docs": "apidoc -i ./web -o ./web/client/docs",
+    "docs": "apidoc -i ./web -o ./web/apidocs",
     "mocha": "mocha -R mocha-unfunk-reporter",
     "mocha:watch": "npm run mocha -- -w",
     "pretest": "npm run lint",
