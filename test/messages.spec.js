@@ -69,15 +69,14 @@ app.use('/messages', messages);
 MSG_TYPE.forEach(function(type) {
     describe(`GET /api/v${VERSION}/messages/${type}/:year`, function() {
         this.timeout(3000);
-        var endpoint = (`/messages/${type}/16`).toLowerCase();
+        var endpoint = `/messages/${type}/16`;
         it('can format scraped messages data', function(done) {
-            request(app)
-                .get(endpoint)
+            get(app, endpoint)
                 .expect(function(res) {
                     var response = res.body;
                     var href = response.collection.href.split(`/v${VERSION}`).slice(1).join('/');
                     expect(response).to.have.property('collection');
-                    expect(href).to.equal(endpoint)
+                    expect(href).to.equal(endpoint.toLowerCase())
                     expect(response.collection.items).to.be.an('array');
                     expect(response.collection.items.length).to.equal(TEST_DATA.length);
                 })
@@ -87,9 +86,7 @@ MSG_TYPE.forEach(function(type) {
                 })
         });
         it('can return Collection+JSON MIME type response', function(done) {
-            request(app)
-                .get(endpoint)
-                .expect(200)
+            get(app, endpoint)
                 .expect('Content-Type', 'application/vnd.collection+json; charset=utf-8')
                 .end(function(err, res) {
                     if (err) {return done(err);}
@@ -100,11 +97,9 @@ MSG_TYPE.forEach(function(type) {
 });
 describe(`GET /api/v${VERSION}/messages/search`, function() {
     this.timeout(3000);
-    var endpoint = (`/messages/search?q=foo`);
+    var endpoint = `/messages/search?q=foo`;
     it('can get message search results array', function(done) {
-        request(app)
-            .get(endpoint)
-            .expect(200)
+        get(app, endpoint)
             .expect('Content-Type', JSON_CONTENT_TYPE)
             .end(function(err, res) {
                 if (err) {return done(err);}
@@ -115,11 +110,9 @@ describe(`GET /api/v${VERSION}/messages/search`, function() {
 });
 describe(`GET /api/v${VERSION}/messages/summary`, function() {
     this.timeout(3000);
-    var endpoint = (`/messages/summary`);
+    var endpoint = `/messages/summary`;
     it('can get message details for all message types', function(done) {
-        request(app)
-            .get(endpoint)
-            .expect(200)
+        get(app, endpoint)
             .expect('Content-Type', JSON_CONTENT_TYPE)
             .end(function(err, res) {
                 if (err) {return done(err);}
@@ -129,11 +122,9 @@ describe(`GET /api/v${VERSION}/messages/summary`, function() {
 });
 describe(`GET /api/v${VERSION}/message`, function() {
     this.timeout(3000);
-    var endpoint = (`/message?type=NAVADMIN&year=16&num=042`);
+    var endpoint = `/message?type=NAVADMIN&year=16&num=042`;
     it('can get message text', function(done) {
-        request(app)
-            .get(endpoint)
-            .expect(200)
+        get(app, endpoint)
             .expect('Content-Type', TEXT_CONTENT_TYPE)
             .end(function(err, res) {
                 if (err) {return done(err);}
@@ -143,11 +134,9 @@ describe(`GET /api/v${VERSION}/message`, function() {
 });
 describe(`GET /api/v${VERSION}/message/:id`, function() {
     this.timeout(3000);
-    var endpoint = (`/message/NAVADMIN16215`).toLowerCase();
+    var endpoint = `/message/NAVADMIN16215`;
     it('can get message text', function(done) {
-        request(app)
-            .get(endpoint)
-            .expect(200)
+        get(app, endpoint)
             .expect('Content-Type', TEXT_CONTENT_TYPE)
             .end(function(err, res) {
                 if (err) {return done(err);}
@@ -157,11 +146,9 @@ describe(`GET /api/v${VERSION}/message/:id`, function() {
 });
 describe(`GET /api/v${VERSION}/message/NAVADMIN/:year/:num`, function() {
     this.timeout(3000);
-    var endpoint = (`/message/NAVADMIN/16/215`).toLowerCase();
+    var endpoint = `/message/NAVADMIN/16/215`;
     it('can get message text', function(done) {
-        request(app)
-            .get(endpoint)
-            .expect(200)
+        get(app, endpoint)
             .expect('Content-Type', TEXT_CONTENT_TYPE)
             .end(function(err, res) {
                 if (err) {return done(err);}
@@ -171,11 +158,9 @@ describe(`GET /api/v${VERSION}/message/NAVADMIN/:year/:num`, function() {
 });
 describe(`GET /api/v${VERSION}/message/ALNAV/:year/:num`, function() {
     this.timeout(3000);
-    var endpoint = (`/message/ALNAV/16/042`).toLowerCase();
+    var endpoint = `/message/ALNAV/16/042`;
     it('can get message text', function(done) {
-        request(app)
-            .get(endpoint)
-            .expect(200)
+        get(app, endpoint)
             .expect('Content-Type', TEXT_CONTENT_TYPE)
             .end(function(err, res) {
                 if (err) {return done(err);}
@@ -183,3 +168,7 @@ describe(`GET /api/v${VERSION}/message/ALNAV/:year/:num`, function() {
             });
     });
 });
+
+function get(app, endpoint) {
+    return request(app).get(endpoint.toLowerCase()).expect(200);
+}
