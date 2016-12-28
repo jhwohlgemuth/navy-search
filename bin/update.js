@@ -59,11 +59,12 @@ function printStartMessage(items) {
 
 function printDoneMessage(items) {
     if (Array.isArray(items)) {
+        var justOne = (items.length === 1);
         var updatedItemsNumStr = items.slice(0)
             .map(_.property('num'))
             .sort((a, b) => (Number(a) > Number(b)))
             .join(', ');
-        var details = ` ~ ${chalk.bold(items.length)} messages added (${updatedItemsNumStr})`;
+        var details = ` ~ ${chalk.bold(items.length)} message${justOne ? '' : 's'} added (${updatedItemsNumStr})`;
         process.stdout.write(`${chalk.green.bold('COMPLETE')}${details}\n\n`);
     }
 }
