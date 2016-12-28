@@ -10,11 +10,18 @@ const expect     = chai.expect;
 const URL_ROOT = 'http://www.public.navy.mil/bupers-npc/reference/messages/Documents/NAVADMINS/NAV2016/';
 const API_ROOT = '127.0.0.1:5984/';
 const VERSION  = '1.0';
+const TEXT_CONTENT_TYPE = 'text/plain; charset=utf-8';
+const JSON_CONTENT_TYPE = 'application/json; charset=utf-8';
 const MSG_TYPE = [
     'NAVADMIN',
     'ALNAV'
 ];
 const TEST_NUM = '042';
+const TEST_SEARCH_RESULTS = [
+    {
+        foo: 'bar'
+    }
+];
 const TEST_DATA = [
     {
         id: `NAVADMIN16${TEST_NUM}`,
@@ -42,6 +49,12 @@ const stubs = {
         },
         getMessage: function() {
             return Bluebird.resolve(readFile('../../test/data/NAVADMIN16215.txt'));
+        },
+        getMessages: function() {
+            return Bluebird.resolve([readFile('../../test/data/NAVADMIN16215.txt')]);
+        },
+        searchMessages: function() {
+            return Bluebird.resolve(TEST_SEARCH_RESULTS);
         }
     }
 };
@@ -85,6 +98,49 @@ MSG_TYPE.forEach(function(type) {
         });
     });
 });
+describe(`GET /api/v${VERSION}/messages/search`, function() {
+    this.timeout(3000);
+    var endpoint = (`/messages/search?q=foo`);
+    it('can get message search results array', function(done) {
+        request(app)
+            .get(endpoint)
+            .expect(200)
+            .expect('Content-Type', JSON_CONTENT_TYPE)
+            .end(function(err, res) {
+                if (err) {return done(err);}
+                expect(res.body).to.deep.equal(TEST_SEARCH_RESULTS);
+                done();
+            });
+    });
+});
+describe(`GET /api/v${VERSION}/messages/summary`, function() {
+    this.timeout(3000);
+    var endpoint = (`/messages/summary`);
+    it('can get message details for all message types', function(done) {
+        request(app)
+            .get(endpoint)
+            .expect(200)
+            .expect('Content-Type', JSON_CONTENT_TYPE)
+            .end(function(err, res) {
+                if (err) {return done(err);}
+                done();
+            });
+    });
+});
+describe(`GET /api/v${VERSION}/message`, function() {
+    this.timeout(3000);
+    var endpoint = (`/message?type=NAVADMIN&year=16&num=042`);
+    it('can get message text', function(done) {
+        request(app)
+            .get(endpoint)
+            .expect(200)
+            .expect('Content-Type', TEXT_CONTENT_TYPE)
+            .end(function(err, res) {
+                if (err) {return done(err);}
+                done();
+            });
+    });
+});
 describe(`GET /api/v${VERSION}/message/:id`, function() {
     this.timeout(3000);
     var endpoint = (`/message/NAVADMIN16215`).toLowerCase();
@@ -92,7 +148,7 @@ describe(`GET /api/v${VERSION}/message/:id`, function() {
         request(app)
             .get(endpoint)
             .expect(200)
-            .expect('Content-Type', 'text/plain; charset=utf-8')
+            .expect('Content-Type', TEXT_CONTENT_TYPE)
             .end(function(err, res) {
                 if (err) {return done(err);}
                 done();
@@ -106,7 +162,7 @@ describe(`GET /api/v${VERSION}/message/NAVADMIN/:year/:num`, function() {
         request(app)
             .get(endpoint)
             .expect(200)
-            .expect('Content-Type', 'text/plain; charset=utf-8')
+            .expect('Content-Type', TEXT_CONTENT_TYPE)
             .end(function(err, res) {
                 if (err) {return done(err);}
                 done();
@@ -120,7 +176,7 @@ describe(`GET /api/v${VERSION}/message/ALNAV/:year/:num`, function() {
         request(app)
             .get(endpoint)
             .expect(200)
-            .expect('Content-Type', 'text/plain; charset=utf-8')
+            .expect('Content-Type', TEXT_CONTENT_TYPE)
             .end(function(err, res) {
                 if (err) {return done(err);}
                 done();

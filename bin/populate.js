@@ -8,7 +8,7 @@ const request        = require('request-promise');
 const mongoose       = require('mongoose');
 const Message        = require('../web/data/schema/message');
 const msglib         = require('../web/lib/message');
-const hasSameAttr    = require('../web/lib/common').hasSameAttr;
+const uniqWithAttr   = require('../web/lib/common').uniqWithAttr;
 const scrapeItems    = msglib.scrapeMessageData;
 const maybeRequest   = msglib.maybeRequest;
 const attemptRequest = msglib.attemptRequest;
@@ -69,7 +69,7 @@ function populateMessages(type) {
         .reduce((allItems, items) => allItems.concat(items))
         .tap(printStartMessage)
         .then((items) => {
-            var messageItems = _.uniqWith(items, hasSameAttr('id'));
+            var messageItems = uniqWithAttr(items, 'id');
             var chunks = _.chunk(messageItems, CHUNK_SIZE);
             return Bluebird.all(chunks.map(function(chunk, index) {
                 return Bluebird.all(chunk.map((item) => attemptRequest(item)))

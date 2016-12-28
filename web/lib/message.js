@@ -19,23 +19,18 @@ const FAIL_TEXT = 'intentionally left blank';
 const searchMessages = _.partial(search, Message);
 
 module.exports = {
-    hasSameAttr,
+    getMessage,
+    getMessages,
+    searchMessages,
     parseMessageId,
     parseMessageUri,
     createMessageId,
     isValidMessageId,
     scrapeMessageData,
-    getMessage,
-    getMessages,
-    searchMessages,
     attemptRequest,
     maybeRequest,
     isRequestFail
 };
-
-function hasSameAttr(val) {
-    return (a, b) => (a[val] === b[val]);
-}
 
 function attemptRequest(options) {
     let args = _.at(options, 'type', 'year', 'num');
