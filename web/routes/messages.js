@@ -1,13 +1,19 @@
 /* eslint-disable new-cap */
 'use strict';
 
-const _        = require('lodash');
-const bunyan   = require('bunyan');
-const express  = require('express');
-const Bluebird = require('bluebird');
-const msglib   = require('../lib/message');
-const router   = express.Router();
-
+const _                 = require('lodash');
+const express           = require('express');
+const bunyan            = require('bunyan');
+const Bluebird          = require('bluebird');
+const msglib            = require('../lib/message');
+const middleware        = require('./middleware');
+const router            = express.Router();
+const validate          = middleware.validate;
+const setMimeType       = middleware.setMimeType;
+const scrapeMessageData = msglib.scrapeMessageData;
+const createMessageId   = msglib.createMessageId;
+const getMessages       = msglib.getMessages;
+const searchMessages    = msglib.searchMessages;
 const log = bunyan.createLogger({
     name: 'messages',
     streams: [
@@ -20,16 +26,6 @@ const log = bunyan.createLogger({
         }
     ]
 });
-
-const scrapeMessageData = msglib.scrapeMessageData;
-const createMessageId = msglib.createMessageId;
-const getMessages = msglib.getMessages;
-const searchMessages = msglib.searchMessages;
-
-function collectionJsonMimeType(req, res, next) {
-    res.type('application/vnd.collection+json');
-    next();
-}
 
 /**
  * @api {get} /messages/search Search messages
@@ -78,7 +74,7 @@ router.get('/count', function(req, res) {
  * @apiDescription Gets a list of message data for a given year
  * @apiSampleRequest /messages/NAVADMIN/16
 **/
-router.get('/navadmin/:year', collectionJsonMimeType, function(req, res) {
+router.get('/navadmin/:year', [validate, setMimeType('collection')], function(req, res) {
     var hostname = 'https://' + req.get('host');
     var version = res.app.get('version');
     var year = req.params.year;
@@ -110,7 +106,7 @@ router.get('/navadmin/:year', collectionJsonMimeType, function(req, res) {
  * @apiDescription Gets a list of message data for a given year
  * @apiSampleRequest /messages/ALNAV/16
 **/
-router.get('/alnav/:year', collectionJsonMimeType, function(req, res) {
+router.get('/alnav/:year', [validate, setMimeType('collection')], function(req, res) {
     var hostname = 'https://' + req.get('host');
     var version = res.app.get('version');
     var year = req.params.year;

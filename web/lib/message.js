@@ -7,15 +7,37 @@ const request  = require('request-promise');
 const Message  = require('../../web/data/schema/message');
 
 const NPC_DOMAIN = 'http://www.public.navy.mil';
-
-const MSG_TYPE = {
+const MSG_TYPE_LOOKUP = {
     NAV: 'NAVADMIN',
     ALN: 'ALNAV'
 };
 const YEAR_FORMAT = 'YY';
+const NUM_FORMAT = '###';
 const YEAR_FORMAT_LENGTH = YEAR_FORMAT.length;
+const NUM_FORMAT_LENGTH = NUM_FORMAT.length;
+const ERROR_LOOKUP = {
+    id: {
+        title: 'Invalid Message ID',
+        code: 'INVALID_MESSAGE_ID',
+        description: 'Message ID must include type, year, and number. Message ID format is "(NAVADMIN|ALNAV)YY###"'
+    },
+    type: {
+        title: 'Invalid Message ID',
+        code: 'INVALID_MESSAGE_ID',
+        description: 'Message ID must include type, year, and number. Message ID format is "(NAVADMIN|ALNAV)YY###"'
+    },
+    year: {
+        title: 'Invalid Message "year" Parameter',
+        code: 'INVALID_MESSAGE_YEAR',
+        description: 'Message year must be a present or past date in "YY" format'
+    },
+    num: {
+        title: 'Invalid Message "num" Parameter',
+        code: 'INVALID_MESSAGE_NUM',
+        description: 'Message number must be in "###" format (ex: "2" --> "002")'
+    }
+};
 const FAIL_TEXT = 'intentionally left blank';
-
 const searchMessages = _.partial(search, Message);
 
 module.exports = {
@@ -25,7 +47,11 @@ module.exports = {
     parseMessageId,
     parseMessageUri,
     createMessageId,
+    validateValues,
     isValidMessageId,
+    isValidMessageType,
+    isValidMessageYear,
+    isValidMessageNum,
     scrapeMessageData,
     attemptRequest,
     maybeRequest,
@@ -61,7 +87,7 @@ function parseMessageUri(data) {
     var codeLength = code.length;
     var year = messageId.substring(codeLength, codeLength + YEAR_FORMAT_LENGTH);
     var num = messageId.substring(codeLength + YEAR_FORMAT_LENGTH);
-    var type = MSG_TYPE[code];
+    var type = MSG_TYPE_LOOKUP[code];
     var url = `${NPC_DOMAIN}${data}`;
     var id = createMessageId(type, year, num);
     return {id, type, code, year, num, ext, url};
@@ -81,9 +107,43 @@ function parseMessageId(val) {
     return {type, year, num};
 }
 
+function validateValues() {
+    var params = _.head(Array.prototype.slice.apply(arguments));
+    var methodLookup = {
+        id:   isValidMessageId,
+        type: isValidMessageId,
+        year: isValidMessageYear,
+        num:  isValidMessageNum
+    };
+    var methodNames = Object.keys(_.pick(methodLookup, Object.keys(params)));
+    var isValid = methodNames.map((val) => methodLookup[val](params[val]));
+    return (isValid.every(_.identity)) ? {} : {
+        errors: _(isValid)
+            .map((val, i) => (val ? null : ERROR_LOOKUP[methodNames[i]]))
+            .compact()
+            .value()
+    };
+}
+
 function isValidMessageId(val) {
     var MESSAGE_ID_REGEX = /^[a-z]{5,8}\d{5}$/gmi;
     return MESSAGE_ID_REGEX.test(val);
+}
+
+function isValidMessageType(val) {
+    return _(MSG_TYPE_LOOKUP).values().includes(val);
+}
+
+function isValidMessageYear(val) {
+    var FORMAT = 'YY';
+    var len = FORMAT.length;
+    var valLen = val.length;
+    var year = String(new Date().getFullYear()).substring(valLen);
+    return (valLen === len) && !_.flow(Number, isNaN)(val) && (Number(val) <= Number(year));
+}
+
+function isValidMessageNum(val) {
+    return val.length === NUM_FORMAT_LENGTH;
 }
 
 function scrapeMessageData(type, year, options) {

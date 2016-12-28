@@ -1,90 +1,15 @@
 /* eslint-disable new-cap */
 'use strict';
 
-const _       = require('lodash');
-const bunyan  = require('bunyan');
-const express = require('express');
-const msglib  = require('../lib/message');
-const router  = express.Router();
-
-const log = bunyan.createLogger({
-    name: 'message',
-    streams: [
-        {
-            stream: process.stdout
-        },
-        {
-            type: 'file',
-            path: 'navy-search.log'
-        }
-    ]
-});
-
-const NUM_FORMAT = '###';
-const NUM_FORMAT_LENGTH = NUM_FORMAT.length;
-const BAD_REQUEST = 400;
-
-const isValidMessageId = msglib.isValidMessageId;
+const _              = require('lodash');
+const express        = require('express');
+const msglib         = require('../lib/message');
+const middleware     = require('./middleware');
+const router         = express.Router();
+const validate       = middleware.validate;
+const setMimeType    = middleware.setMimeType;
 const parseMessageId = msglib.parseMessageId;
-const getMessage = msglib.getMessage;
-
-function isValid(req, res, next) {
-    if (isValidMessageId(_.get(req, 'params.id', ''))) {
-        next();
-    } else {
-        var errorResponse = {
-            errors: [{
-                title: 'Invalid Message ID',
-                code: 'INVALID_MESSAGE_ID',
-                description: 'Message ID must include type, year, and number. Message ID format is "(NAVADMIN|ALNAV)YY###"'
-            }]
-        };
-        log.error(errorResponse);
-        res.status(BAD_REQUEST);
-        res.json(errorResponse);
-    }
-}
-
-function isValidYear(val) {
-    var FORMAT = 'YY';
-    var len = FORMAT.length;
-    var valLen = val.length;
-    var year = String(new Date().getFullYear()).substring(valLen);
-    return (valLen === len) && (Number(val) <= Number(year));
-}
-
-function isValidNum(val) {
-    return val.length === NUM_FORMAT_LENGTH;
-}
-
-function hasValidParameters(req, res, next) {
-    var validYear = isValidYear(_.get(req, 'params.year', ''));
-    var validNum = isValidNum(_.get(req, 'params.num', ''));
-    if (validYear && validNum) {
-        next();
-    } else {
-        var errorResponse = {errors: []};
-        errorResponse.errors = []
-            .concat(validYear ? [] : {
-                title: 'Invalid Message "year" Parameter',
-                code: 'INVALID_MESSAGE_YEAR',
-                description: 'Message year must be a present or past date in "YY" format'
-            })
-            .concat(validNum ? [] : {
-                title: 'Invalid Message "num" Parameter',
-                code: 'INVALID_MESSAGE_NUM',
-                description: 'Message number must be in "###" format (ex: "2" --> "002")'
-            });
-        log.error(errorResponse);
-        res.status(BAD_REQUEST);
-        res.json(errorResponse);
-    }
-}
-
-function parseMessageDetails(req, res, next) {
-    res.locals.msgDetails = parseMessageId(req.params.id);
-    next();
-}
+const getMessage     = msglib.getMessage;
 
 var NO_MESSAGE = 'intentionally left blank';
 /**
@@ -99,9 +24,8 @@ var NO_MESSAGE = 'intentionally left blank';
  * curl -i https://api.navysearch.org/v1.0/message?type=NAVADMIN&year=16&num=042
  * @apiSampleRequest /message
 **/
-router.get('/', function(req, res) {
+router.get('/', setMimeType('text'), function(req, res) {
     var options = _.pick(req.query, 'type', 'year', 'num');
-    res.type('text/plain');
     getMessage(options).then(
         message => res.send(_.get(message, 'text', NO_MESSAGE))
     );
@@ -113,9 +37,8 @@ router.get('/', function(req, res) {
  * @apiDescription Gets a single message based on message ID
  * @apiSampleRequest /message/NAVADMIN16123
 **/
-router.get('/:id', [isValid, parseMessageDetails], function(req, res) {
-    var options = _.pick(res.locals.msgDetails, 'type', 'year', 'num');
-    res.type('text/plain');
+router.get('/:id', [validate, setMimeType('text')], function(req, res) {
+    var options = parseMessageId(req.params.id);
     getMessage(options).then(
         message => res.send(_.get(message, 'text', NO_MESSAGE))
     );
@@ -127,9 +50,8 @@ router.get('/:id', [isValid, parseMessageDetails], function(req, res) {
  * @apiDescription Gets a single message based on message year and number
  * @apiSampleRequest /message/NAVADMIN/15/213
 **/
-router.get('/NAVADMIN/:year/:num', [hasValidParameters], function(req, res) {
+router.get('/NAVADMIN/:year/:num', [validate, setMimeType('text')], function(req, res) {
     var options = _.pick(req.params, 'year', 'num');
-    res.type('text/plain');
     getMessage(_.extend(options, {type: 'NAVADMIN'})).then(
         message => res.send(_.get(message, 'text', NO_MESSAGE))
     );
@@ -141,9 +63,8 @@ router.get('/NAVADMIN/:year/:num', [hasValidParameters], function(req, res) {
  * @apiDescription Gets a single message based on message year and number
  * @apiSampleRequest /message/ALNAV/16/042
 **/
-router.get('/ALNAV/:year/:num', [hasValidParameters], function(req, res) {
+router.get('/ALNAV/:year/:num', [validate, setMimeType('text')], function(req, res) {
     var options = _.pick(req.params, 'year', 'num');
-    res.type('text/plain');
     getMessage(_.extend(options, {type: 'ALNAV'})).then(
         message => res.send(_.get(message, 'text', NO_MESSAGE))
     );
