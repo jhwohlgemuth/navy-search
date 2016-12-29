@@ -29,6 +29,7 @@ module.exports = {
     csp: {
         'default-src': '\'self\' \'unsafe-inline\'',
         'script-src':  '\'self\' \'unsafe-eval\' cdnjs.cloudflare.com',
-        'font-src': '\'self\' fonts.gstatic.com data:'
+        'font-src': '\'self\' fonts.gstatic.com data:',
+        'connect-src': 'https://navysearch.org https://www.navysearch.org'
     }
 };
