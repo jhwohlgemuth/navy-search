@@ -8,12 +8,12 @@ define({
     "NAVADMIN",
     "ALNAV"
   ],
-  "url": "https://navysearch.org/api/v1.0",
-  "sampleUrl": "https://navysearch.org/api/v1.0",
+  "url": "https://www.navysearch.org/api/v1.0",
+  "sampleUrl": "https://www.navysearch.org/api/v1.0",
   "apidoc": "0.2.0",
   "generator": {
     "name": "apidoc",
-    "time": "2016-12-28T21:28:01.477Z",
+    "time": "2016-12-29T22:40:35.128Z",
     "url": "http://apidocjs.com",
     "version": "0.16.1"
   }

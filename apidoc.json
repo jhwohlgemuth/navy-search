@@ -7,6 +7,6 @@
     "NAVADMIN",
     "ALNAV"
   ],
-  "url": "https://navysearch.org/api/v1.0",
-  "sampleUrl": "https://navysearch.org/api/v1.0"
+  "url": "https://www.navysearch.org/api/v1.0",
+  "sampleUrl": "https://www.navysearch.org/api/v1.0"
 }

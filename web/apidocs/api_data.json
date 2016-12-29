@@ -8,7 +8,7 @@
     "description": "<p>Gets a single message based on message year and number</p>",
     "sampleRequest": [
       {
-        "url": "https://navysearch.org/api/v1.0/message/ALNAV/16/042"
+        "url": "https://www.navysearch.org/api/v1.0/message/ALNAV/16/042"
       }
     ],
     "filename": "web/routes/message.js",
@@ -24,7 +24,7 @@
     "description": "<p>Gets a list of message data for a given year</p>",
     "sampleRequest": [
       {
-        "url": "https://navysearch.org/api/v1.0/messages/ALNAV/16"
+        "url": "https://www.navysearch.org/api/v1.0/messages/ALNAV/16"
       }
     ],
     "filename": "web/routes/messages.js",
@@ -80,7 +80,7 @@
     ],
     "sampleRequest": [
       {
-        "url": "https://navysearch.org/api/v1.0/message"
+        "url": "https://www.navysearch.org/api/v1.0/message"
       }
     ],
     "filename": "web/routes/message.js",
@@ -96,7 +96,7 @@
     "description": "<p>Gets a single message based on message ID</p>",
     "sampleRequest": [
       {
-        "url": "https://navysearch.org/api/v1.0/message/NAVADMIN16123"
+        "url": "https://www.navysearch.org/api/v1.0/message/NAVADMIN16123"
       }
     ],
     "filename": "web/routes/message.js",
@@ -112,7 +112,7 @@
     "description": "<p>Gets count data for all message types</p>",
     "sampleRequest": [
       {
-        "url": "https://navysearch.org/api/v1.0/messages/count"
+        "url": "https://www.navysearch.org/api/v1.0/messages/count"
       }
     ],
     "filename": "web/routes/messages.js",
@@ -148,7 +148,7 @@
     ],
     "sampleRequest": [
       {
-        "url": "https://navysearch.org/api/v1.0/messages/search"
+        "url": "https://www.navysearch.org/api/v1.0/messages/search"
       }
     ],
     "filename": "web/routes/messages.js",
@@ -164,7 +164,7 @@
     "description": "<p>Gets a single message based on message year and number</p>",
     "sampleRequest": [
       {
-        "url": "https://navysearch.org/api/v1.0/message/NAVADMIN/15/213"
+        "url": "https://www.navysearch.org/api/v1.0/message/NAVADMIN/15/213"
       }
     ],
     "filename": "web/routes/message.js",
@@ -180,7 +180,7 @@
     "description": "<p>Gets a list of message data for a given year</p>",
     "sampleRequest": [
       {
-        "url": "https://navysearch.org/api/v1.0/messages/NAVADMIN/16"
+        "url": "https://www.navysearch.org/api/v1.0/messages/NAVADMIN/16"
       }
     ],
     "filename": "web/routes/messages.js",
@@ -210,9 +210,9 @@
     "type": "",
     "url": "",
     "version": "0.0.0",
-    "filename": "web/client/docs/main.js",
-    "group": "_home_vagrant_appdev_navy_search_web_client_docs_main_js",
-    "groupTitle": "_home_vagrant_appdev_navy_search_web_client_docs_main_js",
+    "filename": "web/apidocs/main.js",
+    "group": "_home_vagrant_appdev_navy_search_web_apidocs_main_js",
+    "groupTitle": "_home_vagrant_appdev_navy_search_web_apidocs_main_js",
     "name": ""
   }
 ]
