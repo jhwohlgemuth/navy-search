@@ -21,7 +21,7 @@ var NO_MESSAGE = 'intentionally left blank';
  * @apiParam {string{2}} year Year in YY format (15, 16, etc...)
  * @apiParam {string{3}} num Message number (004, 052, 213, etc...)
  * @apiExample {json} Example usage:
- * curl -i https://api.navysearch.org/v1.0/message?type=NAVADMIN&year=16&num=042
+ * curl -i https://www.navysearch.org/v1.0/message?type=NAVADMIN&year=16&num=042
  * @apiSampleRequest /message
 **/
 router.get('/', setMimeType('text'), function(req, res) {

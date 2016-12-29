@@ -34,7 +34,7 @@ const log = bunyan.createLogger({
  * @apiDescription Search messages
  * @apiParam {string} q String to search for
  * @apiExample {json} Search for messages containing "PRT":
- * curl -i https://api.navysearch.org/v1.0/messages/search?q=PRT
+ * curl -i https://www.navysearch.org/v1.0/messages/search?q=PRT
  * @apiSampleRequest /messages/search
 **/
 router.get('/search', function(req, res) {
