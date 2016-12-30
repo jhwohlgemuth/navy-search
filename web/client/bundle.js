@@ -6,7 +6,7 @@ require('./shims/marionette.radio.shim');
 require('./helpers/handlebars.helpers');
 require('./helpers/jquery.extensions');
 require('./helpers/underscore.mixins');
-var ApplicationModel = Backbone.Model.extend({ defaults: { name: 'omaha-project' } });
+var ApplicationModel = Backbone.Model.extend({ defaults: { name: 'Navy Search' } });
 var Application = Marionette.Application.extend({
     region: 'body',
     model: new ApplicationModel()
