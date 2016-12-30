@@ -36,6 +36,7 @@ function validate(req, res, next) {
 function setMimeType(name) {
     var mimeTypeLookup = {
         text: 'text/plain',
+        javascript: 'application/javascript',
         collection: 'application/vnd.collection+json'
     };
     return function(req, res, next) {
