@@ -48,10 +48,10 @@ const stubs = {
             return Bluebird.resolve(TEST_DATA);
         },
         getMessage: function() {
-            return Bluebird.resolve(readFile('../../test/data/NAVADMIN16215.txt'));
+            return Bluebird.resolve(readFile('../../test/data/NAVADMIN16215.txt').toString());
         },
         getMessages: function() {
-            return Bluebird.resolve([readFile('../../test/data/NAVADMIN16215.txt')]);
+            return Bluebird.resolve([readFile('../../test/data/NAVADMIN16215.txt').toString()]);
         },
         searchMessages: function() {
             return Bluebird.resolve(TEST_SEARCH_RESULTS);
