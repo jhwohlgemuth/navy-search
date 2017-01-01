@@ -21,8 +21,6 @@ var hljs       = require('highlight.js');
 var Remarkable = require('remarkable');
 var message    = require('./routes/message');
 var messages   = require('./routes/messages');
-const middleware     = require('./routes/middleware');
-const setMimeType    = middleware.setMimeType;
 
 var log = bunyan.createLogger({
     name: 'message',
@@ -93,8 +91,11 @@ var app = express()
     .use(require('opbeat').middleware.express());
 
 app.get('/', function(req, res) {
-    console.log('Boot!');
-    res.redirect('/client/index.html');
+    if (res.get('X-CSRF') === req.sessionID) {
+        res.redirect('/client/index.html');
+    } else {
+        res.status(PRECONDITION_FAILED).end();
+    }
 });
 app.get('/api/docs', function(req, res) {
     if (res.get('X-CSRF') === req.sessionID) {
