@@ -107,7 +107,7 @@ module.exports = new Application();
     var Backbone = require('backbone');
     var WebApp = require('./app');
     var Example = require('./router');
-    var View = require('./views/example');
+    var Homepage = require('./views/home');
     WebApp.on('before:start', function () {
         console.info(WebApp.model.get('name') + ' is starting...');
         WebApp.router = new Example.Router();
@@ -115,7 +115,7 @@ module.exports = new Application();
     WebApp.on('start', function () {
         Backbone.history.start();
         console.info(WebApp.model.get('name') + ' is started!');
-        WebApp.getRegion().show(new View());
+        WebApp.showView(new Homepage(), { replaceElement: true });
     });
     if (typeof define === 'undefined') {
         document.addEventListener('DOMContentLoaded', function () {
@@ -125,15 +125,15 @@ module.exports = new Application();
         WebApp.start();
     }
 }(require));
-},{"./app":1,"./router":7,"./views/example":10,"backbone":14}],6:[function(require,module,exports){
+},{"./app":1,"./router":7,"./views/home":10,"backbone":14}],6:[function(require,module,exports){
 (function (require, exports) {
     'use strict';
     var Backbone = require('backbone');
     var WebApp = require('./../app');
-    var ExampleModel = Backbone.Model.extend({ defaults: { name: WebApp.model.get('name') } });
-    var ExampleCollection = Backbone.Collection.extend({ model: ExampleModel });
-    exports.Model = ExampleModel;
-    exports.Collection = ExampleCollection;
+    var DataModel = Backbone.Model.extend({ defaults: { name: WebApp.model.get('name') } });
+    var DataCollection = Backbone.Collection.extend({ model: DataModel });
+    exports.Model = DataModel;
+    exports.Collection = DataCollection;
 }(require, exports));
 },{"./../app":1,"backbone":14}],7:[function(require,module,exports){
 (function (require, exports) {
@@ -164,13 +164,13 @@ module.exports = new Application();
 },{"backbone.marionette":12,"backbone.radio":13,"underscore":60}],9:[function(require,module,exports){
 module.exports = function (Handlebars) {
     this['JST'] = this['JST'] || {};
-    this['JST']['example'] = Handlebars.template({
+    this['JST']['home'] = Handlebars.template({
         'compiler': [
             7,
             '>= 4.0.0'
         ],
         'main': function (container, depth0, helpers, partials, data) {
-            return '<header role="banner"></header>\n<nav role="navigation"></nav>\n<section id="main"></section>\n<footer role="contentinfo">\n    Made with <span style="color: red;font-weight: bold;">\u2764</span> using <a href="https://github.com/omahajs/generator-omaha">OMAHA JS</a>\n</footer>\n';
+            return '<footer role="contentinfo">\n    Made with <span style="color: red;font-weight: bold;">\u2764</span> using <a href="https://github.com/omahajs/generator-omaha">OMAHA JS</a>\n</footer>\n<section id="main">\n    <div class="full-width centered navy-search text-input-wrapper">\n        <input type="text" class="centered" placeholder="Search Navy Messages"/>\n    </div>\n    <!-- <button class="submit-btn">go</button> -->\n    <div class="bottom full-width centered control-wrapper">\n        <button class="about-btn">about</button>\n    </button>\n</section>\n';
         },
         'useData': true
     });
@@ -178,15 +178,29 @@ module.exports = function (Handlebars) {
 }(require('handlebars'));
 },{"handlebars":45}],10:[function(require,module,exports){
 'use strict';
-var Marionette = require('backbone.marionette');
+var Mn = require('backbone.marionette');
 var JST = require('./../templates');
-var Example = require('./../models/example');
-var ExampleView = Marionette.View.extend({
-    template: JST.example,
-    model: new Example.Model()
+var Data = require('./../models/Data');
+var HomeView = Mn.View.extend({
+    template: JST.home,
+    model: new Data.Model(),
+    ui: {
+        main: '#main',
+        aboutButton: '.about-btn'
+    },
+    events: {
+        'click .about-btn': 'onClickAbout',
+        'touchstart .about-btn': 'onClickAbout'
+    },
+    onRender: function () {
+    },
+    onClickAbout: function () {
+        this.ui.main.toggleClass('show-about');
+        this.ui.aboutButton.toggleClass('active-btn');
+    }
 });
-module.exports = ExampleView;
-},{"./../models/example":6,"./../templates":9,"backbone.marionette":12}],11:[function(require,module,exports){
+module.exports = HomeView;
+},{"./../models/Data":6,"./../templates":9,"backbone.marionette":12}],11:[function(require,module,exports){
 (function (process,__filename){
 /** vim: et:ts=4:sw=4:sts=4
  * @license amdefine 1.0.1 Copyright (c) 2011-2016, The Dojo Foundation All Rights Reserved.
