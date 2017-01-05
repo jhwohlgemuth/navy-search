@@ -170,7 +170,7 @@ module.exports = function (Handlebars) {
             '>= 4.0.0'
         ],
         'main': function (container, depth0, helpers, partials, data) {
-            return '<footer role="contentinfo">\n    Made with <span style="color: red;font-weight: bold;">\u2764</span> using <a href="https://github.com/omahajs/generator-omaha">OMAHA JS</a>\n</footer>\n<section id="main">\n    <div class="full-width centered navy-search text-input-wrapper">\n        <input type="text" class="centered" placeholder="Search Navy Messages"/>\n    </div>\n    <!-- <button class="submit-btn">go</button> -->\n    <div class="bottom full-width centered control-wrapper">\n        <button class="about-btn">about</button>\n    </button>\n</section>\n';
+            return '<footer role="contentinfo">\n    Made with <span style="color: red;font-weight: bold;">\u2764</span> using <a href="https://github.com/omahajs/generator-omaha">OMAHA JS</a>\n</footer>\n<section id="main">\n    <div class="full-width centered navy-search text-input-wrapper">\n        <input type="text" class="centered" placeholder="Search Navy Messages" required/>\n        <button class="submit-btn">go navy</button>\n    </div>\n    <div class="bottom full-width centered control-wrapper">\n        <button class="about-btn">about</button>\n    </button>\n</section>\n';
         },
         'useData': true
     });
