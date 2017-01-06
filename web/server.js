@@ -92,7 +92,7 @@ var app = express()
 
 app.get('/', function(req, res) {
     if (res.get('X-CSRF') === req.sessionID) {
-        res.redirect('/client/index.html');
+        res.redirect('/client');
     } else {
         res.status(PRECONDITION_FAILED).end();
     }
