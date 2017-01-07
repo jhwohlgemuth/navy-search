@@ -81,11 +81,6 @@ var app = express()
     .use(lusca.xssProtection(true))
     .use(helmet.noSniff())
     .use(helmet.ieNoOpen())
-    .use(helmet.hpkp({
-        maxAge: NINETY_DAYS_IN_MILLISECONDS,
-        sha256s: ['base64==', 'base64=='],  /** Needs to be changed **/
-        includeSubdomains: true
-    }))
     .use(compress())                        /** Use gzip compression **/
     .use(express.static(__dirname))         /** Serve static files **/
     .use(require('opbeat').middleware.express());
