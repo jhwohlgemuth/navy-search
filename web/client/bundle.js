@@ -170,7 +170,7 @@ module.exports = function (Handlebars) {
             '>= 4.0.0'
         ],
         'main': function (container, depth0, helpers, partials, data) {
-            return '<footer role="contentinfo">\n    Made with <span style="color: red;font-weight: bold;">\u2764</span> using <a href="https://github.com/omahajs/generator-omaha">OMAHA JS</a>\n</footer>\n<section id="main">\n    <div class="full-width centered navy-search text-input-wrapper">\n        <input type="text" class="centered" placeholder="Search Navy Messages" required/>\n        <button class="submit-btn">go navy</button>\n    </div>\n    <div class="bottom full-width centered control-wrapper">\n        <button class="about-btn">about</button>\n    </div>\n</section>\n';
+            return '<footer role="contentinfo">\n    Made with <span style="color: red;font-weight: bold;">\u2764</span> using <a href="https://github.com/omahajs/generator-omaha">OMAHA JS</a>\n</footer>\n<section id="main">\n    <div class="full-width centered navy-search text-input-wrapper">\n        <input type="text" tabindex="1" class="centered" placeholder="Search Navy Messages" required/>\n        <div class="centered control-wrapper">\n            <button class="submit-btn">go navy</button>\n        </div>\n    </div>\n    <div class="bottom full-width centered control-wrapper">\n        <button class="about-btn">about</button>\n    </div>\n</section>\n';
         },
         'useData': true
     });
@@ -178,6 +178,7 @@ module.exports = function (Handlebars) {
 }(require('handlebars'));
 },{"handlebars":45}],10:[function(require,module,exports){
 'use strict';
+var $ = require('jquery');
 var Mn = require('backbone.marionette');
 var JST = require('./../templates');
 var Data = require('./../models/Data');
@@ -200,25 +201,25 @@ var HomeView = Mn.View.extend({
         var RETURN_KEY_CODE = 13;
         $(document).keypress(function (e) {
             var key = e.which || e.keyCode;
-            if (key === RETURN_KEY_CODE && view.ui.searchInput.val().length > 1) {
+            if (key === RETURN_KEY_CODE && view.ui.searchInput.val().length > 0) {
                 view.triggerMethod('click:submit');
             }
         });
     },
     onRender: function () {
     },
+    onClickSubmit: function () {
+        this.ui.searchInput.toggleClass('fly-out--right').blur();
+        this.ui.submitButton.toggleClass('processing');
+        this.ui.aboutButton.toggle();
+    },
     onClickAbout: function () {
         this.ui.main.toggleClass('show-about');
         this.ui.aboutButton.toggleClass('active-btn');
-    },
-    onClickSubmit: function () {
-        this.ui.searchInput.toggleClass('fly-out--right');
-        this.ui.submitButton.toggleClass('processing');
-        this.ui.aboutButton.toggle();
     }
 });
 module.exports = HomeView;
-},{"./../models/Data":6,"./../templates":9,"backbone.marionette":12}],11:[function(require,module,exports){
+},{"./../models/Data":6,"./../templates":9,"backbone.marionette":12,"jquery":57}],11:[function(require,module,exports){
 (function (process,__filename){
 /** vim: et:ts=4:sw=4:sts=4
  * @license amdefine 1.0.1 Copyright (c) 2011-2016, The Dojo Foundation All Rights Reserved.
