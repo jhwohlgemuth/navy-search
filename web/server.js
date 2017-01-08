@@ -85,6 +85,13 @@ var app = express()
     .use(express.static(__dirname))         /** Serve static files **/
     .use(require('opbeat').middleware.express());
 
+app.get('/loaderio-fcb6df7ac290a70c00036985de13836f',function(req, res) {
+    if (res.get('X-CSRF') === req.sessionID) {
+        res.send('loaderio-fcb6df7ac290a70c00036985de13836f');
+    } else {
+        res.status(PRECONDITION_FAILED).end();
+    }
+});
 app.get('/', function(req, res) {
     if (res.get('X-CSRF') === req.sessionID) {
         res.redirect('/client');
