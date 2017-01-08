@@ -42,6 +42,7 @@ router.get('/search', function(req, res) {
         .split(',')
         .map(_.trim);
     searchMessages(searchStrings)
+        .then(_.flatten)
         .then((results) => res.json(results))
         .catch((err) => log(err));
 });
