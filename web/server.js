@@ -49,7 +49,6 @@ var md = new Remarkable({
     }
 });
 
-var NINETY_DAYS_IN_MILLISECONDS = 7776000000;
 var PRECONDITION_FAILED = 412;
 
 var app = express()
@@ -68,6 +67,7 @@ var app = express()
     .set('version', process.env.VERSION)
     .set('view engine', 'html')
     .set('views', __dirname + '/client')
+    .set('jsonp callback', true)
     .use(session(config.get('session')))
     .use(function(req, res, next) {
         res.set('X-CSRF', req.sessionID);
