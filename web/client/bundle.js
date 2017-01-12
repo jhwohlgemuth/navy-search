@@ -116,7 +116,7 @@ module.exports = WebApp;
     var Backbone = require('backbone');
     var WebApp = require('./app');
     var Example = require('./router');
-    var Homepage = require('./views/home');
+    var Homepage = require('./views/Home');
     WebApp.on('before:start', function () {
         WebApp.info('Starting...');
         WebApp.router = new Example.Router();
@@ -134,7 +134,7 @@ module.exports = WebApp;
         WebApp.start();
     }
 }(require));
-},{"./app":1,"./router":9,"./views/home":13,"backbone":17}],6:[function(require,module,exports){
+},{"./app":1,"./router":9,"./views/Home":12,"backbone":17}],6:[function(require,module,exports){
 (function (require, exports) {
     'use strict';
     var Backbone = require('backbone');
@@ -302,27 +302,6 @@ module.exports = function (Handlebars) {
 }(require('handlebars'));
 },{"handlebars":48}],12:[function(require,module,exports){
 'use strict';
-var Mn = require('backbone.marionette');
-var JST = require('./../templates');
-var Message = require('./../models/Message');
-var ChildView = Mn.View.extend({
-    className: 'item-wrapper',
-    model: new Message.Model(),
-    template: JST.item
-});
-var ResultsCollectionView = Mn.CollectionView.extend({
-    className: 'items',
-    childView: ChildView,
-    initialize: function () {
-        var items = this.collection;
-        if (!(items instanceof Message.Collection)) {
-            this.collection = new Message.Collection(items);
-        }
-    }
-});
-module.exports = ResultsCollectionView;
-},{"./../models/Message":7,"./../templates":11,"backbone.marionette":15}],13:[function(require,module,exports){
-'use strict';
 var $ = require('jquery');
 var _ = require('underscore');
 var Mn = require('backbone.marionette');
@@ -387,7 +366,38 @@ var HomeView = Mn.View.extend({
     }
 });
 module.exports = HomeView;
-},{"./../app":1,"./../models/Data":6,"./../templates":11,"./Results":12,"backbone.marionette":15,"jquery":60,"underscore":63}],14:[function(require,module,exports){
+},{"./../app":1,"./../models/Data":6,"./../templates":11,"./Results":13,"backbone.marionette":15,"jquery":60,"underscore":63}],13:[function(require,module,exports){
+'use strict';
+var Mn = require('backbone.marionette');
+var JST = require('./../templates');
+var Message = require('./../models/Message');
+var ChildView = Mn.View.extend({
+    className: 'animated fly-out--left full-width item-wrapper',
+    model: new Message.Model(),
+    template: JST.item
+});
+var ResultsCollectionView = Mn.CollectionView.extend({
+    className: 'items',
+    childView: ChildView,
+    initialize: function () {
+        var items = this.collection;
+        if (!(items instanceof Message.Collection)) {
+            this.collection = new Message.Collection(items);
+            this.collection.each(function (model, index) {
+                model.set('index', index);
+            });
+        }
+    },
+    onChildviewAttach: function (child) {
+        var index = child.model.get('index');
+        console.log(index);
+        setTimeout(function () {
+            child.$el.toggleClass('fly-out--left');
+        }, index * 50 + 100);
+    }
+});
+module.exports = ResultsCollectionView;
+},{"./../models/Message":7,"./../templates":11,"backbone.marionette":15}],14:[function(require,module,exports){
 (function (process,__filename){
 /** vim: et:ts=4:sw=4:sts=4
  * @license amdefine 1.0.1 Copyright (c) 2011-2016, The Dojo Foundation All Rights Reserved.
