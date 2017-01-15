@@ -223,13 +223,42 @@ module.exports = WebApp;
 },{"backbone.marionette":13}],9:[function(require,module,exports){
 module.exports = function (Handlebars) {
     this['JST'] = this['JST'] || {};
+    this['JST']['details'] = Handlebars.template({
+        'compiler': [
+            7,
+            '>= 4.0.0'
+        ],
+        'main': function (container, depth0, helpers, partials, data) {
+            var helper, alias1 = depth0 != null ? depth0 : {}, alias2 = helpers.helperMissing, alias3 = 'function', alias4 = container.escapeExpression;
+            return '<input type="text" class="full-width centered" placeholder="' + alias4((helper = (helper = helpers.searchString || (depth0 != null ? depth0.searchString : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
+                'name': 'searchString',
+                'hash': {},
+                'data': data
+            }) : helper)) + '"/>\n<div class="centered">' + alias4((helper = (helper = helpers.total || (depth0 != null ? depth0.total : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
+                'name': 'total',
+                'hash': {},
+                'data': data
+            }) : helper)) + ' Messages Found</div>\n';
+        },
+        'useData': true
+    });
+    this['JST']['empty'] = Handlebars.template({
+        'compiler': [
+            7,
+            '>= 4.0.0'
+        ],
+        'main': function (container, depth0, helpers, partials, data) {
+            return '<!-- intentionally left blank -->\n';
+        },
+        'useData': true
+    });
     this['JST']['home'] = Handlebars.template({
         'compiler': [
             7,
             '>= 4.0.0'
         ],
         'main': function (container, depth0, helpers, partials, data) {
-            return '<footer role="contentinfo">\n    Made with <span style="color: red;font-weight: bold;">\u2764</span> using <a href="https://github.com/omahajs/generator-omaha">OMAHA JS</a>\n</footer>\n<section id="main">\n    <div class="full-width centered navy-search text-input-wrapper">\n        <input type="text" tabindex="1" class="animated centered" placeholder="Search Navy Messages" required/>\n        <div class="centered control-wrapper">\n            <button class="submit-btn">go navy</button>\n        </div>\n    </div>\n    <div class="search-results">\n        <div class="items-container"></div>\n    </div>\n    <div class="bottom full-width centered control-wrapper">\n        <button class="about-btn">about</button>\n    </div>\n</section>\n';
+            return '<footer role="contentinfo">\n    Made with <span style="color: red;font-weight: bold;">\u2764</span> using <a href="https://github.com/omahajs/generator-omaha">OMAHA JS</a>\n</footer>\n<section id="main">\n    <div class="full-width centered navy-search text-input-wrapper">\n        <input type="text" tabindex="1" class="animated centered" placeholder="Search Navy Messages" required/>\n        <div class="centered control-wrapper">\n            <button class="submit-btn">go navy</button>\n        </div>\n    </div>\n    <div class="search-results">\n        <div class="details"></div>\n        <div class="items-container"></div>\n    </div>\n    <div class="bottom full-width centered control-wrapper">\n        <button class="about-btn">about</button>\n    </div>\n</section>\n';
         },
         'useData': true
     });
@@ -240,23 +269,23 @@ module.exports = function (Handlebars) {
         ],
         'main': function (container, depth0, helpers, partials, data) {
             var helper, alias1 = depth0 != null ? depth0 : {}, alias2 = helpers.helperMissing, alias3 = 'function', alias4 = container.escapeExpression;
-            return '<a target="_blank" href="' + alias4((helper = (helper = helpers.url || (depth0 != null ? depth0.url : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
-                'name': 'url',
+            return '<div class="message item-type">' + alias4((helper = (helper = helpers.code || (depth0 != null ? depth0.code : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
+                'name': 'code',
                 'hash': {},
                 'data': data
-            }) : helper)) + '"><span class="item-title">' + alias4((helper = (helper = helpers.type || (depth0 != null ? depth0.type : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
-                'name': 'type',
-                'hash': {},
-                'data': data
-            }) : helper)) + alias4((helper = (helper = helpers.year || (depth0 != null ? depth0.year : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
+            }) : helper)) + '</div>\n<div class="message item-year">' + alias4((helper = (helper = helpers.year || (depth0 != null ? depth0.year : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
                 'name': 'year',
                 'hash': {},
                 'data': data
-            }) : helper)) + alias4((helper = (helper = helpers.num || (depth0 != null ? depth0.num : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
+            }) : helper)) + '</div>\n<div class="message item-num">' + alias4((helper = (helper = helpers.num || (depth0 != null ? depth0.num : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
                 'name': 'num',
                 'hash': {},
                 'data': data
-            }) : helper)) + '</span></a>\n';
+            }) : helper)) + '</div>\n<div class="message item-subject">' + alias4((helper = (helper = helpers.text || (depth0 != null ? depth0.text : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
+                'name': 'text',
+                'hash': {},
+                'data': data
+            }) : helper)) + '</div>\n';
         },
         'useData': true
     });
@@ -273,6 +302,14 @@ var WebApp = require('./../app').model;
 var Data = require('./../models/Data');
 var Results = require('./Results');
 var SEARCH_URL = '/api/' + WebApp.get('version') + '/messages/search';
+var DetailsView = Mn.View.extend({
+    className: 'details',
+    template: JST.details,
+    model: new Data.Model(),
+    events: { 'input input': 'onInput' },
+    onInput: function () {
+    }
+});
 var HomeView = Mn.View.extend({
     template: JST.home,
     model: new Data.Model(),
@@ -288,7 +325,13 @@ var HomeView = Mn.View.extend({
         'touchstart .about-btn': 'onClickAbout',
         'click .submit-btn': 'onClickSubmit'
     },
-    regions: { itemsContainer: '.search-results > .items-container' },
+    regions: {
+        itemsDetails: {
+            el: '.search-results > .details',
+            replaceElement: true
+        },
+        itemsContainer: '.search-results > .items-container'
+    },
     initialize: function () {
         var view = this;
         var RETURN_KEY_CODE = 13;
@@ -307,8 +350,16 @@ var HomeView = Mn.View.extend({
             ui.searchInput.toggleClass('fly-out--right').blur();
             ui.submitButton.addClass('processing');
             ui.aboutButton.toggle();
-            view.getSearchResults(ui.searchInput.val()).then(function (items) {
-                view.showChildView('itemsContainer', new Results({ collection: items }));
+            var searchString = ui.searchInput.val();
+            view.getSearchResults(searchString).then(function (items) {
+                var details = new DetailsView();
+                details.model.set({
+                    searchString: searchString,
+                    total: items.length
+                });
+                var results = new Results({ collection: items });
+                view.showChildView('itemsDetails', details);
+                view.showChildView('itemsContainer', results);
                 ui.searchResults.css('display', 'block');
                 ui.submitButton.hide().removeClass('processing');
             }).then(function () {
@@ -338,10 +389,19 @@ module.exports = HomeView;
 var Mn = require('backbone.marionette');
 var JST = require('./../templates');
 var Message = require('./../models/Message');
+var API_ROOT = 'https://www.navysearch.org/api/v1.0/message/';
 var ChildView = Mn.View.extend({
     className: 'animated fly-out--left full-width item-wrapper',
     model: new Message.Model(),
-    template: JST.item
+    template: JST.item,
+    events: { click: 'onClick' },
+    onRender: function () {
+        var view = this;
+        var model = view.model;
+    },
+    onClick: function () {
+        window.open(API_ROOT + this.model.get('id'));
+    }
 });
 var ResultsCollectionView = Mn.CollectionView.extend({
     className: 'items',
