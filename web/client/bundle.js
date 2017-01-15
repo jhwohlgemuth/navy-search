@@ -302,6 +302,7 @@ var WebApp = require('./../app').model;
 var Data = require('./../models/Data');
 var Results = require('./Results');
 var SEARCH_URL = '/api/' + WebApp.get('version') + '/messages/search';
+var MAX_RESULTS = 400;
 var DetailsView = Mn.View.extend({
     className: 'details',
     template: JST.details,
@@ -358,7 +359,10 @@ var HomeView = Mn.View.extend({
                     searchString: searchString,
                     total: items.length
                 });
-                return new Results({ collection: items });
+                var collection = _(items).map(function (item) {
+                    return _.omit(item, 'text');
+                }).take(MAX_RESULTS).value();
+                return new Results({ collection: collection });
             }).then(function (results) {
                 ui.searchResults.css('display', 'block');
                 view.showChildView('itemsDetails', details);
