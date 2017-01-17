@@ -321,7 +321,7 @@ var DetailsView = Mn.View.extend({
     className: 'animated fly-out--top details',
     template: JST.details,
     model: new Data.Model(),
-    events: { 'input input': 'onInput' },
+    events: { 'focus input': 'onFocus' },
     onAttach: function () {
         var details = this;
         var $details = details.$el;
@@ -329,15 +329,16 @@ var DetailsView = Mn.View.extend({
             $details.toggleClass('fly-out--top');
         });
     },
-    onRender: function () {
+    onFocus: function () {
         var details = this;
         var $details = details.$el;
-        $details.keypress(function (e) {
+        $details.one('keypress', function (e) {
             var key = e.which || e.keyCode;
             if (key === RETURN_KEY_CODE && e.target.value.length > 0) {
                 $details.addClass('processing');
                 var home = details._parent._parent;
                 var results = home.getRegion('itemsContainer').currentView;
+                console.log(results.collection.size());
                 home.getSearchResults(e.target.value).then(function (items) {
                     results.collection.reset(items);
                     ps.update(results.el);
