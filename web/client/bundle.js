@@ -243,15 +243,15 @@ module.exports = function (Handlebars) {
         ],
         'main': function (container, depth0, helpers, partials, data) {
             var helper, alias1 = depth0 != null ? depth0 : {}, alias2 = helpers.helperMissing, alias3 = 'function', alias4 = container.escapeExpression;
-            return '<input type="text" class="full-width centered" placeholder="' + alias4((helper = (helper = helpers.searchString || (depth0 != null ? depth0.searchString : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
+            return '<input type="text" tabindex="1" class="full-width centered" value="' + alias4((helper = (helper = helpers.searchString || (depth0 != null ? depth0.searchString : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
                 'name': 'searchString',
                 'hash': {},
                 'data': data
-            }) : helper)) + '"/>\n<div class="centered">' + alias4((helper = (helper = helpers.total || (depth0 != null ? depth0.total : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
+            }) : helper)) + '"/>\n<div class="centered">\n    <span class="messages-found-count">' + alias4((helper = (helper = helpers.total || (depth0 != null ? depth0.total : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
                 'name': 'total',
                 'hash': {},
                 'data': data
-            }) : helper)) + ' Messages Found</div>\n';
+            }) : helper)) + ' Messages Found</span>\n</div>\n';
         },
         'useData': true
     });
@@ -316,15 +316,35 @@ var Data = require('./../models/Data');
 var Results = require('./Results');
 var SEARCH_URL = '/api/' + WebApp.get('version') + '/messages/search';
 var MAX_RESULTS = 400;
+var RETURN_KEY_CODE = 13;
 var DetailsView = Mn.View.extend({
     className: 'animated fly-out--top details',
     template: JST.details,
     model: new Data.Model(),
     events: { 'input input': 'onInput' },
     onAttach: function () {
-        var $details = this.$el;
+        var details = this;
+        var $details = details.$el;
         _.defer(function () {
             $details.toggleClass('fly-out--top');
+        });
+    },
+    onRender: function () {
+        var details = this;
+        var $details = details.$el;
+        $details.keypress(function (e) {
+            var key = e.which || e.keyCode;
+            if (key === RETURN_KEY_CODE && e.target.value.length > 0) {
+                $details.addClass('processing');
+                var home = details._parent._parent;
+                var results = home.getRegion('itemsContainer').currentView;
+                home.getSearchResults(e.target.value).then(function (items) {
+                    results.collection.reset(items);
+                    ps.update(results.el);
+                    var $input = details.$('input');
+                    $input.focus().setCursorPosition($input.val().length);
+                });
+            }
         });
     },
     onInput: function () {
@@ -343,7 +363,8 @@ var HomeView = Mn.View.extend({
     events: {
         'click .about-btn': 'onClickAbout',
         'touchstart .about-btn': 'onClickAbout',
-        'click .submit-btn': 'onClickSubmit'
+        'click .submit-btn': 'onClickSubmit',
+        'keypress @ui.searchInput': 'onKeyPress'
     },
     regions: {
         itemsDetails: {
@@ -353,43 +374,27 @@ var HomeView = Mn.View.extend({
         itemsContainer: '.search-results > .items-container'
     },
     behaviors: [require('./../plugins/ie.shim.behavior')],
-    initialize: function () {
+    onKeyPress: function (e) {
         var view = this;
-        var RETURN_KEY_CODE = 13;
-        $(document).keypress(function (e) {
-            var key = e.which || e.keyCode;
-            if (key === RETURN_KEY_CODE && view.ui.searchInput.val().length > 0) {
-                view.triggerMethod('click:submit');
-                $(document).off('keypress');
-            }
-        });
+        var key = e.which || e.keyCode;
+        if (key === RETURN_KEY_CODE && view.ui.searchInput.val().length > 0) {
+            view.triggerMethod('click:submit');
+        }
     },
     onClickSubmit: function () {
-        var view = this;
-        var ui = view.ui;
+        var home = this;
+        var ui = home.ui;
         if (!ui.submitButton.hasClass('processing')) {
             ui.searchInput.toggleClass('fly-out--right').attr('disabled', true);
             ui.submitButton.addClass('processing');
             ui.aboutButton.toggle();
-            var searchString = ui.searchInput.val();
-            var details = new DetailsView();
-            view.getSearchResults(searchString).then(function (items) {
+            home.details = new DetailsView();
+            home.getSearchResults(ui.searchInput.val()).then(function (items) {
                 ui.submitButton.css('display', 'none').removeClass('processing');
-                details.model.set({
-                    searchString: searchString,
-                    total: items.length
-                });
-                var collection = _(items).map(function (item) {
-                    return _.omit(item, 'text');
-                }).take(MAX_RESULTS).value();
-                return new Results({ collection: collection });
-            }).then(function (results) {
                 ui.searchResults.css('display', 'block');
-                view.showChildView('itemsDetails', details);
-                view.showChildView('itemsContainer', results);
-                ps.initialize(view.getRegion('itemsContainer').el);
-            }).catch(function (err) {
-                WebApp.error(err);
+                home.showChildView('itemsDetails', home.details);
+                home.showChildView('itemsContainer', new Results({ collection: items }));
+                ps.initialize(home.getRegion('itemsContainer').el);
             });
         }
     },
@@ -399,17 +404,33 @@ var HomeView = Mn.View.extend({
         ui.aboutButton.toggleClass('active-btn');
     },
     getSearchResults: function (str, ajaxOptions) {
+        var view = this;
         var defaults = {
             data: { q: str },
             dataType: 'json',
             url: SEARCH_URL
         };
-        return $.get(_.extend(defaults, ajaxOptions));
+        return $.get(_.extend(defaults, ajaxOptions)).then(function (items) {
+            return _(items).map(function (item) {
+                return _.omit(item, 'text');
+            }).take(MAX_RESULTS).value();
+        }).then(function (items) {
+            view.details.model.set({
+                searchString: str,
+                total: items.length
+            });
+            view.details.$el.removeClass('processing');
+            view.details.render();
+            return items;
+        }).catch(function (err) {
+            WebApp.error(err);
+        });
     }
 });
 module.exports = HomeView;
 },{"./../app":1,"./../models/Data":5,"./../plugins/ie.shim.behavior":7,"./../templates":10,"./Results":12,"backbone.marionette":14,"jquery":48,"lodash":49,"perfect-scrollbar":51}],12:[function(require,module,exports){
 'use strict';
+var _ = require('lodash');
 var Mn = require('backbone.marionette');
 var JST = require('./../templates');
 var Message = require('./../models/Message');
@@ -442,13 +463,13 @@ var ResultsCollectionView = Mn.CollectionView.extend({
     },
     onChildviewAttach: function (child) {
         var index = child.model.get('index');
-        setTimeout(function () {
-            child.$el.toggleClass('fly-out--left');
+        _.delay(function () {
+            child.$el.removeClass('fly-out--left');
         }, index * 50 + 100);
     }
 });
 module.exports = ResultsCollectionView;
-},{"./../models/Message":6,"./../templates":10,"backbone.marionette":14}],13:[function(require,module,exports){
+},{"./../models/Message":6,"./../templates":10,"backbone.marionette":14,"lodash":49}],13:[function(require,module,exports){
 (function (process,__filename){
 /** vim: et:ts=4:sw=4:sts=4
  * @license amdefine 1.0.1 Copyright (c) 2011-2016, The Dojo Foundation All Rights Reserved.
