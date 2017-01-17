@@ -332,7 +332,7 @@ var DetailsView = Mn.View.extend({
     onFocus: function () {
         var details = this;
         var $details = details.$el;
-        $details.one('keypress', function (e) {
+        $details.keypress(function (e) {
             var key = e.which || e.keyCode;
             if (key === RETURN_KEY_CODE && e.target.value.length > 0) {
                 $details.addClass('processing');
