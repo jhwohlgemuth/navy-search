@@ -338,9 +338,8 @@ var DetailsView = Mn.View.extend({
                 $details.addClass('processing');
                 var home = details._parent._parent;
                 var results = home.getRegion('itemsContainer').currentView;
-                console.log(results.collection.size());
                 home.getSearchResults(e.target.value).then(function (items) {
-                    results.collection.reset(items);
+                    home.showChildView('itemsContainer', new Results({ collection: items }));
                     ps.update(results.el);
                     var $input = details.$('input');
                     $input.focus().setCursorPosition($input.val().length);
@@ -438,7 +437,7 @@ var JST = require('./../templates');
 var Message = require('./../models/Message');
 var API_ROOT = 'https://www.navysearch.org/api/v1.0/message/';
 var ChildView = Mn.View.extend({
-    className: 'animated fly-out--left full-width item-wrapper',
+    className: 'animated--200 fly-out--left full-width item-wrapper',
     model: new Message.Model(),
     template: JST.item,
     events: { click: 'onClick' },
@@ -458,16 +457,14 @@ var ResultsCollectionView = Mn.CollectionView.extend({
         var items = this.collection;
         if (!(items instanceof Message.Collection)) {
             this.collection = new Message.Collection(items);
-            this.collection.each(function (model, index) {
-                model.set('index', index);
-            });
         }
     },
-    onChildviewAttach: function (child) {
-        var index = child.model.get('index');
-        _.delay(function () {
-            child.$el.removeClass('fly-out--left');
-        }, index * 50 + 100);
+    onDomRefresh: function () {
+        this.children.forEach(function (child, index) {
+            _.delay(function () {
+                child.$el.removeClass('fly-out--left');
+            }, 100 + index * 50);
+        });
     }
 });
 module.exports = ResultsCollectionView;
