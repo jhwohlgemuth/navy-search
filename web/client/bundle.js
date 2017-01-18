@@ -345,6 +345,7 @@ var DetailsView = Mn.View.extend({
                     var $input = details.$('input');
                     $input.focus().setCursorPosition($input.val().length);
                 });
+                $details.off('keypress');
             }
         });
     },
