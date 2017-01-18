@@ -247,11 +247,11 @@ module.exports = function (Handlebars) {
                 'name': 'searchString',
                 'hash': {},
                 'data': data
-            }) : helper)) + '"/>\n<div class="centered">\n    <span class="messages-found-count">' + alias4((helper = (helper = helpers.total || (depth0 != null ? depth0.total : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
-                'name': 'total',
+            }) : helper)) + '"/>\n<div class="centered">\n    <span class="messages-found-count">' + alias4((helper = (helper = helpers.countMessage || (depth0 != null ? depth0.countMessage : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
+                'name': 'countMessage',
                 'hash': {},
                 'data': data
-            }) : helper)) + ' Messages Found</span>\n</div>\n';
+            }) : helper)) + '</span>\n</div>\n';
         },
         'useData': true
     });
@@ -317,11 +317,17 @@ var Results = require('./Results');
 var SEARCH_URL = '/api/' + WebApp.get('version') + '/messages/search';
 var MAX_RESULTS = 400;
 var RETURN_KEY_CODE = 13;
+function createCountMessage(count) {
+    return count + ' Message' + (count !== 1 ? 's' : '') + ' Found';
+}
 var DetailsView = Mn.View.extend({
     className: 'animated fly-out--top details',
     template: JST.details,
     model: new Data.Model(),
     events: { 'focus input': 'onFocus' },
+    templateContext: function () {
+        return { countMessage: createCountMessage(this.model.get('total')) };
+    },
     onAttach: function () {
         var details = this;
         var $details = details.$el;
