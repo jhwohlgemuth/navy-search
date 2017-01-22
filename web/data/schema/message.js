@@ -25,6 +25,7 @@ var messageSchema = new mongoose.Schema({
         required: true,
         unique: false
     },
+    subject: String,
     url: String,
     text: String
 }, options);
