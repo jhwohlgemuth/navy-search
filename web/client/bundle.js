@@ -271,7 +271,7 @@ module.exports = function (Handlebars) {
             '>= 4.0.0'
         ],
         'main': function (container, depth0, helpers, partials, data) {
-            return '<footer role="contentinfo">\n    Made with <span style="color: red;font-weight: bold;">\u2764</span> using <a href="https://github.com/omahajs/generator-omaha">OMAHA JS</a>\n</footer>\n<section id="main">\n    <div class="full-width centered navy-search text-input-wrapper">\n        <input type="text" tabindex="1" class="animated centered" placeholder="Search Navy Messages" required/>\n        <div class="centered control-wrapper">\n            <button class="submit-btn">go navy</button>\n        </div>\n    </div>\n    <div class="search-results">\n        <div class="details"></div>\n        <div class="items-container"></div>\n    </div>\n    <div class="bottom full-width centered control-wrapper">\n        <button class="about-btn">about</button>\n    </div>\n</section>\n';
+            return '<section id="main" class="animated--200">\n    <div class="full-width centered navy-search text-input-wrapper">\n        <input type="text" tabindex="1" class="animated centered" placeholder="Search Navy Messages" required/>\n        <div class="centered control-wrapper">\n            <button class="submit-btn">go navy</button>\n        </div>\n    </div>\n    <div class="search-results">\n        <div class="details"></div>\n        <div class="items-container"></div>\n    </div>\n    <div class="bottom full-width centered control-wrapper">\n        <button class="about-btn">about</button>\n    </div>\n</section>\n';
         },
         'useData': true
     });
@@ -343,10 +343,11 @@ var DetailsView = Mn.View.extend({
             if (key === RETURN_KEY_CODE && e.target.value.length > 0) {
                 $details.addClass('processing');
                 var home = details._parent._parent;
-                var results = home.getRegion('itemsContainer').currentView;
                 home.getSearchResults(e.target.value).then(function (items) {
                     home.showChildView('itemsContainer', new Results({ collection: items }));
-                    ps.update(results.el);
+                    var results = home.getRegion('itemsContainer').el;
+                    ps.initialize(results);
+                    results.scrollTop = 0;
                     var $input = details.$('input');
                     $input.focus().setCursorPosition($input.val().length);
                 });
@@ -406,9 +407,7 @@ var HomeView = Mn.View.extend({
         }
     },
     onClickAbout: function () {
-        var ui = this.ui;
-        ui.main.toggleClass('show-about');
-        ui.aboutButton.toggleClass('active-btn');
+        window.open('https://github.com/jhwohlgemuth/navy-search/blob/master/README.md');
     },
     getSearchResults: function (str, ajaxOptions) {
         var view = this;
