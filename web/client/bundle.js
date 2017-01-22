@@ -294,8 +294,8 @@ module.exports = function (Handlebars) {
                 'name': 'num',
                 'hash': {},
                 'data': data
-            }) : helper)) + '</div>\n<div class="message item-subject">' + alias4((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
-                'name': 'id',
+            }) : helper)) + '</div>\n<div class="message item-subject">' + alias4((helper = (helper = helpers.subject || (depth0 != null ? depth0.subject : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
+                'name': 'subject',
                 'hash': {},
                 'data': data
             }) : helper)) + '</div>\n';
