@@ -70,7 +70,7 @@ function attemptRequest(options) {
             var subject = parser
                 .input(item.text)
                 .parse()
-                .get('subject') || 'intentionally left blank'.toUpperCase();
+                .get('subject') || 'unintentionally left blank'.toUpperCase();
             return _.assign(item, {subject})
         })
         .catch(() => _.assign(item, {id, text: FAIL_TEXT}));
