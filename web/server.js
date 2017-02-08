@@ -49,7 +49,6 @@ var md = new Remarkable({
     }
 });
 
-var NINETY_DAYS_IN_MILLISECONDS = 7776000000;
 var PRECONDITION_FAILED = 412;
 
 var app = express()
@@ -68,6 +67,7 @@ var app = express()
     .set('version', process.env.VERSION)
     .set('view engine', 'html')
     .set('views', __dirname + '/client')
+    .set('jsonp callback', true)
     .use(session(config.get('session')))
     .use(function(req, res, next) {
         res.set('X-CSRF', req.sessionID);
@@ -81,15 +81,17 @@ var app = express()
     .use(lusca.xssProtection(true))
     .use(helmet.noSniff())
     .use(helmet.ieNoOpen())
-    .use(helmet.hpkp({
-        maxAge: NINETY_DAYS_IN_MILLISECONDS,
-        sha256s: ['base64==', 'base64=='],  /** Needs to be changed **/
-        includeSubdomains: true
-    }))
     .use(compress())                        /** Use gzip compression **/
     .use(express.static(__dirname))         /** Serve static files **/
     .use(require('opbeat').middleware.express());
 
+app.get('/loaderio-fcb6df7ac290a70c00036985de13836f',function(req, res) {
+    if (res.get('X-CSRF') === req.sessionID) {
+        res.send('loaderio-fcb6df7ac290a70c00036985de13836f');
+    } else {
+        res.status(PRECONDITION_FAILED).end();
+    }
+});
 app.get('/', function(req, res) {
     if (res.get('X-CSRF') === req.sessionID) {
         res.redirect('/client');

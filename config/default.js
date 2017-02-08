@@ -28,8 +28,8 @@ module.exports = {
     },
     csp: {
         'default-src': '\'self\' \'unsafe-inline\'',
-        'script-src':  '\'self\' \'unsafe-eval\' cdnjs.cloudflare.com',
+        'script-src':  '\'self\' \'unsafe-eval\' cdnjs.cloudflare.com www.navysearch.org',
         'font-src': '\'self\' fonts.gstatic.com data:',
-        'connect-src': 'https://navysearch.org https://www.navysearch.org'
+        'connect-src': 'https://navysearch.org https://www.navysearch.org http://localhost:5984'
     }
 };

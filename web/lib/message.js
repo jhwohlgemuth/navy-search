@@ -5,6 +5,7 @@ const Xray     = require('x-ray');
 const Bluebird = require('bluebird');
 const request  = require('request-promise');
 const Message  = require('../../web/data/schema/message');
+const parser   = require('navy-message-parser');
 
 const NPC_DOMAIN = 'http://www.public.navy.mil';
 const MSG_TYPE_LOOKUP = {
@@ -65,6 +66,13 @@ function attemptRequest(options) {
     let id = _.spread(createMessageId)(args);
     return request(requestOptions)
         .then((text) => _.assign(item, {id, text}))
+        .then((item) => {
+            var subject = parser
+                .input(item.text)
+                .parse()
+                .get('subject') || 'unintentionally left blank'.toUpperCase();
+            return _.assign(item, {subject})
+        })
         .catch(() => _.assign(item, {id, text: FAIL_TEXT}));
 }
 
