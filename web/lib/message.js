@@ -71,7 +71,7 @@ function attemptRequest(options) {
                 .input(item.text)
                 .parse()
                 .get('subject') || 'unintentionally left blank'.toUpperCase();
-            return _.assign(item, {subject})
+            return _.assign(item, {subject});
         })
         .catch(() => _.assign(item, {id, text: FAIL_TEXT}));
 }
