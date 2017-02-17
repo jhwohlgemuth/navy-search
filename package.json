@@ -39,7 +39,7 @@
     "node-uuid": "^1.4.3",
     "npmlog": "*",
     "nsp": "*",
-    "opbeat": "^4.0.0",
+    "opbeat": "4.11.0",
     "protocolify": "^1.0.2",
     "remarkable": "*",
     "request-promise": "^4.1.1",
