@@ -63,7 +63,7 @@
     "proxyquire": "^1.7.10",
     "sinon": "^1.17.6",
     "supertest": "^2.0.1",
-    "watch": "^1.0.1"
+    "watch": "1.0.1"
   },
   "scripts": {
     "scan": "nsp check",
