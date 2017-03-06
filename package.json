@@ -38,7 +38,7 @@
     "navy-message-parser": "0.0.4",
     "node-uuid": "^1.4.3",
     "npmlog": "*",
-    "nsp": "*",
+    "nsp": "2.6.2",
     "opbeat": "^4.0.0",
     "protocolify": "^1.0.2",
     "remarkable": "*",
