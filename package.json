@@ -28,7 +28,7 @@
     "ejs": "^2.5.6",
     "express": "^4.13.1",
     "express-session": "^1.15.1",
-    "fs-extra": "^1.0.0",
+    "fs-extra": "^2.1.2",
     "helmet": "^3.5.0",
     "highlight.js": "^9.10.0",
     "lodash": "^4.17.0",
