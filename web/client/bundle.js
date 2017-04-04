@@ -1,24 +1,26 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
-var _ = require('lodash');
-var Backbone = require('backbone');
-var Marionette = require('backbone.marionette');
-var logging = require('./plugins/radio.logging');
-require('./helpers/handlebars.helpers');
-require('./helpers/jquery.extensions');
-var ApplicationModel = Backbone.Model.extend({
-    defaults: {
-        name: 'Navy Search',
-        version: 'v1.0'
-    }
-});
-var Application = Marionette.Application.extend({
-    region: 'body',
-    model: new ApplicationModel()
-});
-var WebApp = new Application();
-_.extend(WebApp, logging);
-module.exports = WebApp;
+(function (require, exports, module) {
+    'use strict';
+    var _ = require('lodash');
+    var Backbone = require('backbone');
+    var Marionette = require('backbone.marionette');
+    var logging = require('./plugins/radio.logging');
+    require('./helpers/handlebars.helpers');
+    require('./helpers/jquery.extensions');
+    var ApplicationModel = Backbone.Model.extend({
+        defaults: {
+            name: 'Navy Search',
+            version: 'v1.0'
+        }
+    });
+    var Application = Marionette.Application.extend({
+        region: 'body',
+        model: new ApplicationModel()
+    });
+    var WebApp = new Application();
+    _.extend(WebApp, logging);
+    module.exports = WebApp;
+}(require, exports, module));
 },{"./helpers/handlebars.helpers":2,"./helpers/jquery.extensions":3,"./plugins/radio.logging":8,"backbone":16,"backbone.marionette":14,"lodash":49}],2:[function(require,module,exports){
 (function (require) {
     'use strict';
@@ -143,18 +145,20 @@ module.exports = WebApp;
     exports.Collection = MessageCollection;
 }(require, exports));
 },{"backbone":16}],7:[function(require,module,exports){
-'use strict';
-var Mn = require('backbone.marionette');
-function isEmptyInput(el) {
-    return el.value.length === 0;
-}
-var InternetExplorerShimBehavior = Mn.Behavior.extend({
-    events: { 'input input': 'shimInput' },
-    shimInput: function (e) {
-        this.ui.searchInput.toggleClass('ie-shim-input', !isEmptyInput(e.currentTarget));
+(function (require, exports, module) {
+    'use strict';
+    var Mn = require('backbone.marionette');
+    function isEmptyInput(el) {
+        return el.value.length === 0;
     }
-});
-module.exports = InternetExplorerShimBehavior;
+    var InternetExplorerShimBehavior = Mn.Behavior.extend({
+        events: { 'input input': 'shimInput' },
+        shimInput: function (e) {
+            this.ui.searchInput.toggleClass('ie-shim-input', !isEmptyInput(e.currentTarget));
+        }
+    });
+    module.exports = InternetExplorerShimBehavior;
+}(require, exports, module));
 },{"backbone.marionette":14}],8:[function(require,module,exports){
 (function (require, exports) {
     'use strict';
@@ -305,175 +309,181 @@ module.exports = function (Handlebars) {
     return this['JST'];
 }(require('handlebars'));
 },{"handlebars":47}],11:[function(require,module,exports){
-'use strict';
-var $ = require('jquery');
-var _ = require('lodash');
-var ps = require('perfect-scrollbar');
-var Mn = require('backbone.marionette');
-var JST = require('./../templates');
-var WebApp = require('./../app').model;
-var Data = require('./../models/Data');
-var Results = require('./Results');
-var SEARCH_URL = '/api/' + WebApp.get('version') + '/messages/search';
-var MAX_RESULTS = 400;
-var RETURN_KEY_CODE = 13;
-function createCountMessage(count) {
-    return count + ' Message' + (count !== 1 ? 's' : '') + ' Found';
-}
-var DetailsView = Mn.View.extend({
-    className: 'animated fly-out--top details',
-    template: JST.details,
-    model: new Data.Model(),
-    events: { 'focus input': 'onFocus' },
-    templateContext: function () {
-        return { countMessage: createCountMessage(this.model.get('total')) };
-    },
-    onAttach: function () {
-        var details = this;
-        var $details = details.$el;
-        _.defer(function () {
-            $details.toggleClass('fly-out--top');
-        });
-    },
-    onFocus: function () {
-        var details = this;
-        var $details = details.$el;
-        $details.keypress(function (e) {
-            var key = e.which || e.keyCode;
-            if (key === RETURN_KEY_CODE && e.target.value.length > 0) {
-                $details.addClass('processing');
-                var home = details._parent._parent;
-                home.getSearchResults(e.target.value).then(function (items) {
-                    home.showChildView('itemsContainer', new Results({ collection: items }));
-                    var results = home.getRegion('itemsContainer').el;
-                    ps.destroy(results);
-                    ps.initialize(results);
-                    results.scrollTop = 0;
-                    var $input = details.$('input');
-                    $input.focus().setCursorPosition($input.val().length);
-                });
-                $details.off('keypress');
-            }
-        });
-    },
-    onInput: function () {
+(function (require, exports, module) {
+    'use strict';
+    var $ = require('jquery');
+    var _ = require('lodash');
+    var ps = require('perfect-scrollbar');
+    var Mn = require('backbone.marionette');
+    var JST = require('./../templates');
+    var WebApp = require('./../app').model;
+    var Data = require('./../models/Data');
+    var Results = require('./Results');
+    var SEARCH_URL = '/api/' + WebApp.get('version') + '/messages/search';
+    var MAX_RESULTS = 400;
+    var RETURN_KEY_CODE = 13;
+    function createCountMessage(count) {
+        return count + ' Message' + (count !== 1 ? 's' : '') + ' Found';
     }
-});
-var HomeView = Mn.View.extend({
-    template: JST.home,
-    model: new Data.Model(),
-    ui: {
-        main: '#main',
-        searchInput: '.navy-search > input',
-        submitButton: '.submit-btn',
-        searchResults: '.search-results',
-        aboutButton: '.about-btn'
-    },
-    events: {
-        'click .about-btn': 'onClickAbout',
-        'touchstart .about-btn': 'onClickAbout',
-        'click .submit-btn': 'onClickSubmit',
-        'keypress @ui.searchInput': 'onKeyPress'
-    },
-    regions: {
-        itemsDetails: {
-            el: '.search-results > .details',
-            replaceElement: true
+    var DetailsView = Mn.View.extend({
+        className: 'animated fly-out--top details',
+        template: JST.details,
+        model: new Data.Model(),
+        events: { 'focus input': 'onFocus' },
+        templateContext: function () {
+            return { countMessage: createCountMessage(this.model.get('total')) };
         },
-        itemsContainer: '.search-results > .items-container'
-    },
-    behaviors: [require('./../plugins/ie.shim.behavior')],
-    onKeyPress: function (e) {
-        var view = this;
-        var key = e.which || e.keyCode;
-        if (key === RETURN_KEY_CODE && view.ui.searchInput.val().length > 0) {
-            view.triggerMethod('click:submit');
+        onAttach: function () {
+            var $details = this.$el;
+            _.defer(function () {
+                $details.toggleClass('fly-out--top');
+            });
+        },
+        onFocus: function () {
+            var details = this;
+            var $details = details.$el;
+            $details.keypress(function (e) {
+                var key = e.which || e.keyCode;
+                var query = e.target.value;
+                if (key === RETURN_KEY_CODE && query.length > 0) {
+                    $details.addClass('processing').off('keypress');
+                    details.trigger('results:update', query);
+                }
+            });
+        },
+        onInput: function () {
         }
-    },
-    onClickSubmit: function () {
-        var home = this;
-        var ui = home.ui;
-        if (!ui.submitButton.hasClass('processing')) {
-            ui.searchInput.toggleClass('fly-out--right').attr('disabled', true);
-            ui.submitButton.addClass('processing');
-            ui.aboutButton.toggle();
-            home.details = new DetailsView();
-            home.getSearchResults(ui.searchInput.val()).then(function (items) {
-                ui.submitButton.css('display', 'none').removeClass('processing');
-                ui.searchResults.css('display', 'block');
-                home.showChildView('itemsDetails', home.details);
+    });
+    var HomeView = Mn.View.extend({
+        template: JST.home,
+        model: new Data.Model(),
+        ui: {
+            main: '#main',
+            searchInput: '.navy-search > input',
+            submitButton: '.submit-btn',
+            searchResults: '.search-results',
+            aboutButton: '.about-btn'
+        },
+        events: {
+            'click .about-btn': 'onClickAbout',
+            'touchstart .about-btn': 'onClickAbout',
+            'click .submit-btn': 'onClickSubmit',
+            'keypress @ui.searchInput': 'onKeyPress'
+        },
+        regions: {
+            itemsDetails: {
+                el: '.search-results > .details',
+                replaceElement: true
+            },
+            itemsContainer: '.search-results > .items-container'
+        },
+        behaviors: [require('./../plugins/ie.shim.behavior')],
+        onKeyPress: function (e) {
+            var view = this;
+            var key = e.which || e.keyCode;
+            if (key === RETURN_KEY_CODE && view.ui.searchInput.val().length > 0) {
+                view.triggerMethod('click:submit');
+            }
+        },
+        onClickSubmit: function () {
+            var home = this;
+            var ui = home.ui;
+            if (!ui.submitButton.hasClass('processing')) {
+                ui.searchInput.toggleClass('fly-out--right').attr('disabled', true);
+                ui.submitButton.addClass('processing');
+                ui.aboutButton.toggle();
+                home.details = new DetailsView();
+                home.listenTo(home.details, 'results:update', home.onResultsUpdate);
+                home.getSearchResults(ui.searchInput.val()).then(function (items) {
+                    ui.submitButton.css('display', 'none').removeClass('processing');
+                    ui.searchResults.css('display', 'block');
+                    home.showChildView('itemsDetails', home.details);
+                    home.showChildView('itemsContainer', new Results({ collection: items }));
+                    ps.initialize(home.getRegion('itemsContainer').el);
+                });
+            }
+        },
+        onClickAbout: function () {
+            window.open('https://github.com/jhwohlgemuth/navy-search/blob/master/README.md');
+        },
+        onResultsUpdate: function (query) {
+            var home = this;
+            home.getSearchResults(query).then(function (items) {
                 home.showChildView('itemsContainer', new Results({ collection: items }));
-                ps.initialize(home.getRegion('itemsContainer').el);
+                var results = home.getRegion('itemsContainer').el;
+                ps.destroy(results);
+                ps.initialize(results);
+                results.scrollTop = 0;
+                home.getRegion('itemsDetails').currentView.$('input').focus().setCursorPosition(query.length);
+            });
+        },
+        getSearchResults: function (str, ajaxOptions) {
+            var view = this;
+            var defaults = {
+                data: { q: str },
+                dataType: 'json',
+                url: SEARCH_URL
+            };
+            return $.get(_.extend(defaults, ajaxOptions)).then(function (items) {
+                return _(items).map(function (item) {
+                    return _.omit(item, 'text');
+                }).take(MAX_RESULTS).value();
+            }).then(function (items) {
+                view.details.model.set({
+                    searchString: str,
+                    total: items.length
+                });
+                view.details.$el.removeClass('processing');
+                view.details.render();
+                return items;
+            }).catch(function (err) {
+                WebApp.error(err);
             });
         }
-    },
-    onClickAbout: function () {
-        window.open('https://github.com/jhwohlgemuth/navy-search/blob/master/README.md');
-    },
-    getSearchResults: function (str, ajaxOptions) {
-        var view = this;
-        var defaults = {
-            data: { q: str },
-            dataType: 'json',
-            url: SEARCH_URL
-        };
-        return $.get(_.extend(defaults, ajaxOptions)).then(function (items) {
-            return _(items).map(function (item) {
-                return _.omit(item, 'text');
-            }).take(MAX_RESULTS).value();
-        }).then(function (items) {
-            view.details.model.set({
-                searchString: str,
-                total: items.length
-            });
-            view.details.$el.removeClass('processing');
-            view.details.render();
-            return items;
-        }).catch(function (err) {
-            WebApp.error(err);
-        });
-    }
-});
-module.exports = HomeView;
+    });
+    module.exports = HomeView;
+}(require, exports, module));
 },{"./../app":1,"./../models/Data":5,"./../plugins/ie.shim.behavior":7,"./../templates":10,"./Results":12,"backbone.marionette":14,"jquery":48,"lodash":49,"perfect-scrollbar":51}],12:[function(require,module,exports){
-'use strict';
-var _ = require('lodash');
-var Mn = require('backbone.marionette');
-var JST = require('./../templates');
-var Message = require('./../models/Message');
-var API_ROOT = 'https://www.navysearch.org/api/v1.0/message/';
-var ChildView = Mn.View.extend({
-    className: 'animated--200 fly-out--left full-width item-wrapper',
-    model: new Message.Model(),
-    template: JST.item,
-    events: { click: 'onClick' },
-    onRender: function () {
-        var view = this;
-        var model = view.model;
-        view.$el.attr('data-type', model.get('type'));
-    },
-    onClick: function () {
-        window.open(API_ROOT + this.model.get('id'));
-    }
-});
-var ResultsCollectionView = Mn.CollectionView.extend({
-    className: 'items',
-    childView: ChildView,
-    initialize: function () {
-        var items = this.collection;
-        if (!(items instanceof Message.Collection)) {
-            this.collection = new Message.Collection(items);
+(function (require, exports, module) {
+    'use strict';
+    var _ = require('lodash');
+    var Mn = require('backbone.marionette');
+    var JST = require('./../templates');
+    var Message = require('./../models/Message');
+    var API_ROOT = 'https://www.navysearch.org/api/v1.0/message/';
+    var ChildView = Mn.View.extend({
+        className: 'animated--200 fly-out--left full-width item-wrapper',
+        model: new Message.Model(),
+        template: JST.item,
+        events: { click: 'onClick' },
+        onRender: function () {
+            var view = this;
+            var model = view.model;
+            view.$el.attr('data-type', model.get('type'));
+        },
+        onClick: function () {
+            window.open(API_ROOT + this.model.get('id'));
         }
-    },
-    onDomRefresh: function () {
-        this.children.forEach(function (child, index) {
-            _.delay(function () {
-                child.$el.removeClass('fly-out--left');
-            }, 100 + index * 50);
-        });
-    }
-});
-module.exports = ResultsCollectionView;
+    });
+    var ResultsCollectionView = Mn.CollectionView.extend({
+        className: 'items',
+        childView: ChildView,
+        initialize: function () {
+            var items = this.collection;
+            if (!(items instanceof Message.Collection)) {
+                this.collection = new Message.Collection(items);
+            }
+        },
+        onDomRefresh: function () {
+            this.children.forEach(function (child, index) {
+                _.delay(function () {
+                    child.$el.removeClass('fly-out--left');
+                }, 100 + index * 50);
+            });
+        }
+    });
+    module.exports = ResultsCollectionView;
+}(require, exports, module));
 },{"./../models/Message":6,"./../templates":10,"backbone.marionette":14,"lodash":49}],13:[function(require,module,exports){
 (function (process,__filename){
 /** vim: et:ts=4:sw=4:sts=4
