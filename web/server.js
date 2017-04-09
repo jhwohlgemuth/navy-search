@@ -81,6 +81,7 @@ var app = express()
     .use(lusca.xssProtection(true))
     .use(helmet.noSniff())
     .use(helmet.ieNoOpen())
+    .use(helmet.referrerPolicy({policy: 'no-referrer'}))
     .use(compress())                        /** Use gzip compression **/
     .use(express.static(__dirname))         /** Serve static files **/
     .use(require('opbeat').middleware.express());
