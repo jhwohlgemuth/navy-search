@@ -75,15 +75,12 @@ function attemptRequest(options) {
         })
         .catch(() => _.assign(item, {id, text: FAIL_TEXT}));
 }
-
 function isRequestFail(item) {
     return (item.text === FAIL_TEXT);
 }
-
 function maybeRequest(item) {
     return isRequestFail(item) ? attemptRequest(item, true) : item;
 }
-
 function parseMessageUri(data) {
     var messageId = _(data)
         .split('/')
@@ -100,11 +97,9 @@ function parseMessageUri(data) {
     var id = createMessageId(type, year, num);
     return {id, type, code, year, num, ext, url};
 }
-
 function createMessageId(type, year, num) {
     return `${type}${year}${num}`;
 }
-
 function parseMessageId(val) {
     var arr = val.split('');
     var type = _.takeWhile(arr, _.flow(Number, isNaN))
@@ -114,7 +109,6 @@ function parseMessageId(val) {
     var num = val.substr(-1 * '###'.length);
     return {type, year, num};
 }
-
 function validateValues() {
     var params = _.head(Array.prototype.slice.apply(arguments));
     var methodLookup = {
@@ -132,16 +126,13 @@ function validateValues() {
             .value()
     };
 }
-
 function isValidMessageId(val) {
     var MESSAGE_ID_REGEX = /^[a-z]{5,8}\d{5}$/gmi;
     return MESSAGE_ID_REGEX.test(val);
 }
-
 function isValidMessageType(val) {
     return _(MSG_TYPE_LOOKUP).values().includes(val);
 }
-
 function isValidMessageYear(val) {
     var FORMAT = 'YY';
     var len = FORMAT.length;
@@ -149,11 +140,9 @@ function isValidMessageYear(val) {
     var year = String(new Date().getFullYear()).substring(valLen);
     return (valLen === len) && !_.flow(Number, isNaN)(val) && (Number(val) <= Number(year));
 }
-
 function isValidMessageNum(val) {
     return val.length === NUM_FORMAT_LENGTH;
 }
-
 function scrapeMessageData(type, year, options) {
     year = (String(year).length === 'YYYY'.length) ? Number(year.substr(-1 * YEAR_FORMAT_LENGTH)) : year;
     var url = `${_.get(options, 'domain', NPC_DOMAIN)}/bupers-npc/reference/messages/${type}S/Pages/${type}20${year}.aspx`;
@@ -163,7 +152,6 @@ function scrapeMessageData(type, year, options) {
         .map(str => str.split('mil')[1])
         .map(parseMessageUri);
 }
-
 function getMessage(options) {
     var type = _.get(options, 'type', '').toUpperCase();
     var year = _.get(options, 'year');
@@ -172,14 +160,12 @@ function getMessage(options) {
         .findOne({type, year, num})
         .exec();
 }
-
 function getMessages(options) {
     var type = _.get(options, 'type', '').toUpperCase();
     return Message
         .find({type})
         .exec();
 }
-
 function search(model, searchStrings) {
     var score = {$meta: 'textScore'};
     var results = searchStrings.map((str) => {
