@@ -45,7 +45,7 @@
     "request-promise": "^4.2.0",
     "ws": "^2.2.3",
     "x-ray": "^2.3.2",
-    "yargs": "^7.0.2"
+    "yargs": "7.0.2"
   },
   "devDependencies": {
     "apidoc": "^0.16.1",
