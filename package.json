@@ -35,12 +35,12 @@
     "lusca": "^1.3.0",
     "mongoose": "^4.9.5",
     "navy-message-parser": "0.0.7",
-    "node-uuid": "^1.4.8",
     "npmlog": "^4.0.2",
     "nsp": "^2.6.3",
     "opbeat": "^4.13.0",
     "remarkable": "^1.7.1",
     "request-promise": "^4.2.0",
+    "uuid": "^3.0.1",
     "ws": "^2.2.3",
     "x-ray": "^2.3.2",
     "yargs": "^7.1.0"
