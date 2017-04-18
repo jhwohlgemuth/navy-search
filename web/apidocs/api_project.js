@@ -10,11 +10,12 @@ define({
   ],
   "url": "https://www.navysearch.org/api/v1.0",
   "sampleUrl": "https://www.navysearch.org/api/v1.0",
-  "apidoc": "0.2.0",
+  "defaultVersion": "0.0.0",
+  "apidoc": "0.3.0",
   "generator": {
     "name": "apidoc",
-    "time": "2016-12-29T22:49:46.215Z",
+    "time": "2017-04-18T01:41:03.439Z",
     "url": "http://apidocjs.com",
-    "version": "0.16.1"
+    "version": "0.17.5"
   }
 });
