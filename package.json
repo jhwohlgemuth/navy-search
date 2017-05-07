@@ -65,7 +65,7 @@
   },
   "scripts": {
     "scan": "nsp check",
-    "prestart": "npm run scan",
+    "xprestart": "npm run scan",
     "start": "node index.js",
     "populate": "node ./bin/populate",
     "update": "node ./bin/update",
