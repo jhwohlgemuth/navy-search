@@ -246,7 +246,7 @@ module.exports = function (Handlebars) {
             '>= 4.0.0'
         ],
         'main': function (container, depth0, helpers, partials, data) {
-            var helper, alias1 = depth0 != null ? depth0 : {}, alias2 = helpers.helperMissing, alias3 = 'function', alias4 = container.escapeExpression;
+            var helper, alias1 = depth0 != null ? depth0 : container.nullContext || {}, alias2 = helpers.helperMissing, alias3 = 'function', alias4 = container.escapeExpression;
             return '<input type="text" tabindex="1" class="full-width centered" value="' + alias4((helper = (helper = helpers.searchString || (depth0 != null ? depth0.searchString : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
                 'name': 'searchString',
                 'hash': {},
@@ -285,7 +285,7 @@ module.exports = function (Handlebars) {
             '>= 4.0.0'
         ],
         'main': function (container, depth0, helpers, partials, data) {
-            var helper, alias1 = depth0 != null ? depth0 : {}, alias2 = helpers.helperMissing, alias3 = 'function', alias4 = container.escapeExpression;
+            var helper, alias1 = depth0 != null ? depth0 : container.nullContext || {}, alias2 = helpers.helperMissing, alias3 = 'function', alias4 = container.escapeExpression;
             return '<div class="message item-type">' + alias4((helper = (helper = helpers.code || (depth0 != null ? depth0.code : depth0)) != null ? helper : alias2, typeof helper === alias3 ? helper.call(alias1, {
                 'name': 'code',
                 'hash': {},
@@ -329,7 +329,10 @@ module.exports = function (Handlebars) {
         className: 'animated fly-out--top details',
         template: JST.details,
         model: new Data.Model(),
-        events: { 'focus input': 'onFocus' },
+        events: {
+            'focus input': 'onFocus',
+            'blur input': 'onBlur'
+        },
         templateContext: function () {
             return { countMessage: createCountMessage(this.model.get('total')) };
         },
@@ -345,13 +348,16 @@ module.exports = function (Handlebars) {
             $details.keypress(function (e) {
                 var key = e.which || e.keyCode;
                 var query = e.target.value;
+                console.log('focus!');
                 if (key === RETURN_KEY_CODE && query.length > 0) {
                     $details.addClass('processing').off('keypress');
                     details.trigger('results:update', query);
                 }
             });
         },
-        onInput: function () {
+        onBlur: function () {
+            console.log('blur');
+            this.$el.off('keypress');
         }
     });
     var HomeView = Mn.View.extend({
@@ -452,7 +458,7 @@ module.exports = function (Handlebars) {
     var Message = require('./../models/Message');
     var API_ROOT = 'https://www.navysearch.org/api/v1.0/message/';
     var ChildView = Mn.View.extend({
-        className: 'animated--200 fly-out--left full-width item-wrapper',
+        className: 'animated--200 fly-out--right full-width item-wrapper',
         model: new Message.Model(),
         template: JST.item,
         events: { click: 'onClick' },
@@ -477,7 +483,7 @@ module.exports = function (Handlebars) {
         onDomRefresh: function () {
             this.children.forEach(function (child, index) {
                 _.delay(function () {
-                    child.$el.removeClass('fly-out--left');
+                    child.$el.removeClass('fly-out--right');
                 }, 100 + index * 50);
             });
         }
@@ -792,7 +798,7 @@ module.exports = amdefine;
 },{"_process":72,"path":50}],14:[function(require,module,exports){
 // MarionetteJS (Backbone.Marionette)
 // ----------------------------------
-// v3.2.0
+// v3.3.1
 //
 // Copyright (c)2017 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
@@ -810,7 +816,7 @@ Backbone = 'default' in Backbone ? Backbone['default'] : Backbone;
 _ = 'default' in _ ? _['default'] : _;
 Radio = 'default' in Radio ? Radio['default'] : Radio;
 
-var version = "3.2.0";
+var version = "3.3.1";
 
 //Internal utility for creating context style global utils
 var proxy = function proxy(method) {
@@ -1019,6 +1025,12 @@ function triggerDOMRefresh(view) {
   }
 }
 
+function triggerDOMRemove(view) {
+  if (view._isAttached && view._isRendered) {
+    triggerMethodOn(view, 'dom:remove', view);
+  }
+}
+
 function handleBeforeAttach() {
   triggerMethodChildren(this, 'before:attach', shouldTriggerAttach);
 }
@@ -1030,10 +1042,15 @@ function handleAttach() {
 
 function handleBeforeDetach() {
   triggerMethodChildren(this, 'before:detach', shouldTriggerDetach);
+  triggerDOMRemove(this);
 }
 
 function handleDetach() {
   triggerMethodChildren(this, 'detach', shouldDetach);
+}
+
+function handleBeforeRender() {
+  triggerDOMRemove(this);
 }
 
 function handleRender() {
@@ -1054,6 +1071,7 @@ function monitorViewEvents(view) {
     'attach': handleAttach,
     'before:detach': handleBeforeDetach,
     'detach': handleDetach,
+    'before:render': handleBeforeRender,
     'render': handleRender
   });
 }
@@ -1374,6 +1392,9 @@ var DomMixin = {
   setInnerContent: function setInnerContent(el, html) {
     Backbone.$(el).html(html);
   },
+  detachEl: function detachEl(el) {
+    Backbone.$(el).detach();
+  },
   removeEl: function removeEl(el) {
     Backbone.$(el).remove();
   },
@@ -1489,8 +1510,6 @@ _.extend(TemplateCache.prototype, DomMixin, {
 // lodash v3, v4, and underscore.js
 var _invoke = _.invokeMap || _.invoke;
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 // MixinOptions
 // - behaviors
 
@@ -1544,11 +1563,15 @@ var BehaviorsMixin = {
   },
   _getBehaviorTriggers: function _getBehaviorTriggers() {
     var triggers = _invoke(this._behaviors, 'getTriggers');
-    return _.extend.apply(_, [{}].concat(_toConsumableArray(triggers)));
+    return _.reduce(triggers, function (memo, _triggers) {
+      return _.extend(memo, _triggers);
+    }, {});
   },
   _getBehaviorEvents: function _getBehaviorEvents() {
     var events = _invoke(this._behaviors, 'getEvents');
-    return _.extend.apply(_, [{}].concat(_toConsumableArray(events)));
+    return _.reduce(events, function (memo, _events) {
+      return _.extend(memo, _events);
+    }, {});
   },
 
 
@@ -1568,12 +1591,26 @@ var BehaviorsMixin = {
   _undelegateBehaviorEntityEvents: function _undelegateBehaviorEntityEvents() {
     _invoke(this._behaviors, 'undelegateEntityEvents');
   },
-  _destroyBehaviors: function _destroyBehaviors(args) {
+  _destroyBehaviors: function _destroyBehaviors() {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
     // Call destroy on each behavior after
     // destroying the view.
     // This unbinds event listeners
     // that behaviors have registered for.
-    _invoke.apply(undefined, [this._behaviors, 'destroy'].concat(_toConsumableArray(args)));
+    _invoke.apply(undefined, [this._behaviors, 'destroy'].concat(args));
+  },
+
+
+  // Remove a behavior
+  _removeBehavior: function _removeBehavior(behavior) {
+    // Don't worry about the clean up if the view is destroyed
+    if (this._isDestroyed) {
+      return;
+    }
+    this._behaviors = _.without(this._behaviors, behavior);
   },
   _bindBehaviorUIElements: function _bindBehaviorUIElements() {
     _invoke(this._behaviors, 'bindUIElements');
@@ -1632,6 +1669,7 @@ var getUniqueEventName = function getUniqueEventName(eventName) {
 // Add Feature flags here
 // e.g. 'class' => false
 var FEATURES = {
+  childViewEventPrefix: true,
   triggersStopPropagation: true,
   triggersPreventDefault: true
 };
@@ -1952,10 +1990,12 @@ var ViewMixin = {
     // remove children after the remove to prevent extra paints
     this._removeChildren();
 
-    this._destroyBehaviors(args);
-
     this._isDestroyed = true;
     this._isRendered = false;
+
+    // Destroy behaviors after _isDestroyed flag
+    this._destroyBehaviors.apply(this, args);
+
     this.triggerMethod.apply(this, ['destroy', this].concat(args));
 
     this.stopListening();
@@ -1984,7 +2024,10 @@ var ViewMixin = {
 
   // used as the prefix for child view events
   // that are forwarded through the layoutview
-  childViewEventPrefix: 'childview',
+  childViewEventPrefix: function childViewEventPrefix() {
+    return isEnabled('childViewEventPrefix') ? 'childview' : false;
+  },
+
 
   // import the `triggerMethod` to trigger events with corresponding
   // methods if the method exists
@@ -2072,6 +2115,7 @@ var Region = MarionetteObject.extend({
   cidPrefix: 'mnr',
   replaceElement: false,
   _isReplaced: false,
+  _isSwappingView: false,
 
   constructor: function constructor(options) {
     this._setOptions(options);
@@ -2110,6 +2154,8 @@ var Region = MarionetteObject.extend({
       return this;
     }
 
+    this._isSwappingView = !!this.currentView;
+
     this.triggerMethod('before:show', this, view, options);
 
     // Assume an attached view is already in the region for pre-existing DOM
@@ -2126,6 +2172,9 @@ var Region = MarionetteObject.extend({
     this.currentView = view;
 
     this.triggerMethod('show', this, view, options);
+
+    this._isSwappingView = false;
+
     return this;
   },
   _setupChildView: function _setupChildView(view) {
@@ -2277,7 +2326,7 @@ var Region = MarionetteObject.extend({
       return;
     }
 
-    this.replaceEl(this.el, view.el);
+    this._detachView(view);
 
     this._isReplaced = false;
   },
@@ -2286,6 +2335,12 @@ var Region = MarionetteObject.extend({
   // Check to see if the region's el was replaced.
   isReplaced: function isReplaced() {
     return !!this._isReplaced;
+  },
+
+
+  // Check to see if a view is being swapped by another
+  isSwappingView: function isSwappingView() {
+    return !!this._isSwappingView;
   },
 
 
@@ -2329,7 +2384,11 @@ var Region = MarionetteObject.extend({
     delete this.currentView;
 
     if (!view._isDestroyed) {
-      this._removeView(view, shouldDestroy);
+      if (shouldDestroy) {
+        this.removeView(view);
+      } else {
+        this._detachView(view);
+      }
       this._stopChildViewEvents(view);
     }
 
@@ -2344,10 +2403,9 @@ var Region = MarionetteObject.extend({
 
     this._parentView.stopListening(view);
   },
-  _removeView: function _removeView(view, shouldDestroy) {
-    if (!shouldDestroy) {
-      this._detachView(view);
-      return;
+  destroyView: function destroyView(view) {
+    if (view._isDestroyed) {
+      return view;
     }
 
     if (view.destroy) {
@@ -2355,7 +2413,15 @@ var Region = MarionetteObject.extend({
     } else {
       destroyBackboneView(view);
     }
+    return view;
   },
+  removeView: function removeView(view) {
+    this.destroyView(view);
+  },
+
+
+  // Empties the Region without destroying the view
+  // Returns the detached view
   detachView: function detachView() {
     var view = this.currentView;
 
@@ -2369,11 +2435,16 @@ var Region = MarionetteObject.extend({
   },
   _detachView: function _detachView(view) {
     var shouldTriggerDetach = !!view._isAttached;
+    var shouldRestoreEl = this._isReplaced;
     if (shouldTriggerDetach) {
       triggerMethodOn(view, 'before:detach', view);
     }
 
-    this.detachHtml();
+    if (shouldRestoreEl) {
+      this.replaceEl(this.el, view.el);
+    } else {
+      this.detachHtml();
+    }
 
     if (shouldTriggerDetach) {
       view._isAttached = false;
@@ -2409,7 +2480,18 @@ var Region = MarionetteObject.extend({
     return this;
   },
   destroy: function destroy(options) {
+    if (this._isDestroyed) {
+      return this;
+    }
+
     this.reset(options);
+
+    if (this._name) {
+      this._parentView._removeReferences(this._name);
+    }
+    delete this._parentView;
+    delete this._name;
+
     return MarionetteObject.prototype.destroy.apply(this, arguments);
   }
 });
@@ -2535,6 +2617,7 @@ var RegionsMixin = {
     this.triggerMethod('before:add:region', this, name, region);
 
     region._parentView = this;
+    region._name = name;
 
     this._regions[name] = region;
 
@@ -2554,7 +2637,7 @@ var RegionsMixin = {
 
   // Remove all regions from the View
   removeRegions: function removeRegions() {
-    var regions = this.getRegions();
+    var regions = this._getRegions();
 
     _.each(this._regions, _.bind(this._removeRegion, this));
 
@@ -2565,10 +2648,14 @@ var RegionsMixin = {
 
     region.destroy();
 
+    this.triggerMethod('remove:region', this, name, region);
+  },
+
+
+  // Called in a region's destroy
+  _removeReferences: function _removeReferences(name) {
     delete this.regions[name];
     delete this._regions[name];
-
-    this.triggerMethod('remove:region', this, name, region);
   },
 
 
@@ -2593,13 +2680,22 @@ var RegionsMixin = {
   // Accepts the region name
   // getRegion('main')
   getRegion: function getRegion(name) {
+    if (!this._isRendered) {
+      this.render();
+    }
     return this._regions[name];
   },
 
 
   // Get all regions
-  getRegions: function getRegions() {
+  _getRegions: function _getRegions() {
     return _.clone(this._regions);
+  },
+  getRegions: function getRegions() {
+    if (!this._isRendered) {
+      this.render();
+    }
+    return this._getRegions();
   },
   showChildView: function showChildView(name, view) {
     var region = this.getRegion(name);
@@ -2668,6 +2764,8 @@ var View = Backbone.View.extend({
     Backbone.View.prototype.constructor.apply(this, args);
 
     this.delegateEntityEvents();
+
+    this._triggerEventOnBehaviors('initialize', this);
   },
 
 
@@ -2773,6 +2871,7 @@ var View = Backbone.View.extend({
 
     // Allow template-less views
     if (template === false) {
+      deprecate('template:false is deprecated.  Use _.noop.');
       return;
     }
 
@@ -2780,8 +2879,14 @@ var View = Backbone.View.extend({
     var data = this.mixinTemplateContext(this.serializeData());
 
     // Render and add to el
-    var html = Renderer.render(template, data, this);
+    var html = this._renderHtml(template, data);
     this.attachElContent(html);
+  },
+
+
+  // Renders the data into the template
+  _renderHtml: function _renderHtml(template, data) {
+    return Renderer.render(template, data, this);
   },
 
 
@@ -2831,7 +2936,12 @@ var View = Backbone.View.extend({
     this.removeRegions();
   },
   _getImmediateChildren: function _getImmediateChildren() {
-    return _.chain(this.getRegions()).map('currentView').compact().value();
+    return _.chain(this._getRegions()).map('currentView').compact().value();
+  }
+}, {
+  // Sets the renderer for the Marionette.View class
+  setRenderer: function setRenderer(renderer) {
+    this.prototype._renderHtml = renderer;
   }
 });
 
@@ -2842,7 +2952,7 @@ _.extend(View.prototype, ViewMixin, RegionsMixin);
 // Borrowing this code from Backbone.Collection:
 // https://github.com/jashkenas/backbone/blob/1.1.2/backbone.js#L962
 
-var methods = ['forEach', 'each', 'map', 'find', 'detect', 'filter', 'select', 'reject', 'every', 'all', 'some', 'any', 'include', 'contains', 'invoke', 'toArray', 'first', 'initial', 'rest', 'last', 'without', 'isEmpty', 'pluck', 'reduce'];
+var methods = ['forEach', 'each', 'map', 'find', 'detect', 'filter', 'select', 'reject', 'every', 'all', 'some', 'any', 'include', 'contains', 'invoke', 'toArray', 'first', 'initial', 'rest', 'last', 'without', 'isEmpty', 'pluck', 'reduce', 'partition'];
 
 var emulateCollection = function emulateCollection(object, listProperty) {
   _.each(methods, function (method) {
@@ -3018,6 +3128,8 @@ var CollectionView = Backbone.View.extend({
     Backbone.View.prototype.constructor.apply(this, args);
 
     this.delegateEntityEvents();
+
+    this._triggerEventOnBehaviors('initialize', this);
   },
 
 
@@ -3232,8 +3344,6 @@ var CollectionView = Backbone.View.extend({
   // you can pass reorderOnSort: true to only reorder the DOM after a sort instead of
   // rendering all the collectionView.
   reorder: function reorder() {
-    var _this3 = this;
-
     var children = this.children;
     var models = this._filteredSortedModels();
 
@@ -3250,38 +3360,36 @@ var CollectionView = Backbone.View.extend({
     if (anyModelsAdded) {
       this.render();
     } else {
-      (function () {
 
-        var filteredOutModels = [];
+      var filteredOutModels = [];
 
-        // Get the DOM nodes in the same order as the models and
-        // find the model that were children before but aren't in this new order.
-        var elsToReorder = children.reduce(function (viewEls, view) {
-          var index = _.indexOf(models, view.model);
+      // Get the DOM nodes in the same order as the models and
+      // find the model that were children before but aren't in this new order.
+      var elsToReorder = children.reduce(function (viewEls, view) {
+        var index = _.indexOf(models, view.model);
 
-          if (index === -1) {
-            filteredOutModels.push(view.model);
-            return viewEls;
-          }
-
-          view._index = index;
-
-          viewEls[index] = view.el;
-
+        if (index === -1) {
+          filteredOutModels.push(view.model);
           return viewEls;
-        }, new Array(models.length));
+        }
 
-        _this3.triggerMethod('before:reorder', _this3);
+        view._index = index;
 
-        // Since append moves elements that are already in the DOM, appending the elements
-        // will effectively reorder them.
-        _this3._appendReorderedChildren(elsToReorder);
+        viewEls[index] = view.el;
 
-        // remove any views that have been filtered out
-        _this3._removeChildModels(filteredOutModels);
+        return viewEls;
+      }, new Array(models.length));
 
-        _this3.triggerMethod('reorder', _this3);
-      })();
+      this.triggerMethod('before:reorder', this);
+
+      // Since append moves elements that are already in the DOM, appending the elements
+      // will effectively reorder them.
+      this._appendReorderedChildren(elsToReorder);
+
+      // remove any views that have been filtered out
+      this._removeChildModels(filteredOutModels);
+
+      this.triggerMethod('reorder', this);
     }
     return this;
   },
@@ -3302,13 +3410,13 @@ var CollectionView = Backbone.View.extend({
   // Internal method. This checks for any changes in the order of the collection.
   // If the index of any view doesn't match, it will render.
   _sortViews: function _sortViews() {
-    var _this4 = this;
+    var _this3 = this;
 
     var models = this._filteredSortedModels();
 
     // check for any changes in sort order of views
     var orderChanged = _.find(models, function (item, index) {
-      var view = _this4.children.findByModel(item);
+      var view = _this3.children.findByModel(item);
       return !view || view._index !== index;
     });
 
@@ -3407,11 +3515,11 @@ var CollectionView = Backbone.View.extend({
 
   // Filter an array of models, if a filter exists
   _filterModels: function _filterModels(models) {
-    var _this5 = this;
+    var _this4 = this;
 
     if (this.filter) {
       models = _.filter(models, function (model, index) {
-        return _this5._shouldAddChild(model, index);
+        return _this4._shouldAddChild(model, index);
       });
     }
     return models;
@@ -3662,11 +3770,11 @@ var CollectionView = Backbone.View.extend({
 
   // Create a fragment buffer from the currently buffered children
   _createBuffer: function _createBuffer() {
-    var _this6 = this;
+    var _this5 = this;
 
     var elBuffer = this.createBuffer();
     _.each(this._bufferedChildren, function (b) {
-      _this6.appendChildren(elBuffer, b.el);
+      _this5.appendChildren(elBuffer, b.el);
     });
     return elBuffer;
   },
@@ -3755,10 +3863,856 @@ var CollectionView = Backbone.View.extend({
 
 _.extend(CollectionView.prototype, ViewMixin);
 
+// Provide a container to store, retrieve and
+// shut down child views.
+var Container$1 = function Container$1() {
+  this._init();
+};
+
+emulateCollection(Container$1.prototype, '_views');
+
+function stringComparator(comparator, view) {
+  return view.model && view.model.get(comparator);
+}
+
+// Container Methods
+// -----------------
+
+_.extend(Container$1.prototype, {
+
+  // Initializes an empty container
+  _init: function _init() {
+    this._views = [];
+    this._viewsByCid = {};
+    this._indexByModel = {};
+    this._updateLength();
+  },
+
+
+  // Add a view to this container. Stores the view
+  // by `cid` and makes it searchable by the model
+  // cid (and model itself). Additionally it stores
+  // the view by index in the _views array
+  _add: function _add(view) {
+    var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this._views.length;
+
+    var viewCid = view.cid;
+
+    // store the view
+    this._viewsByCid[viewCid] = view;
+
+    // index it by model
+    if (view.model) {
+      this._indexByModel[view.model.cid] = viewCid;
+    }
+
+    // add to end by default
+    this._views.splice(index, 0, view);
+
+    this._updateLength();
+  },
+
+
+  // Sort (mutate) and return the array of the child views.
+  _sort: function _sort(comparator) {
+    if (typeof comparator === 'string') {
+      comparator = _.partial(stringComparator, comparator);
+      return this._sortBy(comparator);
+    }
+
+    if (comparator.length === 1) {
+      return this._sortBy(comparator);
+    }
+
+    return this._views.sort(comparator);
+  },
+
+
+  // Makes `_.sortBy` mutate the array to match `this._views.sort`
+  _sortBy: function _sortBy(comparator) {
+    var sortedViews = _.sortBy(this._views, comparator);
+
+    this._set(sortedViews);
+
+    return sortedViews;
+  },
+
+
+  // Replace array contents without overwriting the reference.
+  _set: function _set(views) {
+    this._views.length = 0;
+
+    this._views.push.apply(this._views, views.slice(0));
+
+    this._updateLength();
+  },
+
+
+  // Find a view by the model that was attached to it.
+  // Uses the model's `cid` to find it.
+  findByModel: function findByModel(model) {
+    return this.findByModelCid(model.cid);
+  },
+
+
+  // Find a view by the `cid` of the model that was attached to it.
+  // Uses the model's `cid` to find the view `cid` and
+  // retrieve the view using it.
+  findByModelCid: function findByModelCid(modelCid) {
+    var viewCid = this._indexByModel[modelCid];
+    return this.findByCid(viewCid);
+  },
+
+
+  // Find a view by index.
+  findByIndex: function findByIndex(index) {
+    return this._views[index];
+  },
+
+
+  // Find the index of a view instance
+  findIndexByView: function findIndexByView(view) {
+    return this._views.indexOf(view);
+  },
+
+
+  // Retrieve a view by its `cid` directly
+  findByCid: function findByCid(cid) {
+    return this._viewsByCid[cid];
+  },
+
+
+  // Remove a view and clean up index references.
+  _remove: function _remove(view) {
+    if (!this._viewsByCid[view.cid]) {
+      return;
+    }
+
+    // delete model index
+    if (view.model) {
+      delete this._indexByModel[view.model.cid];
+    }
+
+    // remove the view from the container
+    delete this._viewsByCid[view.cid];
+
+    var index = this.findIndexByView(view);
+    this._views.splice(index, 1);
+
+    this._updateLength();
+  },
+
+
+  // Update the `.length` attribute on this container
+  _updateLength: function _updateLength() {
+    this.length = this._views.length;
+  }
+});
+
+// Next Collection View
+// ---------------
+
+var ClassOptions$4 = ['behaviors', 'childView', 'childViewEventPrefix', 'childViewEvents', 'childViewOptions', 'childViewTriggers', 'collectionEvents', 'emptyView', 'emptyViewOptions', 'events', 'modelEvents', 'sortWithCollection', 'triggers', 'ui', 'viewComparator', 'viewFilter'];
+
+// A view that iterates over a Backbone.Collection
+// and renders an individual child view for each model.
+var CollectionView$2 = Backbone.View.extend({
+  // flag for maintaining the sorted order of the collection
+  sortWithCollection: true,
+
+  // constructor
+  constructor: function constructor(options) {
+    this._setOptions(options);
+
+    this.mergeOptions(options, ClassOptions$4);
+
+    monitorViewEvents(this);
+
+    this.once('render', this._initialEvents);
+
+    // This children container isn't really used by a render, but it provides
+    // the ability to check `this.children.length` prior to rendering
+    // It also allows for cases where only addChildView is used
+    this._initChildViewStorage();
+    this._initBehaviors();
+
+    var args = Array.prototype.slice.call(arguments);
+    args[0] = this.options;
+    Backbone.View.prototype.constructor.apply(this, args);
+
+    this._initEmptyRegion();
+
+    this.delegateEntityEvents();
+
+    this._triggerEventOnBehaviors('initialize', this);
+  },
+
+
+  // Internal method to set up the `children` object for storing all of the child views
+  _initChildViewStorage: function _initChildViewStorage() {
+    this.children = new Container$1();
+  },
+
+
+  // Create an region to show the emptyView
+  _initEmptyRegion: function _initEmptyRegion() {
+    this.emptyRegion = new Region({ el: this.el });
+
+    this.emptyRegion._parentView = this;
+  },
+
+
+  // Configured the initial events that the collection view binds to.
+  _initialEvents: function _initialEvents() {
+    this.listenTo(this.collection, {
+      'sort': this._onCollectionSort,
+      'reset': this._onCollectionReset,
+      'update': this._onCollectionUpdate
+    });
+  },
+
+
+  // Internal method. This checks for any changes in the order of the collection.
+  // If the index of any view doesn't match, it will re-sort.
+  _onCollectionSort: function _onCollectionSort() {
+    var _this = this;
+
+    if (!this.sortWithCollection) {
+      return;
+    }
+
+    // If the data is changing we will handle the sort later
+    if (this.collection.length !== this.children.length) {
+      return;
+    }
+
+    // Additional check if the data is changing
+    var hasAddedModel = this.collection.some(function (model) {
+      return !_this.children.findByModel(model);
+    });
+
+    if (hasAddedModel) {
+      return;
+    }
+
+    // If the only thing happening here is sorting, sort.
+    this.sort();
+  },
+  _onCollectionReset: function _onCollectionReset() {
+    this.render();
+  },
+
+
+  // Handle collection update model additions and  removals
+  _onCollectionUpdate: function _onCollectionUpdate(collection, options) {
+    var changes = options.changes;
+
+    // Remove first since it'll be a shorter array lookup.
+    var removedViews = this._removeChildModels(changes.removed);
+
+    this._addChildModels(changes.added);
+
+    this._detachChildren(removedViews);
+
+    this._showChildren();
+
+    // Destroy removed child views after all of the render is complete
+    this._removeChildViews(removedViews);
+  },
+  _removeChildModels: function _removeChildModels(models) {
+    return _.map(models, _.bind(this._removeChildModel, this));
+  },
+  _removeChildModel: function _removeChildModel(model) {
+    var view = this.children.findByModel(model);
+
+    this._removeChild(view);
+
+    return view;
+  },
+  _removeChild: function _removeChild(view) {
+    this.triggerMethod('before:remove:child', this, view);
+
+    this.children._remove(view);
+
+    this.triggerMethod('remove:child', this, view);
+  },
+
+
+  // Added views are returned for consistency with _removeChildModels
+  _addChildModels: function _addChildModels(models) {
+    return _.map(models, _.bind(this._addChildModel, this));
+  },
+  _addChildModel: function _addChildModel(model) {
+    var view = this._createChildView(model);
+
+    this._addChild(view);
+
+    return view;
+  },
+  _createChildView: function _createChildView(model) {
+    var ChildView = this._getChildView(model);
+    var childViewOptions = this._getChildViewOptions(model);
+    var view = this.buildChildView(model, ChildView, childViewOptions);
+
+    return view;
+  },
+  _addChild: function _addChild(view, index) {
+    this.triggerMethod('before:add:child', this, view);
+
+    this._setupChildView(view);
+    this.children._add(view, index);
+
+    this.triggerMethod('add:child', this, view);
+  },
+
+
+  // Retrieve the `childView` class
+  // The `childView` property can be either a view class or a function that
+  // returns a view class. If it is a function, it will receive the model that
+  // will be passed to the view instance (created from the returned view class)
+  _getChildView: function _getChildView(child) {
+    var childView = this.childView;
+
+    if (!childView) {
+      throw new MarionetteError({
+        name: 'NoChildViewError',
+        message: 'A "childView" must be specified'
+      });
+    }
+
+    childView = this._getView(childView, child);
+
+    if (!childView) {
+      throw new MarionetteError({
+        name: 'InvalidChildViewError',
+        message: '"childView" must be a view class or a function that returns a view class'
+      });
+    }
+
+    return childView;
+  },
+
+
+  // First check if the `view` is a view class (the common case)
+  // Then check if it's a function (which we assume that returns a view class)
+  _getView: function _getView(view, child) {
+    if (view.prototype instanceof Backbone.View || view === Backbone.View) {
+      return view;
+    } else if (_.isFunction(view)) {
+      return view.call(this, child);
+    }
+  },
+  _getChildViewOptions: function _getChildViewOptions(child) {
+    if (_.isFunction(this.childViewOptions)) {
+      return this.childViewOptions(child);
+    }
+
+    return this.childViewOptions;
+  },
+
+
+  // Build a `childView` for a model in the collection.
+  // Override to customize the build
+  buildChildView: function buildChildView(child, ChildViewClass, childViewOptions) {
+    var options = _.extend({ model: child }, childViewOptions);
+    return new ChildViewClass(options);
+  },
+  _setupChildView: function _setupChildView(view) {
+    monitorViewEvents(view);
+
+    // We need to listen for if a view is destroyed in a way other
+    // than through the CollectionView.
+    // If this happens we need to remove the reference to the view
+    // since once a view has been destroyed we can not reuse it.
+    view.on('destroy', this.removeChildView, this);
+
+    // set up the child view event forwarding
+    this._proxyChildViewEvents(view);
+  },
+
+
+  // used by ViewMixin's `_childViewEventHandler`
+  _getImmediateChildren: function _getImmediateChildren() {
+    return this.children._views;
+  },
+
+
+  // Overriding Backbone.View's `setElement` to handle
+  // if an el was previously defined. If so, the view might be
+  // attached on setElement.
+  setElement: function setElement() {
+    var hasEl = !!this.el;
+
+    Backbone.View.prototype.setElement.apply(this, arguments);
+
+    if (hasEl) {
+      this._isAttached = isNodeAttached(this.el);
+    }
+
+    return this;
+  },
+
+
+  // Render children views.
+  render: function render() {
+    if (this._isDestroyed) {
+      return this;
+    }
+    this.triggerMethod('before:render', this);
+
+    this._destroyChildren();
+
+    // After all children have been destroyed re-init the container
+    this.children._init();
+
+    if (this.collection) {
+      this._addChildModels(this.collection.models);
+    }
+
+    this._showChildren();
+
+    this._isRendered = true;
+
+    this.triggerMethod('render', this);
+    return this;
+  },
+
+
+  // Sorts the children then filters and renders the results.
+  sort: function sort() {
+    if (this._isDestroyed) {
+      return this;
+    }
+
+    if (!this.children.length) {
+      return this;
+    }
+
+    this._showChildren();
+
+    return this;
+  },
+  _showChildren: function _showChildren() {
+    if (this.isEmpty()) {
+      this._showEmptyView();
+      return;
+    }
+
+    this._sortChildren();
+
+    this.filter();
+  },
+
+
+  // Returns true if the collectionView is considered empty.
+  // This is called twice during a render. Once to check the data,
+  // and again when views are filtered. Override this function to
+  // customize what empty means.
+  isEmpty: function isEmpty(allViewsFiltered) {
+    return allViewsFiltered || !this.children.length;
+  },
+  _showEmptyView: function _showEmptyView() {
+    var EmptyView = this._getEmptyView();
+
+    if (!EmptyView) {
+      return;
+    }
+
+    var options = this._getEmptyViewOptions();
+
+    this.emptyRegion.show(new EmptyView(options));
+  },
+
+
+  // Retrieve the empty view class
+  _getEmptyView: function _getEmptyView() {
+    var emptyView = this.emptyView;
+
+    if (!emptyView) {
+      return;
+    }
+
+    return this._getView(emptyView);
+  },
+
+
+  // Remove the emptyView
+  _destroyEmptyView: function _destroyEmptyView() {
+
+    // Only empty if a view is show so the region
+    // doesn't detach any other unrelated HTML
+    if (this.emptyRegion.hasView()) {
+      this.emptyRegion.empty();
+    }
+  },
+
+
+  //
+  _getEmptyViewOptions: function _getEmptyViewOptions() {
+    var emptyViewOptions = this.emptyViewOptions || this.childViewOptions;
+
+    if (_.isFunction(emptyViewOptions)) {
+      return emptyViewOptions.call(this);
+    }
+
+    return emptyViewOptions;
+  },
+
+
+  // Sorts views by viewComparator and sets the children to the new order
+  _sortChildren: function _sortChildren() {
+    this.triggerMethod('before:sort', this);
+
+    var viewComparator = this.getComparator();
+
+    if (_.isFunction(viewComparator)) {
+      // Must use native bind to preserve length
+      viewComparator = viewComparator.bind(this);
+    }
+
+    this.children._sort(viewComparator);
+
+    this.triggerMethod('sort', this);
+  },
+
+
+  // Sets the view's `viewComparator` and applies the sort if the view is ready.
+  // To prevent the render pass `{ preventRender: true }` as the 2nd argument.
+  setComparator: function setComparator(comparator) {
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        preventRender = _ref.preventRender;
+
+    var comparatorChanged = this.viewComparator !== comparator;
+    var shouldSort = comparatorChanged && !preventRender;
+
+    this.viewComparator = comparator;
+
+    if (shouldSort) {
+      this.sort();
+    }
+
+    return this;
+  },
+
+
+  // Clears the `viewComparator` and follows the same rules for rendering as `setComparator`.
+  removeComparator: function removeComparator(options) {
+    return this.setComparator(null, options);
+  },
+
+
+  // If viewComparator is overriden it will be returned here.
+  // Additionally override this function to provide custom
+  // viewComparator logic
+  getComparator: function getComparator() {
+    return this.viewComparator || this._viewComparator;
+  },
+
+
+  // Default internal view comparator that order the views by
+  // the order of the collection
+  _viewComparator: function _viewComparator(view) {
+    if (!this.collection) {
+      return;
+    }
+    return this.collection.indexOf(view.model);
+  },
+
+
+  // This method re-filters the children views and re-renders the results
+  filter: function filter() {
+    if (this._isDestroyed) {
+      return this;
+    }
+
+    if (!this.children.length) {
+      return this;
+    }
+
+    var filteredViews = this._filterChildren();
+
+    this._renderChildren(filteredViews);
+
+    return this;
+  },
+  _filterChildren: function _filterChildren() {
+    var viewFilter = this._getFilter();
+
+    if (!viewFilter) {
+      return this.children._views;
+    }
+
+    this.triggerMethod('before:filter', this);
+
+    var filteredViews = this.children.partition(_.bind(viewFilter, this));
+
+    this._detachChildren(filteredViews[1]);
+
+    this.triggerMethod('filter', this);
+
+    return filteredViews[0];
+  },
+
+
+  // This method returns a function for the viewFilter
+  _getFilter: function _getFilter() {
+    var viewFilter = this.getFilter();
+
+    if (!viewFilter) {
+      return false;
+    }
+
+    if (_.isFunction(viewFilter)) {
+      return viewFilter;
+    }
+
+    // Support filter predicates `{ fooFlag: true }`
+    if (_.isObject(viewFilter)) {
+      var matcher = _.matches(viewFilter);
+      return function (view) {
+        return matcher(view.model && view.model.attributes);
+      };
+    }
+
+    // Filter by model attribute
+    if (_.isString(viewFilter)) {
+      return function (view) {
+        return view.model && view.model.get(viewFilter);
+      };
+    }
+
+    throw new MarionetteError({
+      name: 'InvalidViewFilterError',
+      message: '"viewFilter" must be a function, predicate object literal, a string indicating a model attribute, or falsy'
+    });
+  },
+
+
+  // Override this function to provide custom
+  // viewFilter logic
+  getFilter: function getFilter() {
+    return this.viewFilter;
+  },
+
+
+  // Sets the view's `viewFilter` and applies the filter if the view is ready.
+  // To prevent the render pass `{ preventRender: true }` as the 2nd argument.
+  setFilter: function setFilter(filter) {
+    var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        preventRender = _ref2.preventRender;
+
+    var filterChanged = this.viewFilter !== filter;
+    var shouldRender = filterChanged && !preventRender;
+
+    this.viewFilter = filter;
+
+    if (shouldRender) {
+      this.filter();
+    }
+
+    return this;
+  },
+
+
+  // Clears the `viewFilter` and follows the same rules for rendering as `setFilter`.
+  removeFilter: function removeFilter(options) {
+    return this.setFilter(null, options);
+  },
+  _detachChildren: function _detachChildren(detachingViews) {
+    _.each(detachingViews, _.bind(this._detachChildView, this));
+  },
+  _detachChildView: function _detachChildView(view) {
+    var shouldTriggerDetach = !!view._isAttached;
+    if (shouldTriggerDetach) {
+      triggerMethodOn(view, 'before:detach', view);
+    }
+
+    this.detachHtml(view);
+
+    if (shouldTriggerDetach) {
+      view._isAttached = false;
+      triggerMethodOn(view, 'detach', view);
+    }
+  },
+
+
+  // Override this method to change how the collectionView detaches a child view
+  detachHtml: function detachHtml(view) {
+    this.detachEl(view.el);
+  },
+  _renderChildren: function _renderChildren(views) {
+    if (this.isEmpty(!views.length)) {
+      this._showEmptyView();
+      return;
+    }
+
+    this._destroyEmptyView();
+
+    this.triggerMethod('before:render:children', this, views);
+
+    var els = this._getBuffer(views);
+
+    this._attachChildren(els, views);
+
+    this.triggerMethod('render:children', this, views);
+  },
+  _attachChildren: function _attachChildren(els, views) {
+    var shouldTriggerAttach = !!this._isAttached;
+
+    views = shouldTriggerAttach ? views : [];
+
+    _.each(views, function (view) {
+      if (view._isAttached) {
+        return;
+      }
+      triggerMethodOn(view, 'before:attach', view);
+    });
+
+    this.attachHtml(this, els);
+
+    _.each(views, function (view) {
+      if (view._isAttached) {
+        return;
+      }
+      view._isAttached = true;
+      triggerMethodOn(view, 'attach', view);
+    });
+  },
+
+
+  // Renders each view in children and creates a fragment buffer from them
+  _getBuffer: function _getBuffer(views) {
+    var _this2 = this;
+
+    var elBuffer = this.createBuffer();
+
+    _.each(views, function (view) {
+      _this2._renderChildView(view);
+      _this2.appendChildren(elBuffer, view.el);
+    });
+
+    return elBuffer;
+  },
+  _renderChildView: function _renderChildView(view) {
+    if (view._isRendered) {
+      return;
+    }
+
+    if (!view.supportsRenderLifecycle) {
+      triggerMethodOn(view, 'before:render', view);
+    }
+
+    view.render();
+
+    if (!view.supportsRenderLifecycle) {
+      view._isRendered = true;
+      triggerMethodOn(view, 'render', view);
+    }
+  },
+
+
+  // Override this method to do something other than `.append`.
+  // You can attach any HTML at this point including the els.
+  attachHtml: function attachHtml(collectionView, els) {
+    this.appendChildren(collectionView.el, els);
+  },
+
+
+  // Render the child's view and add it to the HTML for the collection view at a given index, based on the current sort
+  addChildView: function addChildView(view, index) {
+    if (!view || view._isDestroyed) {
+      return view;
+    }
+
+    this._addChild(view, index);
+    this._showChildren();
+
+    return view;
+  },
+
+
+  // Detach a view from the children.  Best used when adding a
+  // childView from `addChildView`
+  detachChildView: function detachChildView(view) {
+    this.removeChildView(view, { shouldDetach: true });
+
+    return view;
+  },
+
+
+  // Remove the child view and destroy it.  Best used when adding a
+  // childView from `addChildView`
+  // The options argument is for internal use only
+  removeChildView: function removeChildView(view, options) {
+    if (!view) {
+      return view;
+    }
+
+    this._removeChildView(view, options);
+
+    this._removeChild(view);
+
+    if (this.isEmpty()) {
+      this._showEmptyView();
+    }
+
+    return view;
+  },
+  _removeChildViews: function _removeChildViews(views) {
+    _.each(views, _.bind(this._removeChildView, this));
+  },
+  _removeChildView: function _removeChildView(view) {
+    var _ref3 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        shouldDetach = _ref3.shouldDetach;
+
+    view.off('destroy', this.removeChildView, this);
+
+    if (shouldDetach) {
+      this._detachChildView(view);
+    } else {
+      this._destroyChildView(view);
+    }
+
+    this.stopListening(view);
+  },
+  _destroyChildView: function _destroyChildView(view) {
+    if (view._isDestroyed) {
+      return;
+    }
+
+    if (view.destroy) {
+      view.destroy();
+    } else {
+      destroyBackboneView(view);
+    }
+  },
+
+
+  // called by ViewMixin destroy
+  _removeChildren: function _removeChildren() {
+    this._destroyChildren();
+    this.emptyRegion.destroy();
+  },
+
+
+  // Destroy the child views that this collection view is holding on to, if any
+  _destroyChildren: function _destroyChildren() {
+    if (!this.children || !this.children.length) {
+      return;
+    }
+
+    this.triggerMethod('before:destroy:children', this);
+    this.children.each(_.bind(this._removeChildView, this));
+    this.triggerMethod('destroy:children', this);
+  }
+});
+
+_.extend(CollectionView$2.prototype, ViewMixin);
+
 // Composite View
 // --------------
 
-var ClassOptions$4 = ['childViewContainer', 'template', 'templateContext'];
+var ClassOptions$5 = ['childViewContainer', 'template', 'templateContext'];
 
 // Used for rendering a branch-leaf, hierarchical structure.
 // Extends directly from CollectionView
@@ -3773,7 +4727,7 @@ var CompositeView = CollectionView.extend({
   constructor: function constructor(options) {
     deprecate('CompositeView is deprecated. Convert to View at your earliest convenience');
 
-    this.mergeOptions(options, ClassOptions$4);
+    this.mergeOptions(options, ClassOptions$5);
 
     CollectionView.prototype.constructor.apply(this, arguments);
   },
@@ -3929,7 +4883,7 @@ var CompositeView = CollectionView.extend({
 
 // To prevent duplication but allow the best View organization
 // Certain View methods are mixed directly into the deprecated CompositeView
-var MixinFromView = _.pick(View.prototype, 'serializeModel', 'getTemplate', '_renderTemplate', 'mixinTemplateContext', 'attachElContent');
+var MixinFromView = _.pick(View.prototype, 'serializeModel', 'getTemplate', '_renderTemplate', '_renderHtml', 'mixinTemplateContext', 'attachElContent');
 _.extend(CompositeView.prototype, MixinFromView);
 
 // Behavior
@@ -3940,7 +4894,7 @@ _.extend(CompositeView.prototype, MixinFromView);
 // Behaviors allow you to blackbox View specific interactions
 // into portable logical chunks, keeping your views simple and your code DRY.
 
-var ClassOptions$5 = ['collectionEvents', 'events', 'modelEvents', 'triggers', 'ui'];
+var ClassOptions$6 = ['collectionEvents', 'events', 'modelEvents', 'triggers', 'ui'];
 
 var Behavior = MarionetteObject.extend({
   cidPrefix: 'mnb',
@@ -3951,9 +4905,15 @@ var Behavior = MarionetteObject.extend({
     // wants to directly talk up the chain
     // to the view.
     this.view = view;
+
+    if (this.defaults) {
+      deprecate('Behavior defaults are deprecated. For similar functionality set options on the Behavior class.');
+    }
+
     this.defaults = _.clone(_.result(this, 'defaults', {}));
+
     this._setOptions(this.defaults, options);
-    this.mergeOptions(this.options, ClassOptions$5);
+    this.mergeOptions(this.options, ClassOptions$6);
 
     // Construct an internal UI hash using
     // the behaviors UI hash and then the view UI hash.
@@ -3981,6 +4941,8 @@ var Behavior = MarionetteObject.extend({
   // Overrides Object#destroy to prevent additional events from being triggered.
   destroy: function destroy() {
     this.stopListening();
+
+    this.view._removeBehavior(this);
 
     return this;
   },
@@ -4056,7 +5018,7 @@ _.extend(Behavior.prototype, DelegateEntityEventsMixin, TriggersMixin, UIMixin);
 
 // Application
 // -----------
-var ClassOptions$6 = ['region', 'regionClass'];
+var ClassOptions$7 = ['region', 'regionClass'];
 
 // A container for a Marionette application.
 var Application = MarionetteObject.extend({
@@ -4065,7 +5027,7 @@ var Application = MarionetteObject.extend({
   constructor: function constructor(options) {
     this._setOptions(options);
 
-    this.mergeOptions(options, ClassOptions$6);
+    this.mergeOptions(options, ClassOptions$7);
 
     this._initRegion();
 
@@ -4132,13 +5094,13 @@ var Application = MarionetteObject.extend({
 //
 // You can also add standard routes to an AppRouter.
 
-var ClassOptions$7 = ['appRoutes', 'controller'];
+var ClassOptions$8 = ['appRoutes', 'controller'];
 
 var AppRouter = Backbone.Router.extend({
   constructor: function constructor(options) {
     this._setOptions(options);
 
-    this.mergeOptions(options, ClassOptions$7);
+    this.mergeOptions(options, ClassOptions$8);
 
     Backbone.Router.apply(this, arguments);
 
@@ -4262,6 +5224,7 @@ Marionette.Renderer = Renderer;
 Marionette.TemplateCache = TemplateCache;
 Marionette.View = View;
 Marionette.CollectionView = CollectionView;
+Marionette.NextCollectionView = CollectionView$2;
 Marionette.CompositeView = CompositeView;
 Marionette.Behavior = Behavior;
 Marionette.Region = Region;
@@ -6714,7 +7677,7 @@ var _logger = require('./logger');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var VERSION = '4.0.5';
+var VERSION = '4.0.8';
 exports.VERSION = VERSION;
 var COMPILER_REVISION = 7;
 
@@ -8851,7 +9814,7 @@ JavaScriptCompiler.prototype = {
     var params = [],
         paramsInit = this.setupHelperArgs(name, paramSize, params, blockHelper);
     var foundHelper = this.nameLookup('helpers', name, 'helper'),
-        callContext = this.aliasable(this.contextName(0) + ' != null ? ' + this.contextName(0) + ' : {}');
+        callContext = this.aliasable(this.contextName(0) + ' != null ? ' + this.contextName(0) + ' : (container.nullContext || {})');
 
     return {
       params: params,
@@ -8985,10 +9948,11 @@ module.exports = exports['default'];
 
 
 },{"../base":20,"../exception":33,"../utils":46,"./code-gen":23}],27:[function(require,module,exports){
-/* istanbul ignore next */
+// File ignored in coverage tests via setting in .istanbul.yml
 /* Jison generated parser */
 "use strict";
 
+exports.__esModule = true;
 var handlebars = (function () {
     var parser = { trace: function trace() {},
         yy: {},
@@ -9720,8 +10684,8 @@ var handlebars = (function () {
         this.yy = {};
     }Parser.prototype = parser;parser.Parser = Parser;
     return new Parser();
-})();exports.__esModule = true;
-exports['default'] = handlebars;
+})();exports["default"] = handlebars;
+module.exports = exports["default"];
 
 
 },{}],28:[function(require,module,exports){
@@ -10363,7 +11327,10 @@ function Exception(message, node) {
       // Work around issue under safari where we can't directly set the column value
       /* istanbul ignore next */
       if (Object.defineProperty) {
-        Object.defineProperty(this, 'column', { value: column });
+        Object.defineProperty(this, 'column', {
+          value: column,
+          enumerable: true
+        });
       } else {
         this.column = column;
       }
@@ -10920,6 +11887,8 @@ function template(templateSpec, env) {
 
       return obj;
     },
+    // An empty object to use as replacement for null-contexts
+    nullContext: Object.seal({}),
 
     noop: env.VM.noop,
     compilerInfo: templateSpec.compiler
@@ -10987,7 +11956,7 @@ function wrapProgram(container, i, fn, data, declaredBlockParams, blockParams, d
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
     var currentDepths = depths;
-    if (depths && context != depths[0]) {
+    if (depths && context != depths[0] && !(context === container.nullContext && depths[0] === null)) {
       currentDepths = [context].concat(depths);
     }
 
@@ -11005,12 +11974,7 @@ function wrapProgram(container, i, fn, data, declaredBlockParams, blockParams, d
 function resolvePartial(partial, context, options) {
   if (!partial) {
     if (options.name === '@partial-block') {
-      var data = options.data;
-      while (data['partial-block'] === noop) {
-        data = data._parent;
-      }
-      partial = data['partial-block'];
-      data['partial-block'] = noop;
+      partial = options.data['partial-block'];
     } else {
       partial = options.partials[options.name];
     }
@@ -11023,6 +11987,8 @@ function resolvePartial(partial, context, options) {
 }
 
 function invokePartial(partial, context, options) {
+  // Use the current closure context to save the partial-block if this partial
+  var currentPartialBlock = options.data && options.data['partial-block'];
   options.partial = true;
   if (options.ids) {
     options.data.contextPath = options.ids[0] || options.data.contextPath;
@@ -11030,12 +11996,23 @@ function invokePartial(partial, context, options) {
 
   var partialBlock = undefined;
   if (options.fn && options.fn !== noop) {
-    options.data = _base.createFrame(options.data);
-    partialBlock = options.data['partial-block'] = options.fn;
+    (function () {
+      options.data = _base.createFrame(options.data);
+      // Wrapper function to get access to currentPartialBlock from the closure
+      var fn = options.fn;
+      partialBlock = options.data['partial-block'] = function partialBlockWrapper(context) {
+        var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-    if (partialBlock.partials) {
-      options.partials = Utils.extend({}, options.partials, partialBlock.partials);
-    }
+        // Restore the partial-block from the closure for the execution of the block
+        // i.e. the part inside the block of the partial call.
+        options.data = _base.createFrame(options.data);
+        options.data['partial-block'] = currentPartialBlock;
+        return fn(context, options);
+      };
+      if (fn.partials) {
+        options.partials = Utils.extend({}, options.partials, fn.partials);
+      }
+    })();
   }
 
   if (partial === undefined && partialBlock) {
@@ -40520,6 +41497,10 @@ process.off = noop;
 process.removeListener = noop;
 process.removeAllListeners = noop;
 process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
 
 process.binding = function (name) {
     throw new Error('process.binding is not supported');
