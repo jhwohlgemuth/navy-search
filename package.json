@@ -37,7 +37,7 @@
     "npmlog": "^4.1.0",
     "opbeat": "^4.13.1",
     "remarkable": "^1.7.1",
-    "request-promise": "^4.2.0",
+    "request-promise": "4.2.0",
     "uuid": "^3.0.1",
     "ws": "^2.3.1",
     "x-ray": "^2.3.2",
