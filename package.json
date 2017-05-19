@@ -44,7 +44,7 @@
     "yargs": "^7.1.0"
   },
   "devDependencies": {
-    "apidoc": "^0.17.5",
+    "apidoc": "0.17.5",
     "bunyan": "^1.8.10",
     "chai": "^3.5.0",
     "chalk": "^1.1.3",
