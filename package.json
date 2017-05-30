@@ -60,6 +60,7 @@
     "nsp": "^2.6.3",
     "proxyquire": "^1.8.0",
     "sinon": "^2.3.2",
+    "stmux": "^1.4.10",
     "supertest": "^3.0.0",
     "watch": "^1.0.2"
   },
@@ -68,8 +69,9 @@
     "xprestart": "npm run scan",
     "start": "node index.js",
     "populate": "node ./bin/populate",
+    "populate:alnav": "npm run populate -- --type ALNAV",
     "update": "node ./bin/update",
-    "dev": "nodemon index.js",
+    "dev": "stmux [ \"nodemon index.js\" .. \"npm run lint:watch\" ]",
     "lint": "eslint --fix -c ./config/.eslintrc.js --ignore-path ./config/.eslintignore ./web",
     "lint:watch": "watch 'npm run lint' ./web",
     "docs": "apidoc -i ./web -o ./web/apidocs",

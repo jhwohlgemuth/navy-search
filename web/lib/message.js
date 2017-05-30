@@ -39,12 +39,10 @@ const ERROR_LOOKUP = {
     }
 };
 const FAIL_TEXT = 'intentionally left blank';
-const searchMessages = _.partial(search, Message);
 
 module.exports = {
     getMessage,
     getMessages,
-    searchMessages,
     parseMessageId,
     parseMessageUri,
     createMessageId,
@@ -56,7 +54,8 @@ module.exports = {
     scrapeMessageData,
     attemptRequest,
     maybeRequest,
-    isRequestFail
+    isRequestFail,
+    searchMessages: _.partial(search, Message)
 };
 
 function attemptRequest(options) {
