@@ -13,6 +13,7 @@ var fs         = require('fs-extra');
 var config     = require('config');
 var express    = require('express');
 var bunyan     = require('bunyan');
+var bugsnag    = require('bugsnag');
 var session    = require('express-session');
 var lusca      = require('lusca');
 var helmet     = require('helmet');
@@ -21,6 +22,8 @@ var hljs       = require('highlight.js');
 var Remarkable = require('remarkable');
 var message    = require('./routes/message');
 var messages   = require('./routes/messages');
+
+bugsnag.register(process.env.BUGSNAG_API_KEY);
 
 var log = bunyan.createLogger({
     name: 'message',
@@ -34,7 +37,6 @@ var log = bunyan.createLogger({
         }
     ]
 });
-
 var md = new Remarkable({
     highlight: function(str, lang) {
         if (lang && hljs.getLanguage(lang)) {
@@ -48,7 +50,6 @@ var md = new Remarkable({
         return '';
     }
 });
-
 var PRECONDITION_FAILED = 412;
 
 var app = express()
@@ -83,7 +84,9 @@ var app = express()
     .use(helmet.ieNoOpen())
     .use(helmet.referrerPolicy({policy: 'no-referrer'}))
     .use(compress())                        /** Use gzip compression **/
-    .use(express.static(__dirname));        /** Serve static files **/
+    .use(express.static(__dirname))         /** Serve static files **/
+    .use(bugsnag.requestHandler)
+    .use(bugsnag.errorHandler);
 
 app.get('/loaderio-fcb6df7ac290a70c00036985de13836f', function(req, res) {
     if (res.get('X-CSRF') === req.sessionID) {
