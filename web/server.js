@@ -112,5 +112,5 @@ app.get('/api/docs', function(req, res) {
 var VERSION = app.get('version');
 app.use(`/api/v${VERSION}/message`, message);
 app.use(`/api/v${VERSION}/messages`, messages);
-bugsnag.notify(new Error('Non-fatal'));
+
 module.exports = app;
