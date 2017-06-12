@@ -35,7 +35,6 @@
     "mongoose": "^4.9.5",
     "navy-message-parser": "0.0.7",
     "npmlog": "^4.1.0",
-    "opbeat": "^4.14.0",
     "remarkable": "^1.7.1",
     "request-promise": "^4.2.1",
     "uuid": "^3.0.1",
