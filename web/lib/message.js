@@ -168,12 +168,10 @@ function getMessages(options) {
 function search(model, searchStrings) {
     var score = {$meta: 'textScore'};
     var results = searchStrings.map((str) => {
+        var $text = {$search: str};
         return model
-            .find(
-                {$text: {$search: str}},
-                {score: score}
-            )
-            .sort({score: score})
+            .find({$text}, {score})
+            .sort({score})
             .exec();
     });
     return Bluebird.all(results);
