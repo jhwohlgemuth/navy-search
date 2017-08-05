@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "apidoc": "^0.17.6",
-    "chai": "^3.5.0",
+    "chai": "^4.1.1",
     "chalk": "^2.0.0",
     "coveralls": "^2.13.0",
     "eslint": "^4.1.0",
