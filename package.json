@@ -41,7 +41,8 @@
     "uuid": "^3.0.1",
     "ws": "^3.0.0",
     "x-ray": "^2.3.2",
-    "yargs": "^8.0.1"
+    "yargs": "^8.0.1",
+    "snyk": "^1.41.1"
   },
   "devDependencies": {
     "apidoc": "^0.17.6",
@@ -76,6 +77,9 @@
     "mocha:watch": "npm run mocha -- -w",
     "pretest": "npm run lint",
     "test": "istanbul cover _mocha",
-    "travis": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
-  }
+    "travis": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
+  },
+  "snyk": true
 }
