@@ -48,7 +48,7 @@
     "chai": "^3.5.0",
     "chalk": "^2.0.0",
     "coveralls": "^3.0.0",
-    "eslint": "^4.1.0",
+    "eslint": "^5.14.1",
     "eslint-config-omaha-prime-grade": "^4.0.1",
     "istanbul": "^0.4.5",
     "mocha": "^3.4.2",
